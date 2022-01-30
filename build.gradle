@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'org.dochub.idea'
-version '1.0-SNAPSHOT'
+version '1.4-beta'
 
 repositories {
     mavenCentral()
@@ -22,8 +22,13 @@ intellij {
 }
 patchPluginXml {
     changeNotes = """
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>"""
+      Bata version of DocHub Plugin<br>
+      <em>
+          <ul>
+            <li>Helps to describe the architecture through autocomplete</li>
+          <ul>  
+      </em>
+      """
 }
 test {
     useJUnitPlatform()
