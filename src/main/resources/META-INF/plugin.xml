@@ -1,0 +1,35 @@
+<idea-plugin>
+    <id>org.dochub.idea.arch</id>
+    <name>DocHub Architecture as code</name>
+    <vendor email="r.piontik@mail.ru" url="https://dochub.info">DocHub</vendor>
+
+    <description><![CDATA[
+        Плагин для управления архитектурой как кодом.
+    ]]></description>
+
+    <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html
+         on how to target different products -->
+    <depends>com.intellij.modules.platform</depends>
+    <depends>org.jetbrains.plugins.yaml</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <completion.contributor
+                language="yaml"
+                implementationClass="org.dochub.idea.arch.completions.YamlCompletion"
+        />
+        <localInspection
+                implementationClass="org.dochub.idea.arch.inspections.YamlInspection"
+                bundle="package org.dochub.idea.arch.DocHubBundle"
+                key="inspection.display-name"
+                groupKey="inspection.group"
+                level="WARNING"
+                enabledByDefault="true"
+                runForWholeFile="true"
+                language="yaml"
+        />
+    </extensions>
+
+    <actions>
+        <!-- Add your actions here -->
+    </actions>
+</idea-plugin>
