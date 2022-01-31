@@ -10,6 +10,7 @@ import org.dochub.idea.arch.completions.providers.contexts.umlNotations;
 import org.dochub.idea.arch.completions.providers.forms.FormItem;
 import org.dochub.idea.arch.completions.providers.forms.FormItemField;
 import org.dochub.idea.arch.completions.providers.forms.FormItemFieldRequired;
+import org.dochub.idea.arch.completions.providers.imports.ImportItem;
 import org.dochub.idea.arch.completions.providers.technologies.ItemsItem;
 import org.dochub.idea.arch.completions.providers.technologies.SectionItem;
 import org.dochub.idea.arch.inspections.YamlInspection;
@@ -33,7 +34,9 @@ public class YamlCompletion extends CompletionContributor {
             new Docs(),
             new Technologies(),
                 new SectionItem(),
-                new ItemsItem()
+                new ItemsItem(),
+            new Imports(),
+                new ImportItem()
     };
 
     public YamlCompletion() {
