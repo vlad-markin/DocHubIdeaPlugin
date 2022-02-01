@@ -9,7 +9,7 @@ import org.dochub.idea.arch.completions.providers.CustomProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.yaml.psi.YAMLKeyValue;
 
-public class extralinks extends CustomProvider {
+public class Extralinks extends CustomProvider {
     private static String keyword = "extra-links";
     private static final String[] keys = {
             "true", "false"

@@ -3,10 +3,14 @@ package org.dochub.idea.arch.completions;
 import com.intellij.codeInsight.completion.*;
 import com.intellij.openapi.diagnostic.Logger;
 import org.dochub.idea.arch.completions.providers.*;
+import org.dochub.idea.arch.completions.providers.components.ComponentAspects;
 import org.dochub.idea.arch.completions.providers.components.Links;
-import org.dochub.idea.arch.completions.providers.contexts.extralinks;
-import org.dochub.idea.arch.completions.providers.contexts.uml;
-import org.dochub.idea.arch.completions.providers.contexts.umlNotations;
+import org.dochub.idea.arch.completions.providers.contexts.ContextComponents;
+import org.dochub.idea.arch.completions.providers.contexts.Uml;
+import org.dochub.idea.arch.completions.providers.contexts.UmlNotations;
+import org.dochub.idea.arch.completions.providers.contexts.Extralinks;
+import org.dochub.idea.arch.completions.providers.docs.DocRef;
+import org.dochub.idea.arch.completions.providers.docs.DocSource;
 import org.dochub.idea.arch.completions.providers.forms.FormItem;
 import org.dochub.idea.arch.completions.providers.forms.FormItemField;
 import org.dochub.idea.arch.completions.providers.forms.FormItemFieldRequired;
@@ -20,11 +24,13 @@ public class YamlCompletion extends CompletionContributor {
     private static final CustomProvider[] providers = {
             new Root(),
             new Contexts(),
-                new extralinks(),
-                new uml(),
-                    new umlNotations(),
+                new Extralinks(),
+                new Uml(),
+                    new UmlNotations(),
+                new ContextComponents(),
             new Components(),
                 new Links(),
+                new ComponentAspects(),
             new Forms(),
                 new FormItem(),
                     new FormItemField(),
@@ -32,6 +38,8 @@ public class YamlCompletion extends CompletionContributor {
             new Aspects(),
             new Namespaces(),
             new Docs(),
+                new DocSource(),
+                new DocRef(),
             new Technologies(),
                 new SectionItem(),
                 new ItemsItem(),

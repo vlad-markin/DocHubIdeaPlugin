@@ -1,4 +1,4 @@
-package org.dochub.idea.arch.completions.providers.imports;
+package org.dochub.idea.arch.completions.providers.docs;
 
 import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
@@ -9,7 +9,6 @@ import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import org.dochub.idea.arch.completions.providers.CustomProvider;
-import org.dochub.idea.arch.utils.PsiUtils;
 import org.dochub.idea.arch.utils.SuggestUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.yaml.psi.YAMLDocument;
@@ -17,22 +16,21 @@ import org.jetbrains.yaml.psi.YAMLKeyValue;
 
 import java.util.List;
 
-public class ImportItem extends CustomProvider {
-    private static String keyword = "imports";
+public class DocSource extends CustomProvider {
+    private static String keywordBlock = "docs";
+    private static String keywordField = "source";
 
     public static final ElementPattern<? extends PsiElement> rootPattern = PlatformPatterns.or(
             PlatformPatterns.psiElement()
-                    .withSuperParent(4,
+                    .withSuperParent(2,
                             psi(YAMLKeyValue.class)
-                                    .withName(PlatformPatterns.string().equalTo(keyword))
-                                    .withSuperParent(2, psi(YAMLDocument.class))
-                    ),
-            PlatformPatterns.psiElement()
-                    .withSuperParent(5,
-                            psi(YAMLKeyValue.class)
-                                    .withName(PlatformPatterns.string().equalTo(keyword))
-                                    .withSuperParent(2, psi(YAMLDocument.class))
+                                    .withName(PlatformPatterns.string().equalTo(keywordField))
                     )
+                    .withSuperParent(6,
+                            psi(YAMLKeyValue.class)
+                                    .withName(PlatformPatterns.string().equalTo(keywordBlock))
+                    )
+                    .withSuperParent(8, psi(YAMLDocument.class))
     );
 
     @Override
@@ -52,8 +50,9 @@ public class ImportItem extends CustomProvider {
                             if (thisFile != null) {
                                 List<String> suggests = SuggestUtils.scanDirByContext(
                                         thisFile.getParent().getPath(),
-                                        PsiUtils.getText(parameters.getPosition().getContext()),
-                                        new String[]{".yaml"}
+                                        parameters.getPosition().getContext().getText()
+                                                .replaceFirst("IntellijIdeaRulezzz", ""),
+                                        new String[]{".yaml", ".md", ".puml"}
                                 );
 
                                 for (String suggest : suggests) {

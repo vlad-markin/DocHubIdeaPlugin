@@ -7,9 +7,7 @@ import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import org.dochub.idea.arch.completions.providers.CustomProvider;
-import org.dochub.idea.arch.completions.providers.contexts.uml;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.yaml.psi.YAMLDocument;
 import org.jetbrains.yaml.psi.YAMLKeyValue;
 
 public class FormItemField extends CustomProvider {
