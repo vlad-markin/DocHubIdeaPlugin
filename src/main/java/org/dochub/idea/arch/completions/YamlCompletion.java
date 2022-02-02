@@ -3,12 +3,8 @@ package org.dochub.idea.arch.completions;
 import com.intellij.codeInsight.completion.*;
 import com.intellij.openapi.diagnostic.Logger;
 import org.dochub.idea.arch.completions.providers.*;
-import org.dochub.idea.arch.completions.providers.components.ComponentAspects;
-import org.dochub.idea.arch.completions.providers.components.Links;
-import org.dochub.idea.arch.completions.providers.contexts.ContextComponents;
-import org.dochub.idea.arch.completions.providers.contexts.Uml;
-import org.dochub.idea.arch.completions.providers.contexts.UmlNotations;
-import org.dochub.idea.arch.completions.providers.contexts.Extralinks;
+import org.dochub.idea.arch.completions.providers.components.*;
+import org.dochub.idea.arch.completions.providers.contexts.*;
 import org.dochub.idea.arch.completions.providers.docs.DocRef;
 import org.dochub.idea.arch.completions.providers.docs.DocSource;
 import org.dochub.idea.arch.completions.providers.forms.FormItem;
@@ -28,8 +24,13 @@ public class YamlCompletion extends CompletionContributor {
                 new Uml(),
                     new UmlNotations(),
                 new ContextComponents(),
+                new ContextLocation(),
             new Components(),
-                new Links(),
+                new ComponentID(),
+                new ComponentEntity(),
+                new ComponentLinks(),
+                    new ComponentLinksID(),
+                    new ComponentLinksDirection(),
                 new ComponentAspects(),
             new Forms(),
                 new FormItem(),

@@ -8,6 +8,7 @@ import com.intellij.patterns.PlatformPatterns;
 import com.intellij.util.ProcessingContext;
 import org.dochub.idea.arch.completions.providers.Contexts;
 import org.dochub.idea.arch.completions.providers.CustomProvider;
+import org.dochub.idea.arch.utils.PsiUtils;
 import org.dochub.idea.arch.utils.SuggestUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.yaml.psi.YAMLKeyValue;
@@ -38,6 +39,7 @@ public class ContextComponents extends CustomProvider {
                         List<String> ids = SuggestUtils.scanYamlStringToID(
                                 parameters.getEditor().getDocument().getText()
                                 , keyword
+                                , PsiUtils.getText(parameters.getPosition().getContext())
                         );
                         for (String id : ids) {
                             resultSet.addElement(LookupElementBuilder.create(id));
