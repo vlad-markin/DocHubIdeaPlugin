@@ -17,6 +17,9 @@
                 language="yaml"
                 implementationClass="org.dochub.idea.arch.completions.YamlCompletion"
         />
+        <!--
+        <fileBasedIndex implementation="org.dochub.idea.arch.indexing.YamlIndex"/>
+        -->
         <localInspection
                 implementationClass="org.dochub.idea.arch.inspections.YamlInspection"
                 bundle="package org.dochub.idea.arch.DocHubBundle"

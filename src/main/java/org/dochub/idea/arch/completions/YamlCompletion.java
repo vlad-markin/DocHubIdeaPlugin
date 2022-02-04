@@ -3,10 +3,12 @@ package org.dochub.idea.arch.completions;
 import com.intellij.codeInsight.completion.*;
 import com.intellij.openapi.diagnostic.Logger;
 import org.dochub.idea.arch.completions.providers.*;
+import org.dochub.idea.arch.completions.providers.aspects.AspectID;
 import org.dochub.idea.arch.completions.providers.components.*;
 import org.dochub.idea.arch.completions.providers.contexts.*;
 import org.dochub.idea.arch.completions.providers.docs.DocRef;
 import org.dochub.idea.arch.completions.providers.docs.DocSource;
+import org.dochub.idea.arch.completions.providers.docs.DocsID;
 import org.dochub.idea.arch.completions.providers.forms.FormItem;
 import org.dochub.idea.arch.completions.providers.forms.FormItemField;
 import org.dochub.idea.arch.completions.providers.forms.FormItemFieldRequired;
@@ -32,15 +34,18 @@ public class YamlCompletion extends CompletionContributor {
                     new ComponentLinksID(),
                     new ComponentLinksDirection(),
                 new ComponentAspects(),
+                new ComponentContractID(),
             new Forms(),
                 new FormItem(),
                     new FormItemField(),
                         new FormItemFieldRequired(),
             new Aspects(),
+                new AspectID(),
             new Namespaces(),
             new Docs(),
                 new DocSource(),
                 new DocRef(),
+                new DocsID(),
             new Technologies(),
                 new SectionItem(),
                 new ItemsItem(),

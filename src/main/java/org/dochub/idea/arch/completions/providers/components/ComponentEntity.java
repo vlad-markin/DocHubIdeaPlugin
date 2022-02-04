@@ -15,7 +15,8 @@ public class ComponentEntity extends CustomProvider {
     private static final String[] keys = {
             "package", "node", "folder", "frame", "cloud", "database", "interface",
             "actor", "usecase", "boundary", "control", "entity", "collections", "queue",
-            "card", "circle", "file", "hexagon", "label", "person", "stack", "storage"
+            "card", "circle", "file", "hexagon", "label", "person", "stack", "storage",
+            "component"
     };
 
     @Override

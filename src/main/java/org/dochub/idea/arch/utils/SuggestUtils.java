@@ -1,5 +1,7 @@
 package org.dochub.idea.arch.utils;
 
+import com.intellij.AbstractBundle;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ObjectUtils;
 import org.jetbrains.yaml.psi.YAMLDocument;
@@ -10,8 +12,10 @@ import java.io.*;
 import java.util.*;
 
 public class SuggestUtils {
+    private static final Logger LOG = Logger.getInstance(SuggestUtils.class);
+
     public static List<String> scanDirByContext(String basePath, String context, String[] extensions) {
-        List<String> result = new ArrayList<String>();;
+        List<String> result = new ArrayList<String>();
         String prefix =
                 context.startsWith("../") ? context.substring(3) :
                         context.equals(".") || context.equals("..") ? "" : context;
@@ -77,25 +81,18 @@ public class SuggestUtils {
         return result;
     }
 
-    public static List<String> scanYamlPsiTreeToID(PsiElement element, String section, String context) {
-        PsiElement document = element;
+    public static List<String> scanYamlPsiTreeToID(PsiElement document, String section) {
         List<String> result = new ArrayList<>();
-        while (document != null) {
-            if (ObjectUtils.tryCast(document,  YAMLDocument.class) != null)
-                break;
-            document = document.getParent();
-        }
-        if (document != null) {
-            PsiElement[] yamlSections = document.getFirstChild().getChildren();
-            for (PsiElement yamlSection : yamlSections) {
-                YAMLKeyValue yamlKey = ObjectUtils.tryCast(yamlSection,  YAMLKeyValue.class);
-                if (yamlKey != null && PsiUtils.getText(yamlKey.getKey()).equals(section)) {
-                    PsiElement[] yamlIDs = yamlSection.getLastChild().getChildren();
-                    for (PsiElement id : yamlIDs ) {
-                        YAMLKeyValue yamlID = ObjectUtils.tryCast(id,  YAMLKeyValue.class);
-                        if (yamlID != null) {
-                            appendDividerItem(result, PsiUtils.getText(yamlID.getKey()), context, ".");
-                        }
+        PsiElement[] yamlSections = document.getFirstChild().getChildren();
+        for (PsiElement yamlSection : yamlSections) {
+            YAMLKeyValue yamlKey = ObjectUtils.tryCast(yamlSection,  YAMLKeyValue.class);
+            if (yamlKey != null && PsiUtils.getText(yamlKey.getKey()).equals(section)) {
+                PsiElement[] yamlIDs = yamlSection.getLastChild().getChildren();
+                for (PsiElement id : yamlIDs ) {
+                    YAMLKeyValue yamlID = ObjectUtils.tryCast(id,  YAMLKeyValue.class);
+                    if (yamlID != null) {
+                        // appendDividerItem(result, PsiUtils.getText(yamlID.getKey()), context, ".");
+                        result.add(PsiUtils.getText(yamlID.getKey()));
                     }
                 }
             }
@@ -130,7 +127,8 @@ public class SuggestUtils {
                                 // Если нашли поле location
                                 String key = PsiUtils.getText(yamlField.getKey());
                                 if (yamlField != null && key.equals("location")) {
-                                    appendDividerItem(result, PsiUtils.getText(field.getLastChild()), context, "/");
+                                    // appendDividerItem(result, PsiUtils.getText(field.getLastChild()), context, "/");
+                                    result.add(PsiUtils.getText(yamlID.getKey()));
                                 }
                             }
                         }
