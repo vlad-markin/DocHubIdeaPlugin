@@ -1,4 +1,4 @@
-package org.dochub.idea.arch.references.providers.imports;
+package org.dochub.idea.arch.references.providers;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
@@ -16,7 +16,7 @@ import org.jetbrains.yaml.psi.YAMLDocument;
 import org.jetbrains.yaml.psi.YAMLKeyValue;
 import org.jetbrains.yaml.psi.YAMLSequenceItem;
 
-public class ReferencesProvider extends BaseReferencesProvider {
+public class RefImports extends BaseReferencesProvider {
     private static String keyword = "imports";
 
     private class FileSourceReference extends PsiReferenceBase {

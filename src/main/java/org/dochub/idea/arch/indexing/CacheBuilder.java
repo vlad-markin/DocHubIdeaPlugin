@@ -1,7 +1,14 @@
 package org.dochub.idea.arch.indexing;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.Key;
+import com.intellij.psi.PsiManager;
+import com.intellij.psi.util.CachedValueProvider;
+import com.intellij.psi.util.CachedValuesManager;
+import com.intellij.psi.util.PsiModificationTracker;
+import org.dochub.idea.arch.completions.providers.suggets.BaseSuggest;
+import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
@@ -109,22 +116,38 @@ public class CacheBuilder {
         parseYamlManifest(project.getBasePath() + "/" + rootManifest, context);
 
         return context;
-
-//        File envLocal = new File(project.getBasePath() + )
-//        File dir = new File(project.getBasePath() + relativePath);
-//        File[] listFiles = dir.listFiles();
-//        if (listFiles != null) {
-//            for (File f : listFiles) {
-//                String path = relativePath + "/" + f.getName();
-//                if (f.isDirectory()) {
-//                    rebuildForProject(project, path);
-//                } else if (path.endsWith(".yaml")) {
-//                    VirtualFile file = VirtualFileSystemUtils.findFile(path, project);
-//                    VirtualFile file2 = file;
-//                }
-//            }
-//        }
-//        VirtualFile[] vFiles = ProjectRootManager.getInstance(project).getContentRootsFromAllModules();
-//        String sourceRootsList = Arrays.stream(vFiles).map(VirtualFile::getUrl).collect(Collectors.joining("\n"));
     }
+
+    private static Key cacheProjectKey = Key.create("dochub-global");
+
+    private static class GlobalCacheProvider implements CachedValueProvider {
+        private Project project;
+
+        public GlobalCacheProvider(Project project) {
+            this.project = project;
+        }
+
+        @Override
+        public @Nullable Result compute() {
+            return Result.create(
+                    CacheBuilder.buildForProject(project),
+                    PsiModificationTracker.MODIFICATION_COUNT,
+                    ProjectRootManager.getInstance(project));
+        }
+    }
+
+    private static GlobalCacheProvider globalCacheProvider = null;
+
+    public static Map<String, Object> getProjectCache(Project project) {
+        if (globalCacheProvider == null) {
+            globalCacheProvider = new GlobalCacheProvider(project);
+        }
+        CachedValuesManager cacheManager = CachedValuesManager.getManager(project);
+        return (Map<String, Object>) cacheManager.getCachedValue(
+                PsiManager.getInstance(project).findFile(project.getProjectFile()),
+                cacheProjectKey,
+                globalCacheProvider
+        );
+    }
+
 }
