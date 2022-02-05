@@ -17,7 +17,7 @@ import org.jetbrains.yaml.psi.YAMLScalar;
 
 public class Root extends CustomProvider {
     private static final String[] rootKeys = {
-            "aspects", "components", "contexts", "docs", "forms", "import", "namespaces", "technologies"
+            "aspects", "components", "contexts", "docs", "forms", "imports", "namespaces", "technologies"
     };
 
     private static PatternCondition<PsiElement> isNextLine = new PatternCondition<PsiElement>("") {

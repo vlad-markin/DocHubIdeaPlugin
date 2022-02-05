@@ -1,4 +1,4 @@
-package org.dochub.idea.arch.completions.providers.idsuggets;
+package org.dochub.idea.arch.completions.providers.suggets;
 
 public class LocationSuggestContexts extends LocationSuggest {
     @Override

@@ -2,7 +2,9 @@ package org.dochub.idea.arch.completions.providers;
 
 import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.patterns.ElementPattern;
 import com.intellij.patterns.PlatformPatterns;
+import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.yaml.YAMLTokenTypes;
@@ -17,11 +19,13 @@ public class Docs extends CustomProvider {
             "icon", "location", "description", "type", "subjects", "source"
     };
 
+    public static final ElementPattern<? extends PsiElement> rootPattern = Root.makeRootPattern(keyword);
+
     @Override
     public void appendToCompletion(CompletionContributor completion) {
         completion.extend(
                 CompletionType.BASIC,
-                Root.makeRootPattern(keyword),
+                rootPattern,
                 new CompletionProvider<>() {
                     public void addCompletions(@NotNull CompletionParameters parameters,
                                                @NotNull ProcessingContext context,

@@ -9,6 +9,7 @@ import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import org.dochub.idea.arch.completions.providers.CustomProvider;
+import org.dochub.idea.arch.completions.providers.Docs;
 import org.dochub.idea.arch.utils.SuggestUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.yaml.psi.YAMLDocument;
@@ -17,20 +18,15 @@ import org.jetbrains.yaml.psi.YAMLKeyValue;
 import java.util.List;
 
 public class DocSource extends CustomProvider {
-    private static String keywordBlock = "docs";
-    private static String keywordField = "source";
+    private static String keyword = "source";
 
     public static final ElementPattern<? extends PsiElement> rootPattern = PlatformPatterns.or(
             PlatformPatterns.psiElement()
                     .withSuperParent(2,
                             psi(YAMLKeyValue.class)
-                                    .withName(PlatformPatterns.string().equalTo(keywordField))
+                                    .withName(PlatformPatterns.string().equalTo(keyword))
+                                    .and(Docs.rootPattern)
                     )
-                    .withSuperParent(6,
-                            psi(YAMLKeyValue.class)
-                                    .withName(PlatformPatterns.string().equalTo(keywordBlock))
-                    )
-                    .withSuperParent(8, psi(YAMLDocument.class))
     );
 
     @Override

@@ -1,19 +1,12 @@
 package org.dochub.idea.arch.indexing;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.Key;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.util.CachedValueProvider;
-import com.intellij.psi.util.CachedValuesManager;
-import org.apache.commons.collections.MapIterator;
-import org.dochub.idea.arch.utils.VirtualFileSystemUtils;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class CacheBuilder {
@@ -60,11 +53,17 @@ public class CacheBuilder {
                                                  String path,
                                                  Map<String, Object> context) {
         Map<String, Object> yamlSection = (Map<String, Object>) yaml.get(section);
-        Map<String, Object> cacheAspectIDs = getCacheSection(section, context);
+        Map<String, Object> cacheIDs = getCacheSection(section, context);
         if (yamlSection != null) {
-            for ( String aspectID : yamlSection.keySet()) {
-                Map<String, Object> files = getCacheSection(aspectID, cacheAspectIDs);
-                files.put(path, new CacheFileData());
+            for ( String id : yamlSection.keySet()) {
+                Map<String, Object> files = getCacheSection(id, cacheIDs);
+                String location = null;
+                try {
+                    Map<String, Object> fields = (Map<String, Object>) yamlSection.get(id);
+                    if (fields != null)
+                        location = (String) fields.get("location");
+                } catch (ClassCastException e) {}
+                files.put(path, new CacheFileData(location));
             }
         }
     }
@@ -83,9 +82,6 @@ public class CacheBuilder {
     private static void parseYamlManifest(String path, Map<String, Object> context) {
         Yaml yaml = new Yaml();
         try {
-            if (path.endsWith("systems.yaml")) {
-                Integer a = 1;
-            }
             InputStream inputStream = new FileInputStream(path);
             Map<String, Object> sections = yaml.load(inputStream);
             parseYamlManifestImports(sections, path, context);

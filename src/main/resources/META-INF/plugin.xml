@@ -17,9 +17,11 @@
                 language="yaml"
                 implementationClass="org.dochub.idea.arch.completions.YamlCompletion"
         />
+        <psi.referenceContributor
+                language="yaml"
+                implementation="org.dochub.idea.arch.references.ReferenceContributor"/>
         <!--
         <fileBasedIndex implementation="org.dochub.idea.arch.indexing.YamlIndex"/>
-        -->
         <localInspection
                 implementationClass="org.dochub.idea.arch.inspections.YamlInspection"
                 bundle="package org.dochub.idea.arch.DocHubBundle"
@@ -30,6 +32,7 @@
                 runForWholeFile="true"
                 language="yaml"
         />
+        -->
     </extensions>
 
     <actions>

@@ -101,7 +101,7 @@ public class SuggestUtils {
         return result;
     }
 
-    public static List<String> scanYamlPsiTreeToLocation(PsiElement element, String section, String context) {
+    public static List<String> scanYamlPsiTreeToLocation(PsiElement element, String section) {
         PsiElement document = element;
         List<String> result = new ArrayList<>();
         while (document != null) {

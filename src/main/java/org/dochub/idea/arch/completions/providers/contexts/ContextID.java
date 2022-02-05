@@ -1,17 +1,15 @@
-package org.dochub.idea.arch.completions.providers.docs;
+package org.dochub.idea.arch.completions.providers.contexts;
 
 import com.intellij.patterns.ElementPattern;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
-import org.dochub.idea.arch.completions.providers.idsuggets.IDSuggest;
-import org.dochub.idea.arch.completions.providers.idsuggets.IDSuggestComponents;
-import org.dochub.idea.arch.completions.providers.idsuggets.IDSuggestDocuments;
+import org.dochub.idea.arch.completions.providers.suggets.IDSuggestContexts;
 import org.jetbrains.yaml.psi.YAMLDocument;
 import org.jetbrains.yaml.psi.YAMLKeyValue;
 import org.jetbrains.yaml.psi.YAMLMapping;
 
-public class DocsID extends IDSuggestDocuments {
-    private static String keyword = "docs";
+public class ContextID extends IDSuggestContexts {
+    private static String keyword = "contexts";
 
     @Override
     protected ElementPattern<? extends PsiElement> getPattern() {

@@ -1,25 +1,31 @@
-package org.dochub.idea.arch.completions.providers;
+package org.dochub.idea.arch.completions.providers.docs;
 
 import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.patterns.ElementPattern;
-import com.intellij.psi.PsiElement;
+import com.intellij.patterns.PlatformPatterns;
 import com.intellij.util.ProcessingContext;
+import org.dochub.idea.arch.completions.providers.Contexts;
+import org.dochub.idea.arch.completions.providers.CustomProvider;
+import org.dochub.idea.arch.completions.providers.Docs;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.yaml.psi.YAMLKeyValue;
 
-public class Aspects extends CustomProvider {
-    private static final String keyword = "aspects";
+public class DocType extends CustomProvider {
+    private static String keyword = "type";
     private static final String[] keys = {
-            "title", "location"
+            "markdown", "openapi", "plantuml"
     };
-
-    public static final ElementPattern<? extends PsiElement> rootPattern = Root.makeRootPattern(keyword);
 
     @Override
     public void appendToCompletion(CompletionContributor completion) {
         completion.extend(
                 CompletionType.BASIC,
-                rootPattern,
+                PlatformPatterns.psiElement()
+                        .withSuperParent(2,
+                                psi(YAMLKeyValue.class)
+                                        .withName(PlatformPatterns.string().equalTo(keyword))
+                                        .and(Docs.rootPattern)
+                        ),
                 new CompletionProvider<>() {
                     public void addCompletions(@NotNull CompletionParameters parameters,
                                                @NotNull ProcessingContext context,
@@ -31,4 +37,5 @@ public class Aspects extends CustomProvider {
                 }
         );
     }
+
 }

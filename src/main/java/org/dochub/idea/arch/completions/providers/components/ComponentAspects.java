@@ -4,7 +4,7 @@ import com.intellij.patterns.ElementPattern;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
 import org.dochub.idea.arch.completions.providers.Components;
-import org.dochub.idea.arch.completions.providers.idsuggets.IDSuggestAspects;
+import org.dochub.idea.arch.completions.providers.suggets.IDSuggestAspects;
 import org.jetbrains.yaml.psi.YAMLKeyValue;
 import org.jetbrains.yaml.psi.YAMLSequenceItem;
 
