@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'org.dochub.idea'
-version '1.4-beta'
+version '1.6-beta'
 
 repositories {
     mavenCentral()
@@ -25,7 +25,9 @@ patchPluginXml {
       Bata version of DocHub Plugin<br>
       <em>
           <ul>
-            <li>Helps to describe the architecture through autocomplete</li>
+            <li>Suggests for the structure of architecture manifests (yaml);</li>
+            <li>Suggests for the values of manifest fields;</li>
+            <li>Fast navigation through manifests.</li>
           <ul>  
       </em>
       """

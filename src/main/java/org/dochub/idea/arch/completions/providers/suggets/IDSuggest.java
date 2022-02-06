@@ -55,11 +55,13 @@ public class IDSuggest extends BaseSuggest {
                                 () -> {
                                     List<String> suggest = SuggestUtils.scanYamlPsiTreeToID(document, getSection());
                                     Map<String, Object> globalCache = getProjectCache(project);
-                                    Map<String, Object> section = (Map<String, Object>) globalCache.get(getSection());
-                                    if (section != null) {
-                                        for (String id : section.keySet()) {
-                                            if(suggest.indexOf(id) < 0)
-                                                suggest.add(id);
+                                    if (globalCache != null) {
+                                        Map<String, Object> section = (Map<String, Object>) globalCache.get(getSection());
+                                        if (section != null) {
+                                            for (String id : section.keySet()) {
+                                                if (suggest.indexOf(id) < 0)
+                                                    suggest.add(id);
+                                            }
                                         }
                                     }
 

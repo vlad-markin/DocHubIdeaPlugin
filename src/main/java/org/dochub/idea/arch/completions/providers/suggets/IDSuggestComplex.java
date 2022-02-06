@@ -51,16 +51,18 @@ public class IDSuggestComplex extends BaseSuggest {
                                 () -> {
                                     List<String> suggest = new ArrayList<>();
                                     Map<String, Object> globalCache = getProjectCache(project);
-                                    for (String section: getSections()) {
-                                        List<String> localIds = SuggestUtils.scanYamlPsiTreeToID(document, section);
-                                        for (String id: localIds)
-                                            if (suggest.indexOf(id) < 0)
-                                                suggest.add(id);
-                                        Map<String, Object> projectIds = (Map<String, Object>) globalCache.get(section);
-                                        if (section != null) {
-                                            for (String id : projectIds.keySet()) {
-                                                if(suggest.indexOf(id) < 0)
+                                    if (globalCache != null) {
+                                        for (String section: getSections()) {
+                                            List<String> localIds = SuggestUtils.scanYamlPsiTreeToID(document, section);
+                                            for (String id: localIds)
+                                                if (suggest.indexOf(id) < 0)
                                                     suggest.add(id);
+                                            Map<String, Object> projectIds = (Map<String, Object>) globalCache.get(section);
+                                            if (section != null) {
+                                                for (String id : projectIds.keySet()) {
+                                                    if(suggest.indexOf(id) < 0)
+                                                        suggest.add(id);
+                                                }
                                             }
                                         }
                                     }

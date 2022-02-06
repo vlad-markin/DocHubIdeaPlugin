@@ -4,7 +4,20 @@
     <vendor email="r.piontik@mail.ru" url="https://dochub.info">DocHub</vendor>
 
     <description><![CDATA[
-        Plugin for managing architecture as code.
+        <p>
+            The plugin is part of the DocHub project. This project allows you to describe the architecture
+            of systems in code. You can learn more about the project in the
+            <a href="https://github.com/RabotaRu/DocHub/tree/archops-conception-v2">github</a> repository or
+                on website <a href="https://dochub.info">dochub.info</a>.
+        </p>
+        <p>
+            This release includes:
+            <ul>
+                <li>Suggests for the structure of architecture manifests (yaml);</li>
+                <li>Suggests for the values of manifest fields;</li>
+                <li>Fast navigation through manifests.</li>
+            </ul>
+        </p>
     ]]></description>
 
     <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html

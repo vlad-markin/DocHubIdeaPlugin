@@ -3,11 +3,9 @@ package org.dochub.idea.arch.indexing;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.Key;
-import com.intellij.psi.PsiManager;
 import com.intellij.psi.util.CachedValueProvider;
 import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.psi.util.PsiModificationTracker;
-import org.dochub.idea.arch.completions.providers.suggets.BaseSuggest;
 import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.Yaml;
 
@@ -101,19 +99,37 @@ public class CacheBuilder {
         }
     }
 
+//    private static void appendMessageToSuggest(String message, Map<String, Object> context) {
+//        Map<String, CacheFileData> files = new HashMap<>();
+//        files.put("file", new CacheFileData(null));
+//        Map<String, Object> components = (Map<String, Object>) context.get("components");
+//        if (components == null) components = new HashMap<>();
+//        components.put("message:"  + message, files);
+//        context.put("components", components);
+//    }
+
+    private static String getFromEnv(Project project) {
+        String[] names = new String[]{".env.local", ".env"};
+        for (String name : names) {
+            if (isFileExists(project, name)) {
+                Map<String, String> env = parseEnvFile(project.getBasePath() + "/" + name);
+                return  "public/" + env.get("VUE_APP_DOCHUB_ROOT_MANIFEST");
+            };
+        }
+        return null;
+    }
+
     public static Map<String, Object> buildForProject(Project project)  {
         String rootManifest = null;
-        if (isFileExists(project, "dochub.yaml")) { // Если это проект DocHub
+        if (isFileExists(project, "dochub.yaml"))  // Если это проект DocHub
             rootManifest = "dochub.yaml";
-        } else if (isFileExists(project, ".env.local")) { // Если это VUE проект
-            Map<String, String> env = parseEnvFile(project.getBasePath() + "/.env.local");
-            rootManifest = "public/" + env.get("VUE_APP_DOCHUB_ROOT_MANIFEST");
-        }
-
-        if (rootManifest == null) return null;
+        else
+            rootManifest = getFromEnv(project);
 
         Map<String, Object> context = new HashMap<>();
-        parseYamlManifest(project.getBasePath() + "/" + rootManifest, context);
+
+        if (rootManifest != null)
+            parseYamlManifest(project.getBasePath() + "/" + rootManifest, context);
 
         return context;
     }
@@ -144,10 +160,11 @@ public class CacheBuilder {
         }
         CachedValuesManager cacheManager = CachedValuesManager.getManager(project);
         return (Map<String, Object>) cacheManager.getCachedValue(
-                PsiManager.getInstance(project).findFile(project.getProjectFile()),
+                // PsiManager.getInstance(project).findFile(projectFile),
+                project,
                 cacheProjectKey,
-                globalCacheProvider
+                globalCacheProvider,
+                false
         );
     }
-
 }
