@@ -7,16 +7,15 @@ import com.intellij.patterns.ElementPattern;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.*;
 import com.intellij.util.ProcessingContext;
+import org.dochub.idea.arch.completions.providers.Components;
+import org.dochub.idea.arch.completions.providers.Contexts;
 import org.dochub.idea.arch.indexing.CacheBuilder;
-import org.dochub.idea.arch.indexing.CacheFileData;
 import org.dochub.idea.arch.utils.PsiUtils;
 import org.dochub.idea.arch.utils.VirtualFileSystemUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.yaml.psi.YAMLDocument;
-import org.jetbrains.yaml.psi.YAMLKeyValue;
-import org.jetbrains.yaml.psi.YAMLMapping;
-import org.jetbrains.yaml.psi.YAMLSequenceItem;
+import org.jetbrains.yaml.psi.*;
+import org.jetbrains.yaml.psi.impl.YAMLPlainTextImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,20 +51,54 @@ public class RefComponentID extends BaseReferencesProvider {
 
     @Override
     public ElementPattern<? extends PsiElement> getPattern() {
-        return PlatformPatterns.psiElement(YAMLKeyValue.class)
-                .withParent(psi(YAMLMapping.class))
-                .withSuperParent(2,
-                        psi(YAMLKeyValue.class)
-                                .withName(PlatformPatterns.string().equalTo(keyword))
-                                .withSuperParent(2, psi(YAMLDocument.class))
-                );
+        return PlatformPatterns.or(
+                // Ссылки в идентификаторах компонентов
+                PlatformPatterns.psiElement(YAMLKeyValue.class)
+                        .withParent(psi(YAMLMapping.class))
+                        .withSuperParent(2,
+                                psi(YAMLKeyValue.class)
+                                        .withName(PlatformPatterns.string().equalTo(keyword))
+                                        .withSuperParent(2, psi(YAMLDocument.class))
+                        )
+                ,
+                // Ссылки в линках компонентов
+                PlatformPatterns.psiElement()
+                        .notEmpty()
+                        .withParent(
+                                psi(YAMLKeyValue.class)
+                                        .withName("id")
+                                        .withSuperParent(4,
+                                                psi(YAMLKeyValue.class)
+                                                        .withName("links")
+                                                        .and(Components.rootPattern)
+                                        )
+                        )
+                ,
+                // Ссылки в контекстах
+                PlatformPatterns.psiElement()
+                        .withParent(psi(YAMLSequenceItem.class)
+                                .withSuperParent(2,
+                                        psi(YAMLKeyValue.class)
+                                                .withName(PlatformPatterns.string().equalTo(keyword))
+                                                .and(Contexts.rootPattern)
+                                )
+                        )
+
+        );
     }
 
     @Override
     public PsiReference @NotNull [] getReferencesByElement(@NotNull PsiElement element,
                                                            @NotNull ProcessingContext context) {
         Project project = element.getManager().getProject();
-        String id = PsiUtils.getText(((YAMLKeyValue)element).getKey());
+        String id = null;
+        if (element instanceof YAMLKeyValue)
+            id = PsiUtils.getText(((YAMLKeyValue)element).getKey());
+        else if (element instanceof YAMLPlainTextImpl)
+            id = PsiUtils.getText(element);
+        else
+            return PsiReference.EMPTY_ARRAY;
+
         Map<String, Object> cache = CacheBuilder.getProjectCache(project);
         Map<String, Object> components = cache == null ? null : (Map<String, Object>) cache.get(keyword);
         List<PsiReference> refs = new ArrayList<>();
