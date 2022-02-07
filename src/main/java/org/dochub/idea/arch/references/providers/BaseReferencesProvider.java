@@ -14,8 +14,16 @@ import org.jetbrains.yaml.psi.YAMLScalarText;
 
 public class BaseReferencesProvider  extends PsiReferenceProvider {
 
-    public ElementPattern<? extends PsiElement> getPattern() {
+    public ElementPattern<? extends PsiElement> getRefPattern() {
         return StandardPatterns.instanceOf(PsiElement.class);
+    }
+
+    public ElementPattern<? extends PsiElement> getSourcePattern(Object ref) {
+        return StandardPatterns.instanceOf(PsiElement.class);
+    }
+
+    public boolean isElementFound(PsiElement element, Object ref) {
+        return false;
     }
 
     @Override

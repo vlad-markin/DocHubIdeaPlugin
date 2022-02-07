@@ -45,32 +45,39 @@ public class CacheBuilder {
     }
 
     private static Map<String, Object> getCacheSection(String section, Map<String, Object> context) {
-        Map<String, Object> mapSection = (Map<String, Object>) context.get(section);
-        if (mapSection == null) {
-            mapSection = new HashMap<String, Object>();
-            context.put(section, mapSection);
+        try {
+            Map<String, Object> mapSection = (Map<String, Object>) context.get(section);
+            if (mapSection == null) {
+                mapSection = new HashMap<String, Object>();
+                context.put(section, mapSection);
+            }
+            return mapSection;
+        } catch (ClassCastException e) {
+            return null;
         }
-        return mapSection;
     }
 
     private static void parseYamlManifestIDs(Map<String, Object> yaml,
                                                  String section,
                                                  String path,
                                                  Map<String, Object> context) {
-        Map<String, Object> yamlSection = (Map<String, Object>) yaml.get(section);
-        Map<String, Object> cacheIDs = getCacheSection(section, context);
-        if (yamlSection != null) {
-            for ( String id : yamlSection.keySet()) {
-                Map<String, Object> files = getCacheSection(id, cacheIDs);
-                String location = null;
-                try {
-                    Map<String, Object> fields = (Map<String, Object>) yamlSection.get(id);
-                    if (fields != null)
-                        location = (String) fields.get("location");
-                } catch (ClassCastException e) {}
-                files.put(path, new CacheFileData(location));
+
+        try {
+            Map<String, Object> yamlSection = (Map<String, Object>) yaml.get(section);
+            Map<String, Object> cacheIDs = getCacheSection(section, context);
+            if (yamlSection != null && cacheIDs != null) {
+                for ( String id : yamlSection.keySet()) {
+                    Map<String, Object> files = getCacheSection(id, cacheIDs);
+                    String location = null;
+                    try {
+                        Map<String, Object> fields = (Map<String, Object>) yamlSection.get(id);
+                        if (fields != null)
+                            location = (String) fields.get("location");
+                    } catch (ClassCastException e) {}
+                    files.put(path, new CacheFileData(location));
+                }
             }
-        }
+        } catch (ClassCastException e) {}
     }
 
     private static void parseYamlManifestImports(Map<String, Object> yaml,
@@ -85,16 +92,18 @@ public class CacheBuilder {
     }
 
     private static void parseYamlManifest(String path, Map<String, Object> context) {
-        Yaml yaml = new Yaml();
         try {
+            Yaml yaml = new Yaml();
             InputStream inputStream = new FileInputStream(path);
             Map<String, Object> sections = yaml.load(inputStream);
-            parseYamlManifestImports(sections, path, context);
-            parseYamlManifestIDs(sections, "components", path, context);
-            parseYamlManifestIDs(sections, "aspects", path, context);
-            parseYamlManifestIDs(sections, "contexts", path, context);
-            parseYamlManifestIDs(sections, "docs", path, context);
-        } catch (FileNotFoundException e) {
+            if (sections != null) {
+                parseYamlManifestImports(sections, path, context);
+                parseYamlManifestIDs(sections, "components", path, context);
+                parseYamlManifestIDs(sections, "aspects", path, context);
+                parseYamlManifestIDs(sections, "contexts", path, context);
+                parseYamlManifestIDs(sections, "docs", path, context);
+            }
+        } catch (Exception e) {
             // todo тут нужно сделать предупреждение
         }
     }
