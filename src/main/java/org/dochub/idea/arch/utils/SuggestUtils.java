@@ -126,9 +126,10 @@ public class SuggestUtils {
                                 YAMLKeyValue yamlField = ObjectUtils.tryCast(field,  YAMLKeyValue.class);
                                 // Если нашли поле location
                                 String key = PsiUtils.getText(yamlField.getKey());
-                                if (yamlField != null && key.equals("location")) {
+                                String location = PsiUtils.getText(yamlField.getValue());
+                                if (yamlField != null && key.equals("location") && location.length() > 0) {
                                     // appendDividerItem(result, PsiUtils.getText(field.getLastChild()), context, "/");
-                                    result.add(PsiUtils.getText(yamlID.getKey()));
+                                    result.add(PsiUtils.getText(yamlField.getValue()));
                                 }
                             }
                         }
