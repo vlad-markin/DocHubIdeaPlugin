@@ -9,7 +9,7 @@ import org.jetbrains.yaml.psi.YAMLMapping;
 
 public class ContextRootQuickFix extends BaseStructureQuickFix {
     private static String requiredProps[] = {
-            "title", "location", "source", "type"
+            "title", "location", "components"
     };
 
     public ContextRootQuickFix() {
@@ -28,7 +28,7 @@ public class ContextRootQuickFix extends BaseStructureQuickFix {
                 .withSuperParent(2, psi(YAMLMapping.class))
                 .withSuperParent(3,
                         psi(YAMLKeyValue.class)
-                                .withName(PlatformPatterns.string().equalTo("docs"))
+                                .withName(PlatformPatterns.string().equalTo("contexts"))
                                 .withSuperParent(2, psi(YAMLDocument.class))
                 );
     }

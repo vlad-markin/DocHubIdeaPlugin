@@ -1,4 +1,4 @@
-package org.dochub.idea.arch.quickfix.docs;
+package org.dochub.idea.arch.quickfix.namespaces;
 import com.intellij.patterns.ElementPattern;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
@@ -7,12 +7,12 @@ import org.jetbrains.yaml.psi.YAMLDocument;
 import org.jetbrains.yaml.psi.YAMLKeyValue;
 import org.jetbrains.yaml.psi.YAMLMapping;
 
-public class DocRootQuickFix extends BaseStructureQuickFix {
+public class NamespaceRootQuickFix extends BaseStructureQuickFix {
     private static String requiredProps[] = {
-            "title", "location", "source", "type"
+            "title"
     };
 
-    public DocRootQuickFix() {
+    public NamespaceRootQuickFix() {
         super();
     }
 
@@ -28,7 +28,7 @@ public class DocRootQuickFix extends BaseStructureQuickFix {
                 .withSuperParent(2, psi(YAMLMapping.class))
                 .withSuperParent(3,
                         psi(YAMLKeyValue.class)
-                                .withName(PlatformPatterns.string().equalTo("docs"))
+                                .withName(PlatformPatterns.string().equalTo("namespaces"))
                                 .withSuperParent(2, psi(YAMLDocument.class))
                 );
     }

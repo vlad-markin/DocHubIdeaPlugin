@@ -6,16 +6,13 @@ import com.intellij.lang.annotation.HighlightSeverity;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.patterns.ElementPattern;
-import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiParserFacade;
 import com.intellij.util.IncorrectOperationException;
-import org.dochub.idea.arch.quickfix.BaseQuickFix;
 import org.dochub.idea.arch.utils.PsiUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.yaml.YAMLElementGenerator;
-import org.jetbrains.yaml.psi.YAMLDocument;
 import org.jetbrains.yaml.psi.YAMLFile;
 import org.jetbrains.yaml.psi.YAMLKeyValue;
 import org.jetbrains.yaml.psi.YAMLMapping;
@@ -25,10 +22,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class BaseStructureQuickFix extends BaseQuickFix {
-    private static String requiredProps[] = {
-            "title", "entity"
-    };
-
+    protected String[] getRequiredStructure() {
+        return null;
+    }
     List<String> needToAppendProps = null;
 
     public BaseStructureQuickFix(PsiElement element, List<String> needToAppendProps) {
@@ -42,15 +38,7 @@ public class BaseStructureQuickFix extends BaseQuickFix {
 
     @Override
     public ElementPattern<? extends PsiElement> getFixPattern(PsiElement element) {
-        return PlatformPatterns.psiElement()
-                .beforeLeaf(":")
-                .withSuperParent(2, psi(YAMLMapping.class))
-                .withSuperParent(3,
-                        psi(YAMLKeyValue.class)
-                                .withName(PlatformPatterns.string().equalTo("components"))
-                                .withSuperParent(2, psi(YAMLDocument.class))
-                )
-                ;
+        return null;
     }
 
     @Override
@@ -66,12 +54,12 @@ public class BaseStructureQuickFix extends BaseQuickFix {
                     foundProps.add(PsiUtils.getText(((YAMLKeyValue)prop).getKey()));
                 }
             }
-            for (String require : requiredProps) {
+            for (String require : getRequiredStructure()) {
                 if (foundProps.indexOf(require) < 0) {
                     result.add(require);
                 }
             }
-        } else result = Arrays.asList(requiredProps);
+        } else result = Arrays.asList(getRequiredStructure());
 
 
         if (result.size() > 0) {
@@ -116,7 +104,7 @@ public class BaseStructureQuickFix extends BaseQuickFix {
     public void invoke(@NotNull Project project, Editor editor, PsiFile file) throws IncorrectOperationException {
         final StringBuilder builder = new StringBuilder("\n");
         for (String prop : needToAppendProps) {
-            builder.append("  " + prop + ":\n");
+            builder.append("  " + prop + ": \n");
         }
 
         final YAMLFile yamlFile = YAMLElementGenerator.getInstance(file.getProject()).createDummyYamlWithText(builder.toString());
@@ -128,11 +116,15 @@ public class BaseStructureQuickFix extends BaseQuickFix {
                     PsiParserFacade.SERVICE.getInstance(project).createWhiteSpaceFromText("\n");
             PsiElement lastKey = getLastKeyFromMap(keyMap);
 
-            PsiElement insertKeys[] = mapping.getChildren();
-            for (Integer index = insertKeys.length - 1; index >= 0; index--) {
-                PsiElement key = insertKeys[index];
-                key.add(newLineNode);
-                keyMap.addBefore(key, lastKey);
+            if (lastKey == null) {
+                element.addBefore(mapping, element.getLastChild());
+            } else {
+                PsiElement insertKeys[] = mapping.getChildren();
+                for (Integer index = insertKeys.length - 1; index >= 0; index--) {
+                    PsiElement key = insertKeys[index];
+                    key.add(newLineNode);
+                    keyMap.addBefore(key, lastKey);
+                }
             }
         } else element.add(mapping);
     }

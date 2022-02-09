@@ -4,13 +4,21 @@ import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.patterns.ElementPattern;
 import com.intellij.psi.PsiElement;
-import org.dochub.idea.arch.quickfix.components.ComponentRootStructureFix;
+import org.dochub.idea.arch.quickfix.aspects.AspectRootQuickFix;
+import org.dochub.idea.arch.quickfix.components.ComponentRootQuickFix;
+import org.dochub.idea.arch.quickfix.contexts.ContextRootQuickFix;
+import org.dochub.idea.arch.quickfix.docs.DocRootQuickFix;
+import org.dochub.idea.arch.quickfix.namespaces.NamespaceRootQuickFix;
 import org.jetbrains.annotations.NotNull;
 
 public class FixAnnotator implements Annotator {
 
     private BaseQuickFix[] fixes = {
-            new ComponentRootStructureFix()
+            new ComponentRootQuickFix(),
+            new AspectRootQuickFix(),
+            new DocRootQuickFix(),
+            new ContextRootQuickFix(),
+            new NamespaceRootQuickFix()
     };
 
     @Override

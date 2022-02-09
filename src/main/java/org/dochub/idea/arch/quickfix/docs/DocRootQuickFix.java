@@ -7,14 +7,12 @@ import org.jetbrains.yaml.psi.YAMLDocument;
 import org.jetbrains.yaml.psi.YAMLKeyValue;
 import org.jetbrains.yaml.psi.YAMLMapping;
 
-import java.util.List;
-
-public class ComponentRootDocFix extends BaseStructureQuickFix {
+public class DocRootQuickFix extends BaseStructureQuickFix {
     private static String requiredProps[] = {
             "title", "location", "source", "type"
     };
 
-    public ComponentRootDocFix() {
+    public DocRootQuickFix() {
         super();
     }
 
