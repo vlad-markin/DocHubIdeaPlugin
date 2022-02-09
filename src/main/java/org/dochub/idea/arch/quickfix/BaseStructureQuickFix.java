@@ -1,4 +1,4 @@
-package org.dochub.idea.arch.quickfix.components;
+package org.dochub.idea.arch.quickfix;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.util.IntentionFamilyName;
 import com.intellij.lang.annotation.AnnotationHolder;
@@ -24,19 +24,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ComponentRootStructureFix extends BaseQuickFix {
+public class BaseStructureQuickFix extends BaseQuickFix {
     private static String requiredProps[] = {
             "title", "entity"
     };
 
     List<String> needToAppendProps = null;
 
-    public ComponentRootStructureFix(PsiElement element, List<String> needToAppendProps) {
+    public BaseStructureQuickFix(PsiElement element, List<String> needToAppendProps) {
         super(element);
         this.needToAppendProps = needToAppendProps;
     }
 
-    public ComponentRootStructureFix() {
+    public BaseStructureQuickFix() {
         super();
     }
 
@@ -78,7 +78,7 @@ public class ComponentRootStructureFix extends BaseQuickFix {
             holder.newAnnotation(HighlightSeverity.ERROR, "Lost properties")
                     .range(element)
                     .highlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL)
-                    .withFix(new ComponentRootStructureFix(componentID, result))
+                    .withFix(new BaseStructureQuickFix(componentID, result))
                     .create();
         }
 
@@ -91,7 +91,7 @@ public class ComponentRootStructureFix extends BaseQuickFix {
 
     @Override
     public @NotNull @IntentionFamilyName String getFamilyName() {
-        return "Create property";
+        return "Create properties";
     }
 
     @Override
