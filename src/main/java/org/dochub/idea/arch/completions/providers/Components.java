@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 public class Components extends CustomProvider {
     private static final String keyword = "components";
     private static final String[] keys = {
-            "title", "entity", "aspects", "links"
+            "title", "entity", "aspects", "links", "technologies"
     };
 
     public static final ElementPattern<? extends PsiElement> rootPattern = Root.makeRootPattern(keyword);

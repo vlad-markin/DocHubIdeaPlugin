@@ -8,7 +8,7 @@ import org.jetbrains.yaml.psi.YAMLKeyValue;
 import org.jetbrains.yaml.psi.YAMLMapping;
 
 public class DocRootQuickFix extends BaseStructureQuickFix {
-    private static String requiredProps[] = {
+    public static String requiredProps[] = {
             "title", "location", "source", "type"
     };
 

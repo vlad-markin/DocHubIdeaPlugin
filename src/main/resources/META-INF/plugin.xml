@@ -3,6 +3,10 @@
     <name>DocHub Architecture as code</name>
     <vendor email="r.piontik@mail.ru" url="https://dochub.info">DocHub</vendor>
 
+    <resource-bundle>
+        org.dochub.idea.arch.messages.DocHubBundle
+    </resource-bundle>
+
     <description><![CDATA[
         <p>
             The plugin is part of the DocHub project. This project allows you to describe the architecture
@@ -32,20 +36,26 @@
         />
         <psi.referenceContributor
                 language="yaml"
-                implementation="org.dochub.idea.arch.references.ReferenceContributor"/>
-        <annotator language="yaml" implementationClass="org.dochub.idea.arch.quickfix.FixAnnotator"/>
-        <!--
-        <fileBasedIndex implementation="org.dochub.idea.arch.indexing.YamlIndex"/>
+                implementation="org.dochub.idea.arch.references.ReferenceContributor"
+        />
+        <annotator
+                language="yaml"
+                implementationClass="org.dochub.idea.arch.quickfix.FixAnnotator"
+        />
         <localInspection
-                implementationClass="org.dochub.idea.arch.inspections.YamlInspection"
-                bundle="package org.dochub.idea.arch.DocHubBundle"
-                key="inspection.display-name"
-                groupKey="inspection.group"
+                implementationClass="org.dochub.idea.arch.inspections.DocHubInspection"
                 level="WARNING"
                 enabledByDefault="true"
                 runForWholeFile="true"
                 language="yaml"
+                shortName="DocHubInspector"
+                displayName="DocHub Inspector"
+                groupName="DocHub"
         />
+        <!--
+                key="inspection.display-name"
+                groupKey="inspection.group"
+        <fileBasedIndex implementation="org.dochub.idea.arch.indexing.YamlIndex"/>
         -->
     </extensions>
 

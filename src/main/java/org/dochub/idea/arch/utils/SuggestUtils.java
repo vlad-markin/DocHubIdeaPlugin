@@ -1,6 +1,5 @@
 package org.dochub.idea.arch.utils;
 
-import com.intellij.AbstractBundle;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ObjectUtils;
@@ -12,8 +11,6 @@ import java.io.*;
 import java.util.*;
 
 public class SuggestUtils {
-    private static final Logger LOG = Logger.getInstance(SuggestUtils.class);
-
     public static List<String> scanDirByContext(String basePath, String context, String[] extensions) {
         List<String> result = new ArrayList<String>();
         String prefix =

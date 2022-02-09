@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'org.dochub.idea'
-version '1.7-beta'
+version '1.8-beta'
 
 repositories {
     mavenCentral()
@@ -27,7 +27,8 @@ patchPluginXml {
           <ul>
             <li>Suggests for the structure of architecture manifests (yaml);</li>
             <li>Suggests for the values of manifest fields;</li>
-            <li>Fast navigation through manifests.</li>
+            <li>Fast navigation through manifests;</li>
+            <li>Problems highlighting.</li>
           <ul>  
       </em>
       """
