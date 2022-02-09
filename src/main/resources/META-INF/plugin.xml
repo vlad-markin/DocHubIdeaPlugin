@@ -33,6 +33,7 @@
         <psi.referenceContributor
                 language="yaml"
                 implementation="org.dochub.idea.arch.references.ReferenceContributor"/>
+        <annotator language="yaml" implementationClass="org.dochub.idea.arch.quickfix.FixAnnotator"/>
         <!--
         <fileBasedIndex implementation="org.dochub.idea.arch.indexing.YamlIndex"/>
         <localInspection
