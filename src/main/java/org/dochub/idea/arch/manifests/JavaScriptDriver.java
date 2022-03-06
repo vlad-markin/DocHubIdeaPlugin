@@ -11,6 +11,11 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class JavaScriptDriver {
+
+    private class CallbackLoad {
+
+    }
+
     void test() throws ScriptException, FileNotFoundException {
         ScriptEngineManager factory = new ScriptEngineManager();
         ScriptEngine engine = factory.getEngineByName("JavaScript");
@@ -24,6 +29,7 @@ public class JavaScriptDriver {
         byte[] sample = new byte[0];
         try {
             sample = Files.readAllBytes(Paths.get("sample.json"));
+            engine.put("adaptor", new CallbackLoad());
             engine.put("input", new String(sample));
             Object inputjson = engine.eval("JSON.parse(input);");
 

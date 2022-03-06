@@ -25,12 +25,6 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>org.jetbrains.plugins.yaml</depends>
 
-    <project-components>
-        <component>
-            <implementation-class>org.dochub.idea.arch.views.PreviewerComponent</implementation-class>
-        </component>
-    </project-components>
-
     <extensions defaultExtensionNs="com.intellij">
         <completion.contributor
                 language="yaml"
@@ -54,6 +48,11 @@
                 displayName="DocHub Inspector"
                 groupName="DocHub"
         />
+        <toolWindow factoryClass="org.dochub.idea.arch.tools.DocHubToolWindowFactory"
+                    icon="AllIcons.General.InspectionsEye"
+                    anchor="right"
+                    id="DocHub"
+        />
         <!--
         <editorTabTitleProvider
                 implementation="org.dochub.idea.arch.views.PreviewEditorTabTitleProvider"
@@ -62,7 +61,6 @@
                 groupKey="inspection.group"
         <fileBasedIndex implementation="org.dochub.idea.arch.indexing.YamlIndex"/>
         -->
-        <postStartupActivity implementation="org.dochub.idea.arch.views.ViewerMounter"/>
     </extensions>
 
     <actions>
