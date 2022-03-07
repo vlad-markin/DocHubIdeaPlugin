@@ -93,16 +93,16 @@ public class DocHubToolWindow extends JBCefBrowser {
           response.put("data", PlantUMLDriver.makeSVG(source));
           result.append(mapper.writeValueAsString(response));
         } else if (url.substring(0, 20).equals("plugin:/idea/source/")) {
-          String path = project.getBasePath() + "/"
-                          + (new File(CacheBuilder.getRootManifestName(project))).getParent()
-                          + "/" + url.substring(20);
-          File file = new File(path);
+          String basePath = project.getBasePath() + "/";
+          String parentPath = (new File(CacheBuilder.getRootManifestName(project))).getParent();
+          String sourcePath = basePath + (parentPath != null ? parentPath + "/" : "") + url.substring(20);
+          File file = new File(sourcePath);
           if (!file.exists() || file.isDirectory()) {
             return new JBCefJSQuery.Response("", 404, "No found: " + url);
           }
           Map<String, Object> response = new HashMap<>();
-          response.put("contentType", path.substring(path.length() - 4).toLowerCase(Locale.ROOT));
-          response.put("data", Files.readString(Path.of(path)));
+          response.put("contentType", sourcePath.substring(sourcePath.length() - 4).toLowerCase(Locale.ROOT));
+          response.put("data", Files.readString(Path.of(sourcePath)));
           result.append(mapper.writeValueAsString(response));
         } else if (url.equals("plugin:/idea/change/index")) {
           Map<String, Object> response = new HashMap<>();
