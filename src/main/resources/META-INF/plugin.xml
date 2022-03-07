@@ -54,6 +54,13 @@
                     anchor="right"
                     id="DocHub"
         />
+        <fileType
+                name="JSONata"
+                implementationClass="org.dochub.idea.arch.jsonata.JSONataFileType"
+                fieldName="INSTANCE"
+                language="JSONata"
+                extensions="jsonata"
+        />
         <!--
         <editorTabTitleProvider
                 implementation="org.dochub.idea.arch.views.PreviewEditorTabTitleProvider"
