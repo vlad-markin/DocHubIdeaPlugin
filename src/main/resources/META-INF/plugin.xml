@@ -15,7 +15,8 @@
             <ul>
                 <li>Suggests for the structure of architecture manifests (yaml);</li>
                 <li>Suggests for the values of manifest fields;</li>
-                <li>Fast navigation through manifests.</li>
+                <li>Fast navigation through manifests;</li>
+                <li>(new) Built-in architecture rendering.</li>
             </ul>
         </p>
     ]]></description>
