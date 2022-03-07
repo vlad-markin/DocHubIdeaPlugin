@@ -91,11 +91,37 @@ public class CacheBuilder {
         }
     }
 
+
+
+    private static void manifestMerge(Map<String, Object> from, Map<String, Object> to) {
+        for (String keyName : from.keySet()) {
+            if (!to.containsKey(keyName)) {
+                to.put(keyName, from.get(keyName));
+            } else {
+                Object destination = to.get(keyName);
+                Object source = from.get(keyName);
+                if ((destination instanceof Map) && (source instanceof Map)) {
+                    manifestMerge((Map<String, Object>) source, (Map<String, Object>) destination);
+                } else if ((destination instanceof ArrayList) && (source instanceof ArrayList)) {
+                    ((ArrayList<?>) destination).addAll((ArrayList)source);
+                } else {
+                    to.put(keyName, from.get(keyName));
+                }
+            }
+        }
+    }
+
     private static void parseYamlManifest(String path, Map<String, Object> context) {
         try {
             Yaml yaml = new Yaml();
+            Map<String, Object> manifest = (Map<String, Object>) context.get("$manifest");
+            if (manifest == null) {
+                manifest = new HashMap<String, Object>();
+                context.put("$manifest", manifest);
+            }
             InputStream inputStream = new FileInputStream(path);
             Map<String, Object> sections = yaml.load(inputStream);
+            manifestMerge(sections, manifest);
             if (sections != null) {
                 parseYamlManifestImports(sections, path, context);
                 parseYamlManifestIDs(sections, "components", path, context);
@@ -128,14 +154,18 @@ public class CacheBuilder {
         return null;
     }
 
-    public static Map<String, Object> buildForProject(Project project)  {
+    public static String getRootManifestName(Project project) {
         String rootManifest = null;
         if (isFileExists(project, "dochub.yaml"))  // Если это проект DocHub
             rootManifest = "dochub.yaml";
         else
             rootManifest = getFromEnv(project);
+        return rootManifest;
+    }
 
+    public static Map<String, Object> buildForProject(Project project)  {
         Map<String, Object> context = new HashMap<>();
+        String rootManifest = getRootManifestName(project);
 
         if (rootManifest != null)
             parseYamlManifest(project.getBasePath() + "/" + rootManifest, context);

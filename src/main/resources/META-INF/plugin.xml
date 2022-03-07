@@ -3,10 +3,6 @@
     <name>DocHub Architecture as code</name>
     <vendor email="r.piontik@mail.ru" url="https://dochub.info">DocHub</vendor>
 
-    <resource-bundle>
-        org.dochub.idea.arch.messages.DocHubBundle
-    </resource-bundle>
-
     <description><![CDATA[
         <p>
             The plugin is part of the DocHub project. This project allows you to describe the architecture
@@ -19,7 +15,8 @@
             <ul>
                 <li>Suggests for the structure of architecture manifests (yaml);</li>
                 <li>Suggests for the values of manifest fields;</li>
-                <li>Fast navigation through manifests.</li>
+                <li>Fast navigation through manifests;</li>
+                <li>(new) Built-in architecture rendering.</li>
             </ul>
         </p>
     ]]></description>
@@ -52,7 +49,15 @@
                 displayName="DocHub Inspector"
                 groupName="DocHub"
         />
+        <toolWindow factoryClass="org.dochub.idea.arch.tools.DocHubToolWindowFactory"
+                    icon="AllIcons.General.InspectionsEye"
+                    anchor="right"
+                    id="DocHub"
+        />
         <!--
+        <editorTabTitleProvider
+                implementation="org.dochub.idea.arch.views.PreviewEditorTabTitleProvider"
+        />
                 key="inspection.display-name"
                 groupKey="inspection.group"
         <fileBasedIndex implementation="org.dochub.idea.arch.indexing.YamlIndex"/>

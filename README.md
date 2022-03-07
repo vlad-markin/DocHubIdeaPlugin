@@ -9,6 +9,9 @@
 
 ![Инкрементальное развитие архитектуры](images/completion.png)
 
+# Использованные библиотеки
+* https://github.com/IBM/JSONata4Java
+
 # Лицензия
 DocHub распространяется под лицензией
 [GNU GPL v.2](http://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
