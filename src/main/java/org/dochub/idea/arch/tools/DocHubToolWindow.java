@@ -11,19 +11,16 @@ import com.intellij.openapi.vfs.newvfs.events.VFileEvent;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiManager;
-import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.ui.jcef.JBCefBrowser;
 import com.intellij.ui.jcef.JBCefBrowserBase;
 import com.intellij.ui.jcef.JBCefJSQuery;
 import com.intellij.util.messages.MessageBusConnection;
+import org.apache.commons.io.FilenameUtils;
 import org.dochub.idea.arch.indexing.CacheBuilder;
 import org.dochub.idea.arch.manifests.PlantUMLDriver;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.ide.BuiltInServerManager;
 
 import javax.swing.*;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -101,13 +98,15 @@ public class DocHubToolWindow extends JBCefBrowser {
             return new JBCefJSQuery.Response("", 404, "No found: " + url);
           }
           Map<String, Object> response = new HashMap<>();
-          response.put("contentType", sourcePath.substring(sourcePath.length() - 4).toLowerCase(Locale.ROOT));
+          response.put("contentType", FilenameUtils.getExtension(sourcePath).toLowerCase(Locale.ROOT));
           response.put("data", Files.readString(Path.of(sourcePath)));
           result.append(mapper.writeValueAsString(response));
         } else if (url.equals("plugin:/idea/change/index")) {
           Map<String, Object> response = new HashMap<>();
           response.put("data", changeCounter);
           result.append(mapper.writeValueAsString(response));
+        } else if (url.equals("plugin:/idea/debugger/show")){
+          openDevtools();
         } else {
           return new JBCefJSQuery.Response("", 404, "No found: " + url);
         }

@@ -1,0 +1,43 @@
+// https://github.com/JetBrains/Grammar-Kit/blob/master/TUTORIAL.md
+{
+  tokens = [
+    comment="regexp:\/\*[\s\S]*?\*\/"
+    space='regexp:\s+'
+    string = "regexp:\"[^\"]*\"|'[^']*'"
+    number = "regexp:(?=[1-9]|0(?!\d))\d+(\.\d+)?([eE][+-]?\d+)?"
+    boolean = "regexp:true|false|null"
+    id = "regexp:\p{Alpha}+\w*"
+    comma = ","
+    colon = ":"
+    brace1 = "{"
+    brace2 = "}"
+    brack1 = "["
+    brack2 = "]"
+  ]
+  extends("array|object|json")=value
+}
+
+root ::= jsonata
+json ::= array | object  { hooks=[wsBinders="null, null"] }
+value ::= jsonata | string | number | boolean  {name="value" hooks=[leftBinder="GREEDY_LEFT_BINDER"]}
+
+array ::= '[' [!']' item (!']' ',' item) *] ']' {pin(".*")=1 extends=json}
+private item ::= string | number | boolean | json {recoverWhile=recover}
+object ::= '{' [!'}' prop (!'}' ',' prop) *] '}' {pin(".*")=1 extends=json}
+prop ::= [] name ':' value {pin=1 recoverWhile=recover} // remove [] to make NAME mandatory
+name ::= id | string {name="name" hooks=[rightBinder="GREEDY_RIGHT_BINDER"]}
+private recover ::= !(',' | ']' | '}' | '[' | '{')
+
+private jsonata ::= expression
+// private jsonata ::= expression | range | json | filter | deep_prop
+
+private deep_prop ::= name ( '.' name) *
+private filter ::= deep_prop '[' expression ']'
+private range ::= '[' number '..' number ']'
+
+private arguments ::= string | number | boolean | filter | deep_prop | object | range | array | expression
+private math_operators ::= '+' | '-' | '*' | '/' | '%'
+private comp_operators ::= '=' | '!=' | '>' | '<' | '>=' | '<=' | ' in '
+private operators ::= math_operators | comp_operators
+private expression ::= arguments (operators arguments) * | '(' expression ')' [operators expression]
+
