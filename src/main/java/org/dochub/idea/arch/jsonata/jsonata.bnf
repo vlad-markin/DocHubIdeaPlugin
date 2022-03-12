@@ -39,17 +39,24 @@ private bind_arr_variable ::= bind_arr_item [bind_arr_index] | bind_arr_index [b
 private deep_prop ::= (range | sys_variable | variable | name | object | array ) [bind_arr_variable] ( '.' (name | object)) *
 private post ::= ('.' (filter | deep_prop )) | ('^(' order_params ')')
 private filter ::= deep_prop  '[' expression ']' post *
+
 private function_params ::= variable (',' variable) *
 private function_body ::= jsonata *
 private function ::= variable ':=' 'function' '(' (function_params|) ')' '{' function_body '}'
-private variable_set ::= variable ':=' jsonata;
+private function_call_params ::= expression (',' expression) *
+private function_call ::= variable '(' function_call_params ')'
+
+private chain ::= (variable | chain) '~>' variable *
+
+private variable_set ::= variable ':=' (chain | jsonata);
 private block_body ::= jsonata (';' jsonata) *;
 private block ::= '(' block_body ')'
 private order_param ::= ['>'|'<'] expression
 private order_params ::= order_param (',' order_param) *
 private order ::= (deep_prop | filter) '^(' order_params ')' post *
 
-private arguments ::= string | number | boolean | order | filter | deep_prop | object | array | expression
+
+private arguments ::= string | number | boolean | function_call | order | filter | deep_prop | object | array | expression
 private math_operators ::= '+' | '-' | '*' | '/' | '%'
 private comp_operators ::= '=' | '!=' | '>' | '<' | '>=' | '<=' | ' in ' | ' and ' | ' or '
 private concat_operators ::= '&'
