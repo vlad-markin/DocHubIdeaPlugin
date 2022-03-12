@@ -31,7 +31,7 @@ prop ::= [] name ':' value {pin=1 recoverWhile=recover} // remove [] to make NAM
 name ::= id | string {name="name" hooks=[rightBinder="GREEDY_RIGHT_BINDER"]}
 private recover ::= !(',' | ']' | '}' | '[' | '{')
 
-private jsonata ::= block | function | variable_set | expression
+private jsonata ::= block | function | variable_set | transform_call | expression
 
 private bind_arr_item ::= '@' variable
 private bind_arr_index ::= '#' variable
@@ -44,10 +44,11 @@ private function_params ::= variable (',' variable) *
 private function_body ::= jsonata *
 private function ::= variable ':=' 'function' '(' (function_params|) ')' '{' function_body '}'
 private function_call_params ::= expression (',' expression) *
-private function_call ::= variable '(' function_call_params ')'
+private function_call ::= variable '(' [function_call_params] ')'
 
 private transform_location ::= id ('.' id) *
 private transform ::= '|' transform_location '|' expression [','  array] '|'
+private transform_call ::= expression '~>' transform ('~>' transform) *
 
 private chain ::= variable ('~>' (transform | chain |  variable)) *
 
