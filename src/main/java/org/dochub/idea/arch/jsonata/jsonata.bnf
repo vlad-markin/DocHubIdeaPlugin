@@ -10,6 +10,8 @@
     range = "regexp:\[([1-9]|0)+\.\.([1-9]|0)+\]*"
     variable = "regexp:\$([a-z]|[A-Z]|\_)*"
     sys_variable = "regexp:\*\*|\*|\%"
+    regex = "regexp:\/.+[^\\]/"
+
     comma = ","
     colon = ":"
     brace1 = "{"
@@ -29,7 +31,7 @@ private item ::= string | number | boolean | json {recoverWhile=recover}
 object ::= '{' [!'}' prop (!'}' ',' prop) *] '}' {pin(".*")=1 extends=json}
 prop ::= [] name ':' value {pin=1 recoverWhile=recover} // remove [] to make NAME mandatory
 name ::= id | string {name="name" hooks=[rightBinder="GREEDY_RIGHT_BINDER"]}
-private recover ::= !(',' | ']' | '}' | '[' | '{')
+private recover ::= !(',' | ']' | '}' | '[' | '{' | '(' | ')')
 
 private jsonata ::= function | variable_set | chain | transform_call | expression
 
@@ -44,7 +46,7 @@ private post ::= ('.' (filter | deep_prop )) | ('^(' order_params ')')
 private filter ::= deep_prop  '[' expression ']' post *
 
 private method_params ::= expression (',' expression) *
-private methods ::= '$string' '(' [method_params|] ')'
+private methods ::= ('$string' | '$number()') '(' [method_params|] ')'
 
 private function_params ::= variable (',' variable) *
 private function_body ::= jsonata *
@@ -73,5 +75,5 @@ private comp_operators ::= '=' | '!=' | '>' | '<' | '>=' | '<=' | ' in ' | ' and
 private concat_operators ::= '&'
 private cond_operators ::= '?' expression ':'
 private operators ::= math_operators | comp_operators | concat_operators | cond_operators
-private expression ::= arguments  (operators arguments) *
+private expression ::= regex | arguments  (operators arguments) *
 
