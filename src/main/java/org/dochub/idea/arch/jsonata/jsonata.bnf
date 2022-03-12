@@ -4,7 +4,7 @@
     comment="regexp:\/\*[\s\S]*?\*\/"
     space='regexp:\s+'
     string = "regexp:\"[^\"]*\"|'[^']*'"
-    number = "regexp:(?=[1-9]|0(?!\d))\d+(\.\d+)?([eE][+-]?\d+)?"
+    number = "regexp:-?(?=[1-9]|0(?!\d))\d+(\.\d+)?([eE][+-]?\d+)?"
     boolean = "regexp:true|false|null"
     id = "regexp:\p{Alpha}+\w*"
     range = "regexp:\[([1-9]|0)+\.\.([1-9]|0)+\]*"
@@ -51,7 +51,9 @@ private order ::= (deep_prop | filter) '^(' order_params ')' post *
 
 private arguments ::= string | number | boolean | order | filter | deep_prop | object | array | expression
 private math_operators ::= '+' | '-' | '*' | '/' | '%'
-private comp_operators ::= '=' | '!=' | '>' | '<' | '>=' | '<=' | ' in '
-private operators ::= math_operators | comp_operators
+private comp_operators ::= '=' | '!=' | '>' | '<' | '>=' | '<=' | ' in ' | ' and ' | ' or '
+private concat_operators ::= '&'
+private cond_operators ::= '?' expression ':'
+private operators ::= math_operators | comp_operators | concat_operators | cond_operators
 private expression ::= arguments (operators arguments) * | '(' expression ')' [operators expression]
 
