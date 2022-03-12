@@ -31,14 +31,20 @@ prop ::= [] name ':' value {pin=1 recoverWhile=recover} // remove [] to make NAM
 name ::= id | string {name="name" hooks=[rightBinder="GREEDY_RIGHT_BINDER"]}
 private recover ::= !(',' | ']' | '}' | '[' | '{')
 
-private jsonata ::= block | function | variable_set | transform_call | expression
+private jsonata ::= function | variable_set | chain | transform_call | expression
 
 private bind_arr_item ::= '@' variable
 private bind_arr_index ::= '#' variable
 private bind_arr_variable ::= bind_arr_item [bind_arr_index] | bind_arr_index [bind_arr_item]
-private deep_prop ::= (range | sys_variable | variable | name | object | array ) [bind_arr_variable] ( '.' (name | object)) *
+private deep_prop ::=
+            (range | sys_variable | variable | name | object | array | block)
+            [bind_arr_variable]
+            ( '.' (name | methods | object )) *
 private post ::= ('.' (filter | deep_prop )) | ('^(' order_params ')')
 private filter ::= deep_prop  '[' expression ']' post *
+
+private method_params ::= expression (',' expression) *
+private methods ::= '$string' '(' [method_params|] ')'
 
 private function_params ::= variable (',' variable) *
 private function_body ::= jsonata *
@@ -50,16 +56,16 @@ private transform_location ::= id ('.' id) *
 private transform ::= '|' transform_location '|' expression [','  array] '|'
 private transform_call ::= expression '~>' transform ('~>' transform) *
 
-private chain ::= variable ('~>' (transform | chain |  variable)) *
+private chain_simple ::= variable '~>' (transform | chain | variable)
+private chain ::= chain_simple ('~>' transform | chain | variable) *
 
 
-private variable_set ::= variable ':=' (chain | transform | jsonata);
+private variable_set ::= variable ':=' jsonata;
 private block_body ::= jsonata (';' jsonata) *;
 private block ::= '(' block_body ')'
 private order_param ::= ['>'|'<'] expression
 private order_params ::= order_param (',' order_param) *
 private order ::= (deep_prop | filter) '^(' order_params ')' post *
-
 
 private arguments ::= string | number | boolean | function_call | order | filter | deep_prop | object | array | expression
 private math_operators ::= '+' | '-' | '*' | '/' | '%'
@@ -67,5 +73,5 @@ private comp_operators ::= '=' | '!=' | '>' | '<' | '>=' | '<=' | ' in ' | ' and
 private concat_operators ::= '&'
 private cond_operators ::= '?' expression ':'
 private operators ::= math_operators | comp_operators | concat_operators | cond_operators
-private expression ::= arguments (operators arguments) * | '(' expression ')' [operators expression]
+private expression ::= arguments  (operators arguments) *
 
