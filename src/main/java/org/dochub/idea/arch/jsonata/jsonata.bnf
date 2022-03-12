@@ -33,7 +33,10 @@ private recover ::= !(',' | ']' | '}' | '[' | '{')
 
 private jsonata ::= block | function | variable_set | expression
 
-private deep_prop ::= (range | sys_variable | variable | name | object | array ) ( '.' (name | object)) *
+private bind_arr_item ::= '@' variable
+private bind_arr_index ::= '#' variable
+private bind_arr_variable ::= bind_arr_item [bind_arr_index] | bind_arr_index [bind_arr_item]
+private deep_prop ::= (range | sys_variable | variable | name | object | array ) [bind_arr_variable] ( '.' (name | object)) *
 private post ::= ('.' (filter | deep_prop )) | ('^(' order_params ')')
 private filter ::= deep_prop  '[' expression ']' post *
 private function_params ::= variable (',' variable) *
