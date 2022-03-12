@@ -46,9 +46,13 @@ private function ::= variable ':=' 'function' '(' (function_params|) ')' '{' fun
 private function_call_params ::= expression (',' expression) *
 private function_call ::= variable '(' function_call_params ')'
 
-private chain ::= (variable | chain) '~>' variable *
+private transform_location ::= id ('.' id) *
+private transform ::= '|' transform_location '|' expression [','  array] '|'
 
-private variable_set ::= variable ':=' (chain | jsonata);
+private chain ::= variable ('~>' (transform | chain |  variable)) *
+
+
+private variable_set ::= variable ':=' (chain | transform | jsonata);
 private block_body ::= jsonata (';' jsonata) *;
 private block ::= '(' block_body ')'
 private order_param ::= ['>'|'<'] expression
