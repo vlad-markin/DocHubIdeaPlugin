@@ -52,8 +52,8 @@
         number = "regexp:-?(?=[1-9]|0(?!\d))\d+(\.\d+)?([eE][+-]?\d+)?"
         boolean = "regexp:true|false|null"
         id = "regexp:\p{Alpha}+\w*"
-        range = "regexp:\[([1-9]|0)+\.\.([1-9]|0)+\]*"
-        variable = "regexp:\$([a-z]|[A-Z]|\_)*"
+        //range = "regexp:\[([1-9]|0)+\.\.([1-9]|0)+\]*"
+        variable = "regexp:\$([a-z]|[A-Z]|\_)*|"
         sys_variable = "regexp:\*\*|\*|\%"
         regex = "regexp:\/.+[^\\]/"
 
@@ -64,61 +64,49 @@
         brack1 = "["
         brack2 = "]"
     ]
-    extends("array|object|json")=value
 }
 
 root ::= jsonata
-json ::= array | object  { hooks=[wsBinders="null, null"] }
-value ::= jsonata | string | number | boolean
 
-array ::= '[' [!']' item (!']' ',' item) *] ']' {pin(".*")=1 extends=json}
-private item ::= string | number | boolean | json {recoverWhile=recover}
-object ::= '{' [!'}' prop (!'}' ',' prop) *] '}' {pin(".*")=1 extends=json}
-prop ::= [] jname ':' value {pin=1 recoverWhile=recover} // remove [] to make NAME mandatory
-jname ::= id | string
-private recover ::= !(',' | ']' | '}' | '[' | '{' | '(' | ')')
+block_item ::= function | set_variable | jsonata
+block_body ::= block_item (';' block_item) *;
+block ::= '(' block_body [';'] ')'
 
-jsonata ::= function | variable_set | chain | transform_call | expression
-
-private bind_arr_item ::= '@' variable
-private bind_arr_index ::= '#' variable
-private bind_arr_variable ::= bind_arr_item [bind_arr_index] | bind_arr_index [bind_arr_item]
-deep_prop ::=
-            (range | sys_variable | variable | jname | object | array | block)
-            [bind_arr_variable]
-            ( '.' (jname | methods | object )) *
-private post ::= ('.' (filter | deep_prop )) | ('^(' order_params ')')
-filter ::= deep_prop  '[' expression ']' post *
-
-method_params ::= expression (',' expression) *
-methods ::= ('$string' | '$number()') '(' [method_params|] ')'
-
-private function_params ::= variable (',' variable) *
-private function_body ::= jsonata *
-function ::= variable ':=' 'function' '(' (function_params|) ')' '{' function_body '}'
-function_call_params ::= expression (',' expression) *
-function_call ::= variable '(' [function_call_params] ')'
-
-transform_location ::= id ('.' id) *
-transform ::= '|' transform_location '|' expression [','  array] '|'
-transform_call ::= expression '~>' transform ('~>' transform) *
-
-chain_simple ::= variable '~>' (transform | chain | variable)
-chain ::= chain_simple ('~>' transform | chain | variable) *
-
-
-variable_set ::= variable ':=' jsonata;
-private block_body ::= jsonata (';' jsonata) *;
-block ::= '(' block_body ')'
-private order_param ::= ['>'|'<'] expression
-order_params ::= order_param (',' order_param) *
-order ::= (deep_prop | filter) '^(' order_params ')' post *
-
-arguments ::= string | number | boolean | function_call | order | filter | deep_prop | object | array | expression
 private math_operators ::= '+' | '-' | '*' | '/' | '%'
 private comp_operators ::= '=' | '!=' | '>' | '<' | '>=' | '<=' | ' in ' | ' and ' | ' or '
 private concat_operators ::= '&'
-private cond_operators ::= '?' expression ':'
-operators ::= math_operators | comp_operators | concat_operators | cond_operators
-expression ::= regex | arguments  (operators arguments) *
+private cond_operators ::= '?' jsonata ':'
+operators ::= cond_operators | math_operators | comp_operators | concat_operators
+
+func_word ::= 'function'
+func_params ::= [variable (',' variable) *]
+function ::= variable ':=' func_word '(' func_params ')' '{' jsonata '}'
+call_params ::= [jsonata (',' jsonata) *]
+call ::= variable + '(' call_params ')'
+
+set_variable ::= variable ':=' jsonata;
+
+private deep_left ::= (id | variable | sys_variable | string | block | call | range | array | object) [modifier]
+deep ::= deep_left ('.' (id | sys_variable | call | array | object) [modifier])*
+
+mod_filter ::= '[' jsonata ']'
+mod_order ::= '^' '(' (['>'|'<'] jsonata (',' ['>'|'<'] jsonata)*) ')'
+mod_bind_index ::= '#' variable
+mod_bind_self ::= '@' variable
+modifier ::= (mod_filter | mod_order | mod_bind_index | mod_bind_self) *
+
+transform_location ::= id ('.' id) *
+transform ::= '|' transform_location '|' jsonata [','  array] '|'
+transform_do ::= '~>' (transform | call | variable)
+
+range ::= '[' jsonata '..' jsonata ']'
+
+array ::= '[' [!']' jsonata (!']' ',' jsonata) *] ']' {pin(".*")=1}
+prop ::= [] (id | string) ':' jsonata {pin=1}
+object ::= '{' [!'}' prop (!'}' ',' prop) *] '}' {pin(".*")=1}
+
+argument ::= (number | call | deep | block | array | object) [modifier]
+
+jsonata ::= regex | chain | transform | argument (operators argument | transform_do) * {pin=1}
+
 

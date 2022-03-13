@@ -28,33 +28,33 @@ public class JSONataJsonataImpl extends ASTWrapperPsiElement implements JSONataJ
   }
 
   @Override
-  @Nullable
-  public JSONataChain getChain() {
-    return findChildByClass(JSONataChain.class);
+  @NotNull
+  public List<JSONataArgument> getArgumentList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, JSONataArgument.class);
+  }
+
+  @Override
+  @NotNull
+  public List<JSONataOperators> getOperatorsList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, JSONataOperators.class);
   }
 
   @Override
   @Nullable
-  public JSONataExpression getExpression() {
-    return findChildByClass(JSONataExpression.class);
+  public JSONataTransform getTransform() {
+    return findChildByClass(JSONataTransform.class);
+  }
+
+  @Override
+  @NotNull
+  public List<JSONataTransformDo> getTransformDoList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, JSONataTransformDo.class);
   }
 
   @Override
   @Nullable
-  public JSONataFunction getFunction() {
-    return findChildByClass(JSONataFunction.class);
-  }
-
-  @Override
-  @Nullable
-  public JSONataTransformCall getTransformCall() {
-    return findChildByClass(JSONataTransformCall.class);
-  }
-
-  @Override
-  @Nullable
-  public JSONataVariableSet getVariableSet() {
-    return findChildByClass(JSONataVariableSet.class);
+  public PsiElement getRegex() {
+    return findChildByType(REGEX);
   }
 
 }

@@ -7,19 +7,19 @@ import com.intellij.psi.PsiElement;
 
 public interface JSONataJsonata extends PsiElement {
 
-  @Nullable
-  JSONataChain getChain();
+  @NotNull
+  List<JSONataArgument> getArgumentList();
+
+  @NotNull
+  List<JSONataOperators> getOperatorsList();
 
   @Nullable
-  JSONataExpression getExpression();
+  JSONataTransform getTransform();
+
+  @NotNull
+  List<JSONataTransformDo> getTransformDoList();
 
   @Nullable
-  JSONataFunction getFunction();
-
-  @Nullable
-  JSONataTransformCall getTransformCall();
-
-  @Nullable
-  JSONataVariableSet getVariableSet();
+  PsiElement getRegex();
 
 }

@@ -46,6 +46,7 @@ REGEX=\/.+[^\\]\/
   "}"                 { return BRACE2; }
   "["                 { return BRACK1; }
   "]"                 { return BRACK2; }
+  "chain"             { return CHAIN; }
 
   {COMMENT}           { return COMMENT; }
   {SPACE}             { return SPACE; }
@@ -53,7 +54,6 @@ REGEX=\/.+[^\\]\/
   {NUMBER}            { return NUMBER; }
   {BOOLEAN}           { return BOOLEAN; }
   {ID}                { return ID; }
-  {RANGE}             { return RANGE; }
   {VARIABLE}          { return VARIABLE; }
   {SYS_VARIABLE}      { return SYS_VARIABLE; }
   {REGEX}             { return REGEX; }

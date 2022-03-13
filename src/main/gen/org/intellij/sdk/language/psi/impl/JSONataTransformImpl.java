@@ -35,8 +35,8 @@ public class JSONataTransformImpl extends ASTWrapperPsiElement implements JSONat
 
   @Override
   @NotNull
-  public JSONataExpression getExpression() {
-    return findNotNullChildByClass(JSONataExpression.class);
+  public JSONataJsonata getJsonata() {
+    return findNotNullChildByClass(JSONataJsonata.class);
   }
 
   @Override

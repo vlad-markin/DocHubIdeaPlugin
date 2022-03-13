@@ -29,8 +29,26 @@ public class JSONataFunctionImpl extends ASTWrapperPsiElement implements JSONata
 
   @Override
   @NotNull
-  public List<JSONataJsonata> getJsonataList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, JSONataJsonata.class);
+  public JSONataFuncParams getFuncParams() {
+    return findNotNullChildByClass(JSONataFuncParams.class);
+  }
+
+  @Override
+  @NotNull
+  public JSONataFuncWord getFuncWord() {
+    return findNotNullChildByClass(JSONataFuncWord.class);
+  }
+
+  @Override
+  @NotNull
+  public JSONataJsonata getJsonata() {
+    return findNotNullChildByClass(JSONataJsonata.class);
+  }
+
+  @Override
+  @NotNull
+  public PsiElement getVariable() {
+    return findNotNullChildByType(VARIABLE);
   }
 
 }

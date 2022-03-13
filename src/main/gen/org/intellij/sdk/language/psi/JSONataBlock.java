@@ -8,6 +8,6 @@ import com.intellij.psi.PsiElement;
 public interface JSONataBlock extends PsiElement {
 
   @NotNull
-  List<JSONataJsonata> getJsonataList();
+  JSONataBlockBody getBlockBody();
 
 }

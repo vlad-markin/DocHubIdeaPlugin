@@ -8,15 +8,15 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static org.dochub.idea.arch.jsonata.psi.JSONataTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.intellij.sdk.language.psi.*;
 
-public class JSONataArrayImpl extends JSONataJsonImpl implements JSONataArray {
+public class JSONataArrayImpl extends ASTWrapperPsiElement implements JSONataArray {
 
   public JSONataArrayImpl(@NotNull ASTNode node) {
     super(node);
   }
 
-  @Override
   public void accept(@NotNull JSONataVisitor visitor) {
     visitor.visitArray(this);
   }
@@ -29,8 +29,8 @@ public class JSONataArrayImpl extends JSONataJsonImpl implements JSONataArray {
 
   @Override
   @NotNull
-  public List<JSONataJson> getJsonList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, JSONataJson.class);
+  public List<JSONataJsonata> getJsonataList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, JSONataJsonata.class);
   }
 
 }

@@ -8,6 +8,6 @@ import com.intellij.psi.PsiElement;
 public interface JSONataOperators extends PsiElement {
 
   @Nullable
-  JSONataExpression getExpression();
+  JSONataJsonata getJsonata();
 
 }

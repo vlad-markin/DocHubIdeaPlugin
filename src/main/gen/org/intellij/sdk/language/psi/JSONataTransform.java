@@ -11,7 +11,7 @@ public interface JSONataTransform extends PsiElement {
   JSONataArray getArray();
 
   @NotNull
-  JSONataExpression getExpression();
+  JSONataJsonata getJsonata();
 
   @NotNull
   JSONataTransformLocation getTransformLocation();

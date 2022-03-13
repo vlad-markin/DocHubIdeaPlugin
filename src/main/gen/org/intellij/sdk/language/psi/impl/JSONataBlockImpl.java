@@ -29,8 +29,8 @@ public class JSONataBlockImpl extends ASTWrapperPsiElement implements JSONataBlo
 
   @Override
   @NotNull
-  public List<JSONataJsonata> getJsonataList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, JSONataJsonata.class);
+  public JSONataBlockBody getBlockBody() {
+    return findNotNullChildByClass(JSONataBlockBody.class);
   }
 
 }

@@ -8,9 +8,12 @@ import com.intellij.psi.PsiElement;
 public interface JSONataProp extends PsiElement {
 
   @Nullable
-  JSONataJname getJname();
+  JSONataJsonata getJsonata();
 
   @Nullable
-  JSONataValue getValue();
+  PsiElement getId();
+
+  @Nullable
+  PsiElement getString();
 
 }

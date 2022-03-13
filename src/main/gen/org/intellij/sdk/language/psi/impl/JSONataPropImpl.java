@@ -29,14 +29,20 @@ public class JSONataPropImpl extends ASTWrapperPsiElement implements JSONataProp
 
   @Override
   @Nullable
-  public JSONataJname getJname() {
-    return findChildByClass(JSONataJname.class);
+  public JSONataJsonata getJsonata() {
+    return findChildByClass(JSONataJsonata.class);
   }
 
   @Override
   @Nullable
-  public JSONataValue getValue() {
-    return findChildByClass(JSONataValue.class);
+  public PsiElement getId() {
+    return findChildByType(ID);
+  }
+
+  @Override
+  @Nullable
+  public PsiElement getString() {
+    return findChildByType(STRING);
   }
 
 }

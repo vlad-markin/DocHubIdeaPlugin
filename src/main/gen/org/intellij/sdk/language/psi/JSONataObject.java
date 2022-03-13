@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface JSONataObject extends JSONataJson {
+public interface JSONataObject extends PsiElement {
 
   @NotNull
   List<JSONataProp> getPropList();

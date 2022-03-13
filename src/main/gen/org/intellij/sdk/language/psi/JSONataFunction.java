@@ -8,6 +8,15 @@ import com.intellij.psi.PsiElement;
 public interface JSONataFunction extends PsiElement {
 
   @NotNull
-  List<JSONataJsonata> getJsonataList();
+  JSONataFuncParams getFuncParams();
+
+  @NotNull
+  JSONataFuncWord getFuncWord();
+
+  @NotNull
+  JSONataJsonata getJsonata();
+
+  @NotNull
+  PsiElement getVariable();
 
 }

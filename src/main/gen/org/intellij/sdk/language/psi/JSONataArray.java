@@ -5,9 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface JSONataArray extends JSONataJson {
+public interface JSONataArray extends PsiElement {
 
   @NotNull
-  List<JSONataJson> getJsonList();
+  List<JSONataJsonata> getJsonataList();
 
 }
