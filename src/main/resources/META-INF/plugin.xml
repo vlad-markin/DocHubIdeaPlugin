@@ -61,6 +61,13 @@
                 language="JSONata"
                 extensions="jsonata"
         />
+        <lang.parserDefinition
+                language="JSONata"
+                implementationClass="org.dochub.idea.arch.jsonata.JSONataParserDefinition"
+        />
+        <lang.syntaxHighlighterFactory
+                language="JSONata"
+                implementationClass="org.dochub.idea.arch.jsonata.JSONataSyntaxHighlighterFactory"/>
         <!--
         <editorTabTitleProvider
                 implementation="org.dochub.idea.arch.views.PreviewEditorTabTitleProvider"

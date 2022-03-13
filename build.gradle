@@ -6,6 +6,8 @@ plugins {
 group 'org.dochub.idea'
 version '1.9-beta'
 
+sourceSets.main.java.srcDirs 'src/main/gen'
+
 repositories {
     mavenCentral()
 }
