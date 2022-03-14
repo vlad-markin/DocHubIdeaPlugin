@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.vfs.newvfs.BulkFileListener;
+import com.intellij.openapi.vfs.newvfs.events.VFileContentChangeEvent;
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.psi.PsiElement;
@@ -27,10 +28,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 
 public class DocHubToolWindow extends JBCefBrowser {
@@ -38,6 +36,7 @@ public class DocHubToolWindow extends JBCefBrowser {
   private Project project;
   private MessageBusConnection eventBus;
   private Integer changeCounter = 0;
+  private static List<String> sourceChanged;
 
   private void reloadHtml() {
     InputStream input = getClass().getClassLoader().getResourceAsStream("html/plugin.html");
@@ -104,7 +103,9 @@ public class DocHubToolWindow extends JBCefBrowser {
         } else if (url.equals("plugin:/idea/change/index")) {
           Map<String, Object> response = new HashMap<>();
           response.put("data", changeCounter);
+          response.put("changed", new ArrayList<>(sourceChanged));
           result.append(mapper.writeValueAsString(response));
+          sourceChanged.clear();
         } else if (url.equals("plugin:/idea/debugger/show")){
           openDevtools();
         } else {
@@ -120,12 +121,22 @@ public class DocHubToolWindow extends JBCefBrowser {
   public DocHubToolWindow(ToolWindow toolWindow, Project project) {
     super("about:blank");
 
+    sourceChanged = new ArrayList<>();
     eventBus = project.getMessageBus().connect();
 
     eventBus.subscribe(VirtualFileManager.VFS_CHANGES, new BulkFileListener() {
       @Override
       public void after(@NotNull List<? extends VFileEvent> events) {
-        changeCounter++;
+        String rootManifest = CacheBuilder.getRootManifestName(project);
+        events.forEach(event -> {
+          if (event instanceof VFileContentChangeEvent &&
+                  event.getFile() != null) {
+            String source = event.getFile().getPath().substring(project.getBasePath().length() + 1);
+            if (source.equals(rootManifest)) source = "$root";
+            sourceChanged.add("plugin:/idea/source/" + source);
+            changeCounter++;
+          }
+        });
       }
     });
 
