@@ -28,7 +28,10 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.Timer;
 import java.util.regex.Matcher;
 
 public class DocHubToolWindow extends JBCefBrowser {
@@ -37,6 +40,23 @@ public class DocHubToolWindow extends JBCefBrowser {
   private MessageBusConnection eventBus;
   private Integer changeCounter = 0;
   private static List<String> sourceChanged;
+  private Boolean doRepair = false;
+  private Timer timer;
+  private TimerTask observer = null;
+
+  private void startObserver() {
+    doRepair = false;
+    if (observer == null) {
+      observer = new TimerTask() {
+        public void run() {
+          if (doRepair) reloadHtml();
+          doRepair = true;
+        }
+      };
+      timer = new Timer("DocHub observer");
+      timer.scheduleAtFixedRate(observer, 5000L, 5000L);
+    }
+  }
 
   private void reloadHtml() {
     InputStream input = getClass().getClassLoader().getResourceAsStream("html/plugin.html");
@@ -88,7 +108,7 @@ public class DocHubToolWindow extends JBCefBrowser {
           Map<String, Object> response = new HashMap<>();
           response.put("data", PlantUMLDriver.makeSVG(source));
           result.append(mapper.writeValueAsString(response));
-        } else if (url.substring(0, 20).equals("plugin:/idea/source/")) {
+        } else if ((url.length() > 20) && url.substring(0, 20).equals("plugin:/idea/source/")) {
           String basePath = project.getBasePath() + "/";
           String parentPath = (new File(CacheBuilder.getRootManifestName(project))).getParent();
           String sourcePath = basePath + (parentPath != null ? parentPath + "/" : "") + url.substring(20);
@@ -108,6 +128,8 @@ public class DocHubToolWindow extends JBCefBrowser {
           sourceChanged.clear();
         } else if (url.equals("plugin:/idea/debugger/show")){
           openDevtools();
+        } else if (url.equals("plugin:/idea/reload")){
+          reloadHtml();
         } else {
           return new JBCefJSQuery.Response("", 404, "No found: " + url);
         }
@@ -115,11 +137,12 @@ public class DocHubToolWindow extends JBCefBrowser {
     } catch (IOException e1) {
       return new JBCefJSQuery.Response("", 500, e1.toString());
     }
+    startObserver();
     return new JBCefJSQuery.Response(result.toString());
   }
 
   public DocHubToolWindow(ToolWindow toolWindow, Project project) {
-    super("about:blank");
+    super("/");
 
     sourceChanged = new ArrayList<>();
     eventBus = project.getMessageBus().connect();

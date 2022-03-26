@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'org.dochub.idea'
-version '1.10-beta'
+version '1.11-beta'
 
 sourceSets.main.java.srcDirs 'src/main/gen'
 
@@ -14,7 +14,7 @@ repositories {
 
 dependencies {
     implementation 'com.ibm.jsonata4java:JSONata4Java:1.6.1'
-    implementation files('jars/plantuml-1.2021.16.jar')
+    implementation files('jars/plantuml.jar')
     // implementation 'net.sourceforge.plantuml'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
