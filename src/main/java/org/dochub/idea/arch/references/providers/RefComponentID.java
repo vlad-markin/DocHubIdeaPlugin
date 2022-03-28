@@ -11,13 +11,7 @@ import org.jetbrains.yaml.psi.*;
 public class RefComponentID extends RefBaseID {
     static private final String keyword = "components";
 
-    @Override
-    protected String getKeyword() {
-        return keyword;
-    }
-
-    @Override
-    public ElementPattern<? extends PsiElement> getRefPattern() {
+    static public ElementPattern<? extends PsiElement> pattern() {
         return PlatformPatterns.or(
                 // Ссылки в идентификаторах компонентов
                 PlatformPatterns.psiElement(YAMLKeyValue.class)
@@ -52,5 +46,15 @@ public class RefComponentID extends RefBaseID {
                         )
 
         );
+    }
+
+    @Override
+    protected String getKeyword() {
+        return keyword;
+    }
+
+    @Override
+    public ElementPattern<? extends PsiElement> getRefPattern() {
+        return pattern();
     }
 }

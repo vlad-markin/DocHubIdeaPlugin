@@ -28,8 +28,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.Timer;
 import java.util.regex.Matcher;
@@ -43,6 +41,7 @@ public class DocHubToolWindow extends JBCefBrowser {
   private Boolean doRepair = false;
   private Timer timer;
   private TimerTask observer = null;
+  private Navigation navigation;
 
   private void startObserver() {
     doRepair = false;
@@ -108,6 +107,20 @@ public class DocHubToolWindow extends JBCefBrowser {
           Map<String, Object> response = new HashMap<>();
           response.put("data", PlantUMLDriver.makeSVG(source));
           result.append(mapper.writeValueAsString(response));
+        } else if (url.equals("plugin:/idea/goto")) {
+          JsonNode jsonSource = jsonObj.get("source");
+          JsonNode jsonID = jsonObj.get("id");
+          if ((jsonSource != null) && (jsonID != null)) {
+            String source = jsonSource.asText();
+            String id = jsonID.asText();
+            String basePath = project.getBasePath() + "/";
+            String parentPath = (new File(CacheBuilder.getRootManifestName(project))).getParent();
+            String sourcePath = basePath + (parentPath != null ? parentPath + "/" : "") + source.substring(20);
+            File file = new File(sourcePath);
+            if (file.exists() || !file.isDirectory()) {
+              navigation.go(sourcePath, "component", id);
+            }
+          }
         } else if ((url.length() > 20) && url.substring(0, 20).equals("plugin:/idea/source/")) {
           String basePath = project.getBasePath() + "/";
           String parentPath = (new File(CacheBuilder.getRootManifestName(project))).getParent();
@@ -146,6 +159,7 @@ public class DocHubToolWindow extends JBCefBrowser {
 
     sourceChanged = new ArrayList<>();
     eventBus = project.getMessageBus().connect();
+    navigation = new Navigation(project);
 
     eventBus.subscribe(VirtualFileManager.VFS_CHANGES, new BulkFileListener() {
       @Override

@@ -16,7 +16,10 @@
                 <li>Suggests for the structure of architecture manifests (yaml);</li>
                 <li>Suggests for the values of manifest fields;</li>
                 <li>Fast navigation through manifests;</li>
-                <li>(new) Built-in architecture rendering.</li>
+                <li>Built-in architecture rendering;</li>
+                <li>(new) JSONata file support;</li>
+                <li>(new) Fresh release of DocHub frontend;</li>
+                <li>(new) Fixed bugs of YAML interpretation.</li>
             </ul>
         </p>
     ]]></description>

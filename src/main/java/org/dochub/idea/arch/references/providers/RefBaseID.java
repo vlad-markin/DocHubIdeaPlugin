@@ -26,16 +26,20 @@ public class RefBaseID extends BaseReferencesProvider {
         return "undefined";
     }
 
-    @Override
-    public ElementPattern<? extends PsiElement> getSourcePattern(Object ref) {
+    public static ElementPattern<? extends PsiElement>  makeSourcePattern(String keyword, String id) {
         return PlatformPatterns.psiElement(YAMLKeyValue.class)
-                .withName((String)ref)
+                .withName(id)
                 .notEmpty()
                 .withSuperParent(2,
                         psi(YAMLKeyValue.class)
-                                .withName(PlatformPatterns.string().equalTo(getKeyword()))
+                                .withName(PlatformPatterns.string().equalTo(keyword))
                                 .withSuperParent(2, psi(YAMLDocument.class))
                 );
+    }
+
+    @Override
+    public ElementPattern<? extends PsiElement> getSourcePattern(Object ref) {
+        return makeSourcePattern(getKeyword(), (String)ref);
     }
 
     private class FileSourceReference extends PsiReferenceBase {
