@@ -70,7 +70,12 @@
         />
         <lang.syntaxHighlighterFactory
                 language="JSONata"
-                implementationClass="org.dochub.idea.arch.jsonata.JSONataSyntaxHighlighterFactory"/>
+                implementationClass="org.dochub.idea.arch.jsonata.JSONataSyntaxHighlighterFactory"
+        />
+        <codeInsight.lineMarkerProvider
+                language="yaml"
+                implementationClass="org.dochub.idea.arch.tools.LineMarkerProvider"
+        />
         <!--
         <editorTabTitleProvider
                 implementation="org.dochub.idea.arch.views.PreviewEditorTabTitleProvider"

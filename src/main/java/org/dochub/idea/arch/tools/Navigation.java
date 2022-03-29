@@ -15,14 +15,9 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtilCore;
-import com.intellij.util.messages.MessageBus;
 import com.intellij.util.messages.MessageBusConnection;
-import com.intellij.util.messages.Topic;
 import org.dochub.idea.arch.references.providers.RefBaseID;
 import org.dochub.idea.arch.utils.VirtualFileSystemUtils;
-import org.jetbrains.annotations.NotNull;
-
-import javax.swing.*;
 
 public class Navigation {
     private Project project;
@@ -67,7 +62,6 @@ public class Navigation {
             });
         }
     }
-
 
     public Navigation(Project project) {
         this.project = project;
