@@ -42,6 +42,7 @@ public class DocHubToolWindow extends JBCefBrowser {
   private Timer timer;
   private TimerTask observer = null;
   private Navigation navigation;
+  private JSGateway jsGateway = null;
 
   private void startObserver() {
     doRepair = false;
@@ -133,6 +134,11 @@ public class DocHubToolWindow extends JBCefBrowser {
           response.put("contentType", FilenameUtils.getExtension(sourcePath).toLowerCase(Locale.ROOT));
           response.put("data", Files.readString(Path.of(sourcePath)));
           result.append(mapper.writeValueAsString(response));
+        } else if (url.equals("plugin:/idea/gateway/pull")) {
+          Map<String, Object> response = new HashMap<>();
+          response.put("contentType", "json");
+          response.put("data", jsGateway.pullJSONMessage());
+          result.append(mapper.writeValueAsString(response));
         } else if (url.equals("plugin:/idea/change/index")) {
           Map<String, Object> response = new HashMap<>();
           response.put("data", changeCounter);
@@ -141,6 +147,7 @@ public class DocHubToolWindow extends JBCefBrowser {
           sourceChanged.clear();
         } else if (url.equals("plugin:/idea/debugger/show")){
           openDevtools();
+          getCefBrowser().executeJavaScript("console.info('GO!!');", "events.js", 0);
         } else if (url.equals("plugin:/idea/reload")){
           reloadHtml();
         } else {
@@ -160,6 +167,7 @@ public class DocHubToolWindow extends JBCefBrowser {
     sourceChanged = new ArrayList<>();
     eventBus = project.getMessageBus().connect();
     navigation = new Navigation(project);
+    jsGateway = new JSGateway(project);
 
     eventBus.subscribe(VirtualFileManager.VFS_CHANGES, new BulkFileListener() {
       @Override
@@ -170,6 +178,7 @@ public class DocHubToolWindow extends JBCefBrowser {
                   event.getFile() != null) {
             String source = event.getFile().getPath().substring(project.getBasePath().length() + 1);
             if (source.equals(rootManifest)) source = "$root";
+            jsGateway.appendMessage("source/changed", "plugin:/idea/source/" + source, null);
             sourceChanged.add("plugin:/idea/source/" + source);
             changeCounter++;
           }
