@@ -32,12 +32,12 @@ import java.util.*;
 import java.util.Timer;
 import java.util.regex.Matcher;
 
+import static org.dochub.idea.arch.tools.Consts.*;
+
 public class DocHubToolWindow extends JBCefBrowser {
   private JBCefJSQuery sourceQuery;
   private Project project;
   private MessageBusConnection eventBus;
-  private Integer changeCounter = 0;
-  private static List<String> sourceChanged;
   private Boolean doRepair = false;
   private Timer timer;
   private TimerTask observer = null;
@@ -93,7 +93,7 @@ public class DocHubToolWindow extends JBCefBrowser {
       JsonNode jsonURL = jsonObj.get("url");
       if (jsonURL != null) {
         String url = jsonURL.asText();
-        if (url.equals("plugin:/idea/source/$root")) {
+        if (url.equals(ROOT_SOURCE_URI)) {
           Map<String, Object> response = new HashMap<>();
           String rootManifest = CacheBuilder.getRootManifestName(project);
           if (rootManifest == null || rootManifest.length() < 5) {
@@ -102,27 +102,32 @@ public class DocHubToolWindow extends JBCefBrowser {
           response.put("contentType", rootManifest.substring(rootManifest.length() - 4).toLowerCase(Locale.ROOT));
           response.put("data", Files.readString(Path.of(project.getBasePath() + "/" + rootManifest)));
           result.append(mapper.writeValueAsString(response));
-        } else if (url.equals("plugin:/idea/plantuml/svg")) {
+        } else if (url.equals(PLANTUML_RENDER_SVG_URI)) {
           JsonNode jsonSource = jsonObj.get("source");
           String source = jsonSource != null ? jsonSource.asText() : "@startuml\n@enduml";
           Map<String, Object> response = new HashMap<>();
           response.put("data", PlantUMLDriver.makeSVG(source));
           result.append(mapper.writeValueAsString(response));
-        } else if (url.equals("plugin:/idea/goto")) {
+        } else if (url.equals(NAVI_GOTO_SOURCE_URI)) {
           JsonNode jsonSource = jsonObj.get("source");
           JsonNode jsonID = jsonObj.get("id");
           if ((jsonSource != null) && (jsonID != null)) {
-            String source = jsonSource.asText();
             String id = jsonID.asText();
+            String source = jsonSource.asText();
+            File file;
             String basePath = project.getBasePath() + "/";
-            String parentPath = (new File(CacheBuilder.getRootManifestName(project))).getParent();
-            String sourcePath = basePath + (parentPath != null ? parentPath + "/" : "") + source.substring(20);
-            File file = new File(sourcePath);
+            if (source.equals(ROOT_SOURCE_URI)) {
+              source = basePath + CacheBuilder.getRootManifestName(project);
+            } else {
+              String parentPath = (new File(CacheBuilder.getRootManifestName(project))).getParent();
+              source = basePath + (parentPath != null ? parentPath + "/" : "") + source.substring(20);
+            }
+            file = new File(source);
             if (file.exists() || !file.isDirectory()) {
-              navigation.go(sourcePath, "component", id);
+              navigation.go(source, "component", id);
             }
           }
-        } else if ((url.length() > 20) && url.substring(0, 20).equals("plugin:/idea/source/")) {
+        } else if ((url.length() > 20) && url.substring(0, 20).equals(ROOT_SOURCE_PATH)) {
           String basePath = project.getBasePath() + "/";
           String parentPath = (new File(CacheBuilder.getRootManifestName(project))).getParent();
           String sourcePath = basePath + (parentPath != null ? parentPath + "/" : "") + url.substring(20);
@@ -134,21 +139,15 @@ public class DocHubToolWindow extends JBCefBrowser {
           response.put("contentType", FilenameUtils.getExtension(sourcePath).toLowerCase(Locale.ROOT));
           response.put("data", Files.readString(Path.of(sourcePath)));
           result.append(mapper.writeValueAsString(response));
-        } else if (url.equals("plugin:/idea/gateway/pull")) {
+        } else if (url.equals(ACTION_PULL_URI)) {
           Map<String, Object> response = new HashMap<>();
           response.put("contentType", "json");
           response.put("data", jsGateway.pullJSONMessage());
           result.append(mapper.writeValueAsString(response));
-        } else if (url.equals("plugin:/idea/change/index")) {
-          Map<String, Object> response = new HashMap<>();
-          response.put("data", changeCounter);
-          response.put("changed", new ArrayList<>(sourceChanged));
-          result.append(mapper.writeValueAsString(response));
-          sourceChanged.clear();
-        } else if (url.equals("plugin:/idea/debugger/show")){
+        } else if (url.equals(DEVTOOL_SHOW_URI)){
           openDevtools();
           getCefBrowser().executeJavaScript("console.info('GO!!');", "events.js", 0);
-        } else if (url.equals("plugin:/idea/reload")){
+        } else if (url.equals(HTML_RELOAD_URI)){
           reloadHtml();
         } else {
           return new JBCefJSQuery.Response("", 404, "No found: " + url);
@@ -164,7 +163,6 @@ public class DocHubToolWindow extends JBCefBrowser {
   public DocHubToolWindow(ToolWindow toolWindow, Project project) {
     super("/");
 
-    sourceChanged = new ArrayList<>();
     eventBus = project.getMessageBus().connect();
     navigation = new Navigation(project);
     jsGateway = new JSGateway(project);
@@ -177,10 +175,8 @@ public class DocHubToolWindow extends JBCefBrowser {
           if (event instanceof VFileContentChangeEvent &&
                   event.getFile() != null) {
             String source = event.getFile().getPath().substring(project.getBasePath().length() + 1);
-            if (source.equals(rootManifest)) source = "$root";
-            jsGateway.appendMessage("source/changed", "plugin:/idea/source/" + source, null);
-            sourceChanged.add("plugin:/idea/source/" + source);
-            changeCounter++;
+            if (source.equals(rootManifest)) source = ROOT_SOURCE;
+            jsGateway.appendMessage(ACTION_SOURCE_CHANGED, ROOT_SOURCE_PATH + source, null);
           }
         });
       }

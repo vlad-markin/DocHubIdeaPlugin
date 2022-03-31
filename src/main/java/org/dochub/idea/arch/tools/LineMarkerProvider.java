@@ -5,7 +5,6 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.Function;
-import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.messages.Topic;
 import org.dochub.idea.arch.references.providers.RefComponentID;
 import org.jetbrains.annotations.NotNull;
@@ -59,41 +58,64 @@ public class LineMarkerProvider extends LineMarkerProviderDescriptor {
         return null;
     }
 
+    private LineMarkerInfo makeLineMarkerInfo(
+            @NotNull DocHubNavigationHandler naviHandler,
+            @NotNull PsiElement element) {
+        return new LineMarkerInfo<>(
+                element,
+                element.getTextRange(),
+                AllIcons.Actions.Preview,
+                new Function<PsiElement, String>() {
+                    @Override
+                    public String fun(PsiElement element) {
+                        return "Показать в DocHub";
+                    }
+                },
+                naviHandler,
+                GutterIconRenderer.Alignment.LEFT,
+                new Supplier<String>() {
+                    @Override
+                    public String get() {
+                        return "DocHub";
+                    }
+                }
+        );
+    }
+
+    private boolean isRegisteredComponent(@NotNull PsiElement element, String id) {
+//        Map<String, Object> cache = CacheBuilder.getProjectCache(element.getProject());
+//        Map<String, Object> components = cache == null ? null : (Map<String, Object>) cache.get("components");
+//        PsiElement document = PsiUtils.getYamlDocumentByPsiElement(element);
+//        List<String> suggest = SuggestUtils.scanYamlPsiTreeToID(document, "components");
+//        return components.get(id) != null || (suggest.indexOf(id) >= 0);
+        return true; // todo Здесь нужно проверять на действительную регистрацию компонента
+    }
+
+    private LineMarkerInfo getLineMarkerInfoForComponent(@NotNull PsiElement element) {
+        LineMarkerInfo result = null;
+        String id = null;
+        PsiElement markElement = element;
+        if (element instanceof YAMLKeyValue) {
+            markElement = element.getFirstChild();
+            id = ((YAMLKeyValue)element).getName();
+        } else if (element instanceof YAMLPlainTextImpl) {
+            markElement = element.getFirstChild();
+            id = element.getText();
+        }
+        if (id != null && isRegisteredComponent(element, id)) {
+            result = makeLineMarkerInfo(
+                    new DocHubNavigationHandler("component", id),
+                    markElement
+            );
+        }
+        return result;
+    }
+
     @Override
     public LineMarkerInfo<?> getLineMarkerInfo(@NotNull PsiElement element) {
         LineMarkerInfo result = null;
         if (RefComponentID.pattern().accepts(element)) {
-            String id = null;
-            PsiElement markElement = element;
-            if (element instanceof YAMLKeyValue) {
-                markElement = element.getFirstChild();
-                id = ((YAMLKeyValue)element).getName();
-            } else if (element instanceof YAMLPlainTextImpl) {
-                markElement = element.getFirstChild();
-                id = element.getText();
-            }
-            if (id != null) {
-                DocHubNavigationHandler naviHandler = new DocHubNavigationHandler("component", id);
-                result = new LineMarkerInfo<>(
-                        markElement,
-                        markElement.getTextRange(),
-                        AllIcons.Actions.Preview,
-                        new Function<PsiElement, String>() {
-                            @Override
-                            public String fun(PsiElement element) {
-                                return "Показать в DocHub";
-                            }
-                        },
-                        naviHandler,
-                        GutterIconRenderer.Alignment.LEFT,
-                        new Supplier<String>() {
-                            @Override
-                            public String get() {
-                                return "DocHub";
-                            }
-                        }
-                );
-            }
+            result = getLineMarkerInfoForComponent(element);
         }
         return result;
     }

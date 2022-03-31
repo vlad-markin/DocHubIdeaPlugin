@@ -7,6 +7,8 @@ import com.intellij.openapi.project.Project;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.dochub.idea.arch.tools.Consts.*;
+
 public class JSGateway {
     private Map<String, Map> message = new HashMap<>();
     ObjectMapper mapper = new ObjectMapper();
@@ -15,7 +17,7 @@ public class JSGateway {
         project.getMessageBus().connect().subscribe(LineMarkerProvider.ON_NAVIGATE_MESSAGE, new LineMarkerProvider.NavigateMessage() {
             @Override
             public void go(String entity, String id) {
-                appendMessage("navigate/component", id, null);
+                appendMessage(ACTION_NAVIGATE_COMPONENT, id, null);
             }
         });
     }
@@ -27,10 +29,6 @@ public class JSGateway {
             message.put(action, aData);
         }
         aData.put(id, data);
-    }
-
-    public boolean isFound() {
-        return message.size() > 0;
     }
 
     public String pullJSONMessage() throws JsonProcessingException {

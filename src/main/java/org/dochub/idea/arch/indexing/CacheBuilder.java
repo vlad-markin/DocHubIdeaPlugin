@@ -15,13 +15,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CacheBuilder {
-
-//    project.getMessageBus().connect().subscribe(ProjectTopics.PROJECT_ROOTS, new ModuleRootListener() {
-//        @Override
-//        public void rootsChanged(ModuleRootEvent event) {
-//        }
-//    });
-
     private static Key cacheGlobalKey = Key.create("dochub-global-cache");
 
     private static boolean isFileExists(Project project, String filename) {
@@ -133,15 +126,6 @@ public class CacheBuilder {
             // todo тут нужно сделать предупреждение
         }
     }
-
-//    private static void appendMessageToSuggest(String message, Map<String, Object> context) {
-//        Map<String, CacheFileData> files = new HashMap<>();
-//        files.put("file", new CacheFileData(null));
-//        Map<String, Object> components = (Map<String, Object>) context.get("components");
-//        if (components == null) components = new HashMap<>();
-//        components.put("message:"  + message, files);
-//        context.put("components", components);
-//    }
 
     private static String getFromEnv(Project project) {
         String[] names = new String[]{".env.local", ".env"};
