@@ -8,6 +8,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.vfs.newvfs.BulkFileListener;
 import com.intellij.openapi.vfs.newvfs.events.VFileContentChangeEvent;
+import com.intellij.openapi.vfs.newvfs.events.VFileDeleteEvent;
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.psi.PsiElement;
@@ -19,6 +20,7 @@ import com.intellij.util.messages.MessageBusConnection;
 import org.apache.commons.io.FilenameUtils;
 import org.dochub.idea.arch.indexing.CacheBuilder;
 import org.dochub.idea.arch.manifests.PlantUMLDriver;
+import org.dochub.idea.arch.wizard.RootManifest;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -72,18 +74,6 @@ public class DocHubToolWindow extends JBCefBrowser {
     loadHTML(html);
   }
 
-  public static VirtualFile getGotoFile(final Project project, final VirtualFile file) {
-    PsiElement element = PsiManager.getInstance(project).findFile(file);
-    if (element != null) {
-      PsiElement navElement = element.getNavigationElement();
-      navElement = TargetElementUtil.getInstance().getGotoDeclarationTarget(element, navElement);
-      if (navElement != null && navElement.getContainingFile() != null) {
-        return navElement.getContainingFile().getVirtualFile();
-      }
-    }
-    return file;
-  }
-
   private JBCefJSQuery.Response requestProcessing(String json) {
     // openDevtools();
     StringBuilder result = new StringBuilder();
@@ -95,12 +85,13 @@ public class DocHubToolWindow extends JBCefBrowser {
         String url = jsonURL.asText();
         if (url.equals(ROOT_SOURCE_URI)) {
           Map<String, Object> response = new HashMap<>();
-          String rootManifest = CacheBuilder.getRootManifestName(project);
-          if (rootManifest == null || rootManifest.length() < 5) {
+          String rootName = project.getBasePath() + "/" + CacheBuilder.getRootManifestName(project);
+          File rootFile = new File(rootName);
+          if (!rootFile.exists()) {
             return new JBCefJSQuery.Response("", 404, "No found: " + url);
           }
-          response.put("contentType", rootManifest.substring(rootManifest.length() - 4).toLowerCase(Locale.ROOT));
-          response.put("data", Files.readString(Path.of(project.getBasePath() + "/" + rootManifest)));
+          response.put("contentType", rootName.substring(rootName.length() - 4).toLowerCase(Locale.ROOT));
+          response.put("data", Files.readString(Path.of(rootName)));
           result.append(mapper.writeValueAsString(response));
         } else if (url.equals(PLANTUML_RENDER_SVG_URI)) {
           JsonNode jsonSource = jsonObj.get("source");
@@ -109,24 +100,10 @@ public class DocHubToolWindow extends JBCefBrowser {
           response.put("data", PlantUMLDriver.makeSVG(source));
           result.append(mapper.writeValueAsString(response));
         } else if (url.equals(NAVI_GOTO_SOURCE_URI)) {
-          JsonNode jsonSource = jsonObj.get("source");
-          JsonNode jsonID = jsonObj.get("id");
-          if ((jsonSource != null) && (jsonID != null)) {
-            String id = jsonID.asText();
-            String source = jsonSource.asText();
-            File file;
-            String basePath = project.getBasePath() + "/";
-            if (source.equals(ROOT_SOURCE_URI)) {
-              source = basePath + CacheBuilder.getRootManifestName(project);
-            } else {
-              String parentPath = (new File(CacheBuilder.getRootManifestName(project))).getParent();
-              source = basePath + (parentPath != null ? parentPath + "/" : "") + source.substring(20);
-            }
-            file = new File(source);
-            if (file.exists() || !file.isDirectory()) {
-              navigation.go(source, "component", id);
-            }
-          }
+          navigation.go(jsonObj);
+        }  else if (url.equals(WIZARD_INIT_URI)) {
+          (new RootManifest()).createRootManifest(project);
+          reloadHtml();
         } else if ((url.length() > 20) && url.substring(0, 20).equals(ROOT_SOURCE_PATH)) {
           String basePath = project.getBasePath() + "/";
           String parentPath = (new File(CacheBuilder.getRootManifestName(project))).getParent();
@@ -172,8 +149,12 @@ public class DocHubToolWindow extends JBCefBrowser {
       public void after(@NotNull List<? extends VFileEvent> events) {
         String rootManifest = CacheBuilder.getRootManifestName(project);
         events.forEach(event -> {
-          if (event instanceof VFileContentChangeEvent &&
-                  event.getFile() != null) {
+          if (event.getFile() != null &&
+                  (
+                          event instanceof VFileContentChangeEvent
+                          ||  event instanceof VFileDeleteEvent
+                  )
+          ) {
             String source = event.getFile().getPath().substring(project.getBasePath().length() + 1);
             if (source.equals(rootManifest)) source = ROOT_SOURCE;
             jsGateway.appendMessage(ACTION_SOURCE_CHANGED, ROOT_SOURCE_PATH + source, null);
@@ -189,6 +170,7 @@ public class DocHubToolWindow extends JBCefBrowser {
     reloadHtml();
 
     this.project = project;
+
   }
 
   public JComponent getContent() {

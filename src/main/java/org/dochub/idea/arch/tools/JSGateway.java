@@ -17,7 +17,7 @@ public class JSGateway {
         project.getMessageBus().connect().subscribe(LineMarkerProvider.ON_NAVIGATE_MESSAGE, new LineMarkerProvider.NavigateMessage() {
             @Override
             public void go(String entity, String id) {
-                appendMessage(ACTION_NAVIGATE_COMPONENT, id, null);
+                appendMessage("navigate/" + entity, id, null);
             }
         });
     }

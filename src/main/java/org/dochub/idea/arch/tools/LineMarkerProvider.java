@@ -6,7 +6,10 @@ import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.Function;
 import com.intellij.util.messages.Topic;
+import org.dochub.idea.arch.references.providers.RefAspectID;
 import org.dochub.idea.arch.references.providers.RefComponentID;
+import org.dochub.idea.arch.references.providers.RefContextID;
+import org.dochub.idea.arch.references.providers.RefDocsID;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.yaml.psi.YAMLKeyValue;
 import org.jetbrains.yaml.psi.impl.YAMLPlainTextImpl;
@@ -91,7 +94,17 @@ public class LineMarkerProvider extends LineMarkerProviderDescriptor {
         return true; // todo Здесь нужно проверять на действительную регистрацию компонента
     }
 
-    private LineMarkerInfo getLineMarkerInfoForComponent(@NotNull PsiElement element) {
+    private boolean isRegisteredDocument(@NotNull PsiElement element, String id) {
+        return true; // todo Здесь нужно проверять на действительную регистрацию компонента
+    }
+
+    private interface ElementExplain {
+        default DocHubNavigationHandler register(String id) {
+            return null;
+        };
+    }
+
+    private LineMarkerInfo explainElement(@NotNull PsiElement element, ElementExplain explain) {
         LineMarkerInfo result = null;
         String id = null;
         PsiElement markElement = element;
@@ -104,11 +117,47 @@ public class LineMarkerProvider extends LineMarkerProviderDescriptor {
         }
         if (id != null && isRegisteredComponent(element, id)) {
             result = makeLineMarkerInfo(
-                    new DocHubNavigationHandler("component", id),
+                    explain.register(id),
                     markElement
             );
         }
         return result;
+    }
+
+    private LineMarkerInfo getLineMarkerInfoForComponent(@NotNull PsiElement element) {
+        return explainElement(element, new ElementExplain() {
+            @Override
+            public DocHubNavigationHandler register(String id) {
+                return new DocHubNavigationHandler("component", id);
+            }
+        });
+    }
+
+    private LineMarkerInfo getLineMarkerInfoForDocument(@NotNull PsiElement element) {
+        return explainElement(element, new ElementExplain() {
+            @Override
+            public DocHubNavigationHandler register(String id) {
+                return new DocHubNavigationHandler("document", id);
+            }
+        });
+    }
+
+    private LineMarkerInfo getLineMarkerInfoForAspect(@NotNull PsiElement element) {
+        return explainElement(element, new ElementExplain() {
+            @Override
+            public DocHubNavigationHandler register(String id) {
+                return new DocHubNavigationHandler("aspect", id);
+            }
+        });
+    }
+
+    private LineMarkerInfo getLineMarkerInfoForContext(@NotNull PsiElement element) {
+        return explainElement(element, new ElementExplain() {
+            @Override
+            public DocHubNavigationHandler register(String id) {
+                return new DocHubNavigationHandler("context", id);
+            }
+        });
     }
 
     @Override
@@ -116,6 +165,12 @@ public class LineMarkerProvider extends LineMarkerProviderDescriptor {
         LineMarkerInfo result = null;
         if (RefComponentID.pattern().accepts(element)) {
             result = getLineMarkerInfoForComponent(element);
+        } else if (RefDocsID.pattern().accepts(element)) {
+            result = getLineMarkerInfoForDocument(element);
+        } else if (RefAspectID.pattern().accepts(element)) {
+            result = getLineMarkerInfoForAspect(element);
+        } else if (RefContextID.pattern().accepts(element)) {
+            result = getLineMarkerInfoForContext(element);
         }
         return result;
     }

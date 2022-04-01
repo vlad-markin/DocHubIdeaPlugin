@@ -1,0 +1,103 @@
+# Здесь можено подключить другие репозитории архитектуры
+imports:
+#  - https://dochub.info/documentation/root.yaml  # по прямой ссылке
+#  - foo.yaml                                     # или по относительному пути
+
+# Здесь описываются архитектурные объекты учета - компоненты
+components:
+  # Компоненты верхнего уровня (L1 C4Model)
+  user:                       # Компонент описывающий пользователя
+    title: Пользователь       # Название
+    entity: actor             # Представление на схеме
+    links:                    # Компоненты с которым пользователь взаимодействует
+      - id: system            # Идентификатор системы
+        direction: <-->       # Направление взаимодейстия (<-- | -- | --> | <-->)
+        title: Покупка        # Смысл взаимодействия
+  system:                     # Компонент описывающий систему
+    title: Система
+    entity: collections
+  # Устройство компонетов верхнего уровня (L2 C4Model)
+  # Иерархия компонентов определяется структурой их идентификаторов
+
+  # API шлюз
+  system.gateway:
+    title: API шлюз
+    entity: component
+    links:
+      - id: system.backend
+        title: Бизнес API
+        direction: <-->
+        contract: https://editor.swagger.io/  # Можно указать контракт внешней ссылкой
+      #       contract: document_id                 # или идентификатором документа
+      - id: system.auth
+        title: Auth API
+        direction: <-->
+    technologies:             # Технологии используюмые в компоненте
+      - HTTP
+      - OAuth
+
+  # Бэкенд
+  system.backend:
+    title: Бэкенд
+    entity: component
+    links:
+      - id: system.db
+        direction: <-->
+    technologies:
+      - PHP
+      - Laravel
+  # Детальная архитектура бэкенда (L3 C4Model)
+  system.backend.core:        # Ядро бэкенда
+    title: Ядро
+    entity: component
+  system.backend.log:         # Подсистема логирования
+    title: Подсистема логирования
+    entity: component
+  system.backend.business:    # Бизнеслогика
+    title: Бизнес-логика
+    entity: component
+
+  # Сервис аторизации
+  system.auth:                # Компонент акторизации
+    title: Авторизация
+    entity: component
+    links:
+      - id: system.db
+        direction: <-->
+    technologies:
+      - Go
+      - OAuth
+
+  # Хранилища
+  system.db:
+    title: Харнилища
+    entity: database
+  system.db.business:         # База бизнес-логики
+    title: Данные
+    entity: database
+    technologies:
+      - PostgreSQL
+  system.db.users:            # База пользоватлей
+    title: Пользователи
+    entity: database
+    technologies:
+      - PostgreSQL
+
+# Диаграммы представлений
+contexts:
+  overview:                   # Схема верхнего уровня представления (L1 C4Model)
+    title: Обзор              # Название диаграммы
+    location: Пример          # Размещение диаграммы в меню
+    components:               # Компоненты, которые входят в диаграмму
+      - system                # В данной диаграмме будет только один компонент
+      - user
+  system:                     # Архитектура системы (L2 C4Model)
+    title: Устройство системы
+    location: Пример/Система
+    components:
+      - system.*              # Можно указать wildcard включемых компонентов в диаграмму
+  system.backend:             # Архитектура бэкенда (L3 C4Model)
+    title: Устройство бэкенда
+    location: Пример/Система/Бэкенд
+    components:
+      - system.backend.*

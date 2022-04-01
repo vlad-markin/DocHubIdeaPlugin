@@ -144,7 +144,7 @@ public class CacheBuilder {
             rootManifest = "dochub.yaml";
         else
             rootManifest = getFromEnv(project);
-        return rootManifest;
+        return rootManifest != null ? rootManifest : "dochub.yaml";
     }
 
     public static Map<String, Object> buildForProject(Project project)  {

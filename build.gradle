@@ -12,6 +12,12 @@ repositories {
     mavenCentral()
 }
 
+jar {
+    manifest {
+        attributes("PLANTUML_LIMIT_SIZE": "24384")
+    }
+}
+
 dependencies {
     implementation 'com.ibm.jsonata4java:JSONata4Java:1.6.1'
     implementation files('jars/plantuml.jar')

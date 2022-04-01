@@ -11,7 +11,8 @@ public class ReferenceContributor extends PsiReferenceContributor {
             new RefComponentID(),
             new RefAspectID(),
             new RefDocsID(),
-            new RefDocSource()
+            new RefDocSource(),
+            new RefContextID()
     };
 
     @Override
