@@ -102,7 +102,13 @@ public class DocHubToolWindow extends JBCefBrowser {
         } else if (url.equals(NAVI_GOTO_SOURCE_URI)) {
           navigation.go(jsonObj);
         }  else if (url.equals(WIZARD_INIT_URI)) {
-          (new RootManifest()).createRootManifest(project);
+          JsonNode jsonMode = jsonObj.get("mode");
+          String mode = jsonMode != null ? jsonMode.asText() : "production";
+          if (mode.equals("example")) {
+            (new RootManifest()).createExampleManifest(project);
+          } else {
+            (new RootManifest()).createRootManifest(project);
+          }
           reloadHtml();
         } else if ((url.length() > 20) && url.substring(0, 20).equals(ROOT_SOURCE_PATH)) {
           String basePath = project.getBasePath() + "/";

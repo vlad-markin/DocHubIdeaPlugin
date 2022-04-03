@@ -16,7 +16,8 @@ import org.jetbrains.yaml.psi.YAMLScalar;
 public class Docs extends CustomProvider {
     private static final String keyword = "docs";
     private static final String[] keys = {
-            "icon", "location", "description", "type", "subjects", "source"
+            "icon", "location", "description", "type", "subjects"
+            , "source", "origin"
     };
 
     public static final ElementPattern<? extends PsiElement> rootPattern = Root.makeRootPattern(keyword);

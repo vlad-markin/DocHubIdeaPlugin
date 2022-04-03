@@ -121,6 +121,7 @@ public class CacheBuilder {
                 parseYamlManifestIDs(sections, "aspects", path, context);
                 parseYamlManifestIDs(sections, "contexts", path, context);
                 parseYamlManifestIDs(sections, "docs", path, context);
+                parseYamlManifestIDs(sections, "datasets", path, context);
             }
         } catch (Exception e) {
             // todo тут нужно сделать предупреждение

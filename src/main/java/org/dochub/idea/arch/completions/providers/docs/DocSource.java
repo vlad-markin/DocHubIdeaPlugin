@@ -20,14 +20,13 @@ import java.util.List;
 public class DocSource extends CustomProvider {
     private static String keyword = "source";
 
-    public static final ElementPattern<? extends PsiElement> rootPattern = PlatformPatterns.or(
+    public static final ElementPattern<? extends PsiElement> rootPattern =
             PlatformPatterns.psiElement()
                     .withSuperParent(2,
                             psi(YAMLKeyValue.class)
                                     .withName(PlatformPatterns.string().equalTo(keyword))
                                     .and(Docs.rootPattern)
-                    )
-    );
+                    );
 
     @Override
     public void appendToCompletion(CompletionContributor completion) {

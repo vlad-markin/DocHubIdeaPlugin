@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'org.dochub.idea'
-version '1.13-beta'
+version '1.14-beta'
 
 sourceSets.main.java.srcDirs 'src/main/gen'
 
@@ -40,7 +40,8 @@ patchPluginXml {
             <li>Suggests for the values of manifest fields;</li>
             <li>Fast navigation through manifests;</li>
             <li>Problems highlighting;</li>
-            <li>JSONata file support.</li>
+            <li>JSONata file support;</li>
+            <li>Mapping architecture on the code.</li>
           <ul>  
       </em>
       """
