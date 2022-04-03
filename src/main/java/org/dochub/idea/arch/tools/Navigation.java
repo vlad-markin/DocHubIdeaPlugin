@@ -109,6 +109,7 @@ public class Navigation {
             String section = entityToSection(entity);
             if (section == null) return;
             Map<String, Object> components = cache == null ? null : (Map<String, Object>) cache.get(section);
+            if (components == null) return;;
             Map<String, Object> files = (Map<String, Object>) components.get(id);
             if (files == null) return;
             for (String file : files.keySet()) {
