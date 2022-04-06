@@ -12,6 +12,7 @@ import com.intellij.psi.util.CachedValueProvider;
 import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.psi.util.PsiModificationTracker;
 import com.intellij.util.ProcessingContext;
+import org.dochub.idea.arch.indexing.CacheBuilder;
 import org.dochub.idea.arch.utils.PsiUtils;
 import org.dochub.idea.arch.utils.SuggestUtils;
 import org.jetbrains.annotations.NotNull;
@@ -54,11 +55,11 @@ public class IDSuggest extends BaseSuggest {
                                 cacheSectionKey,
                                 () -> {
                                     List<String> suggest = SuggestUtils.scanYamlPsiTreeToID(document, getSection());
-                                    Map<String, Object> globalCache = getProjectCache(project);
+                                    Map<String, CacheBuilder.SectionData> globalCache = getProjectCache(project);
                                     if (globalCache != null) {
-                                        Map<String, Object> section = (Map<String, Object>) globalCache.get(getSection());
+                                        CacheBuilder.SectionData section = globalCache.get(getSection());
                                         if (section != null) {
-                                            for (String id : section.keySet()) {
+                                            for (String id : section.ids.keySet()) {
                                                 if (suggest.indexOf(id) < 0)
                                                     suggest.add(id);
                                             }

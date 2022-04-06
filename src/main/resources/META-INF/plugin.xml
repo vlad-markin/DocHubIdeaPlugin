@@ -76,7 +76,7 @@
                 language="yaml"
                 implementationClass="org.dochub.idea.arch.tools.LineMarkerProvider"
         />
-        <fileBasedIndex implementation="org.dochub.idea.arch.indexing.YamlIndex"/>
+        <fileBasedIndex implementation="org.dochub.idea.arch.indexing.DocHubIndex"/>
         <!--
         <editorTabTitleProvider
                 implementation="org.dochub.idea.arch.views.PreviewEditorTabTitleProvider"

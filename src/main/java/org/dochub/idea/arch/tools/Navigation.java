@@ -22,6 +22,7 @@ import org.dochub.idea.arch.references.providers.RefBaseID;
 import org.dochub.idea.arch.utils.VirtualFileSystemUtils;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Map;
 
 import static org.dochub.idea.arch.tools.Consts.ROOT_SOURCE_URI;
@@ -105,17 +106,13 @@ public class Navigation {
         String entity = jsonEntity.asText();
         String source = jsonSource.asText();
         if (source.equals("null")) {
-            Map<String, Object> cache = CacheBuilder.getProjectCache(project);
+            Map<String, CacheBuilder.SectionData> cache = CacheBuilder.getProjectCache(project);
             String section = entityToSection(entity);
             if (section == null) return;
-            Map<String, Object> components = cache == null ? null : (Map<String, Object>) cache.get(section);
+            CacheBuilder.SectionData components = cache == null ? null : cache.get(section);
             if (components == null) return;;
-            Map<String, Object> files = (Map<String, Object>) components.get(id);
-            if (files == null) return;
-            for (String file : files.keySet()) {
-                source = file;
-                break;
-            }
+            ArrayList<VirtualFile> files = components.ids.get(id);
+            if (files != null && files.size() > 0) source = files.get(0).getPath();
         } else {
             source = jsonSource.asText();
             String basePath = project.getBasePath() + "/";

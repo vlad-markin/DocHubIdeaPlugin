@@ -10,6 +10,7 @@ import com.intellij.psi.util.CachedValueProvider;
 import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.psi.util.PsiModificationTracker;
 import com.intellij.util.ProcessingContext;
+import org.dochub.idea.arch.indexing.CacheBuilder;
 import org.dochub.idea.arch.indexing.CacheFileData;
 import org.dochub.idea.arch.utils.PsiUtils;
 import org.dochub.idea.arch.utils.SuggestUtils;
@@ -50,19 +51,12 @@ public class LocationSuggest extends BaseSuggest {
                                 () -> {
                                     List<String> suggest = SuggestUtils.scanYamlPsiTreeToLocation(document, getSection());
 
-                                    Map<String, Object> globalCache = getProjectCache(project);
+                                    Map<String, CacheBuilder.SectionData> globalCache = getProjectCache(project);
 
-                                    Map<String, Object> section = (Map<String, Object>) globalCache.get(getSection());
+                                    CacheBuilder.SectionData section = globalCache.get(getSection());
                                     if (section != null) {
-                                        for (String id : section.keySet()) {
-                                            Map<String, Object> files = (Map<String, Object>) section.get(id);
-                                            for (String file : files.keySet()) {
-                                                CacheFileData data = (CacheFileData)files.get(file);
-                                                if (data.location != null && suggest.indexOf(data.location) < 0) {
-                                                    suggest.add(data.location);
-                                                }
-                                            }
-                                        }
+                                        for (int i = 0; i < section.locations.size(); i++)
+                                            suggest.add(section.locations.get(i));
                                     }
 
                                     return CachedValueProvider.Result.create(
