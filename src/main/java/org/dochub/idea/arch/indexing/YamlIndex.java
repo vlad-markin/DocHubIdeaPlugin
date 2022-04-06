@@ -10,27 +10,28 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public class YamlIndex extends SingleEntryFileBasedIndexExtension<YamlIndexData.IndexData> {
+public class YamlIndex extends SingleEntryFileBasedIndexExtension<YamlIndexData> {
 
-    public static final ID<Integer, YamlIndexData.IndexData> INDEX_ID = ID.create("DocHubYamlIndex");
+    public static final ID<Integer, YamlIndexData> INDEX_ID = ID.create("DocHubYamlIndex");
 
-    private final SingleEntryIndexer<YamlIndexData.IndexData> myDataIndexer =
+    private final SingleEntryIndexer<YamlIndexData> myDataIndexer =
             new SingleEntryIndexer<>(false) {
                 @Override
-                protected @Nullable YamlIndexData.IndexData computeValue(@NotNull FileContent inputData) {
-                    return new YamlIndexData.IndexData();
+                protected @Nullable YamlIndexData computeValue(@NotNull FileContent inputData) {
+                    CacheBuilder.makeCacheDataManifest(inputData.getPsiFile());
+                    return new YamlIndexData();
                 }
             };
 
-    private final DataExternalizer<YamlIndexData.IndexData> myValueExternalizer = new DataExternalizer<YamlIndexData.IndexData>() {
+    private final DataExternalizer<YamlIndexData> myValueExternalizer = new DataExternalizer<YamlIndexData>() {
         @Override
-        public void save(@NotNull DataOutput out, YamlIndexData.IndexData value) throws IOException {
-            new YamlIndexData.IndexData();
+        public void save(@NotNull DataOutput out, YamlIndexData value) throws IOException {
+            new YamlIndexData();
         }
 
         @Override
-        public YamlIndexData.IndexData read(@NotNull DataInput in) throws IOException {
-            return new YamlIndexData.IndexData();
+        public YamlIndexData read(@NotNull DataInput in) throws IOException {
+            return new YamlIndexData;
         }
     };
 
@@ -42,17 +43,17 @@ public class YamlIndex extends SingleEntryFileBasedIndexExtension<YamlIndexData.
     };
 
     @Override
-    public @NotNull ID<Integer, YamlIndexData.IndexData> getName() {
+    public @NotNull ID<Integer, YamlIndexData> getName() {
         return INDEX_ID;
     }
 
     @Override
-    public @NotNull SingleEntryIndexer<YamlIndexData.IndexData> getIndexer() {
+    public @NotNull SingleEntryIndexer<YamlIndexData> getIndexer() {
         return myDataIndexer;
     }
 
     @Override
-    public @NotNull DataExternalizer<YamlIndexData.IndexData> getValueExternalizer() {
+    public @NotNull DataExternalizer<YamlIndexData> getValueExternalizer() {
         return myValueExternalizer;
     }
 

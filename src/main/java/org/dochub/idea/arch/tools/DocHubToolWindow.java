@@ -161,9 +161,13 @@ public class DocHubToolWindow extends JBCefBrowser {
                           ||  event instanceof VFileDeleteEvent
                   )
           ) {
-            String source = event.getFile().getPath().substring(project.getBasePath().length() + 1);
-            if (source.equals(rootManifest)) source = ROOT_SOURCE;
-            jsGateway.appendMessage(ACTION_SOURCE_CHANGED, ROOT_SOURCE_PATH + source, null);
+            String path = event.getFile().getPath();
+            Integer bpLength = project.getBasePath().length();
+            if (path != null && path.length() > bpLength) {
+              String source = path.substring(bpLength + 1);
+              if (source.equals(rootManifest)) source = ROOT_SOURCE;
+              jsGateway.appendMessage(ACTION_SOURCE_CHANGED, ROOT_SOURCE_PATH + source, null);
+            }
           }
         });
       }
