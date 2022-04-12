@@ -25,12 +25,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Map;
 
+import static org.dochub.idea.arch.tools.Consts.ROOT_SOURCE_PATH;
 import static org.dochub.idea.arch.tools.Consts.ROOT_SOURCE_URI;
 
 public class Navigation {
     private Project project;
     private MessageBusConnection connBus;
 
+    @dochub
     private static String entityToSection(String entity) {
         String section = null;
         switch (entity) {
@@ -40,6 +42,19 @@ public class Navigation {
             case "aspect": section = "aspects"; break;
         }
         return section;
+    }
+
+    public VirtualFile getVFile(String uri) {
+        String source;
+        if (uri.equals(ROOT_SOURCE_URI)) {
+            source = CacheBuilder.getRootManifestName(project);
+        } else if (uri.startsWith(ROOT_SOURCE_PATH)) {
+            source = uri.substring(ROOT_SOURCE_PATH.length());
+        } else if (uri.startsWith(project.getBasePath())) {
+            source = uri.substring(project.getBasePath().length());
+        }else
+            source = uri;
+        return VirtualFileSystemUtils.findFile(source, project);
     }
 
     public void gotoPsiElement(PsiElement element) {
@@ -64,12 +79,8 @@ public class Navigation {
         }
     }
 
-    private void gotoByID(String source, String entity, String id) {
-        VirtualFile vFile = VirtualFileSystemUtils.findFile(
-                source.substring(project.getBasePath().length()),
-                project
-        );
-
+    private void gotoByID(String uri, String entity, String id) {
+        VirtualFile vFile = getVFile(uri);
         if (vFile != null) {
             String section = entityToSection(entity);
             PsiFile targetFile = PsiManager.getInstance(project).findFile(vFile);
@@ -80,6 +91,20 @@ public class Navigation {
                 }
                 return true;
             });
+        }
+    }
+
+    private void gotoBySource(String uri) {
+        VirtualFile vFile = getVFile(uri);
+        if (vFile != null)
+            gotoPsiElement(PsiManager.getInstance(project).findFile(vFile));
+    }
+
+    private void gotoByPosition(String uri, int start) {
+        VirtualFile vFile = getVFile(uri);
+        if (vFile != null) {
+            PsiFile targetFile = PsiManager.getInstance(project).findFile(vFile);
+            gotoPsiElement(targetFile.findElementAt(start));
         }
     }
 
@@ -97,39 +122,47 @@ public class Navigation {
         }, ModalityState.NON_MODAL);
     }
 
+    public void go(String source, int pos) {
+        Application app = ApplicationManager.getApplication();
+        app.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                gotoByPosition(source, pos);
+            }
+        }, ModalityState.NON_MODAL);
+    }
+
+    public void go(String source) {
+        Application app = ApplicationManager.getApplication();
+        app.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                gotoBySource(source);
+            }
+        }, ModalityState.NON_MODAL);
+    }
+
     public void go(JsonNode location) {
         JsonNode jsonID = location.get("id");
         JsonNode jsonEntity = location.get("entity");
         JsonNode jsonSource = location.get("source");
-        if (jsonID == null || jsonEntity == null) return;
-        String id = jsonID.asText();
-        String entity = jsonEntity.asText();
-        String source = jsonSource.asText();
-        if (source.equals("null")) {
-            Map<String, CacheBuilder.SectionData> cache = CacheBuilder.getProjectCache(project);
-            String section = entityToSection(entity);
-            if (section == null) return;
-            CacheBuilder.SectionData components = cache == null ? null : cache.get(section);
-            if (components == null) return;;
-            ArrayList<VirtualFile> files = components.ids.get(id);
-            if (files != null && files.size() > 0) source = files.get(0).getPath();
-        } else {
-            source = jsonSource.asText();
-            String basePath = project.getBasePath() + "/";
-            if (source.equals(ROOT_SOURCE_URI)) {
-                source = basePath + CacheBuilder.getRootManifestName(project);
-            } else {
-                String parentPath = (new File(CacheBuilder.getRootManifestName(project))).getParent();
-                source = basePath + (parentPath != null ? parentPath + "/" : "") + source.substring(20);
+        JsonNode jsonRange = location.get("range");
+        if ((jsonID != null) && (jsonEntity != null) && (jsonSource != null)) {
+            String id = jsonID.asText();
+            String entity = jsonEntity.asText();
+            String source = jsonSource.asText();
+            if (source.equals("null")) {
+                Map<String, CacheBuilder.SectionData> cache = CacheBuilder.getProjectCache(project);
+                String section = entityToSection(entity);
+                if (section == null) return;
+                CacheBuilder.SectionData components = cache == null ? null : cache.get(section);
+                if (components == null) return;;
+                ArrayList<VirtualFile> files = components.ids.get(id);
+                if (files != null && files.size() > 0) source = files.get(0).getPath();
             }
-        }
-
-        File file;
-        file = new File(source);
-        if (file.exists() || !file.isDirectory()) {
             go(source, entity, id);
-        }
-
+        } else if ((jsonRange != null) && (jsonSource != null)) {
+            go(jsonSource.asText(), jsonRange.get("start").asInt());
+        } else if (jsonSource != null) go(jsonSource.asText());
     }
-
 }

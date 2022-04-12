@@ -2,17 +2,12 @@ package org.dochub.idea.arch.tools;
 // JBCefBrowser (https://intellij-support.jetbrains.com/hc/en-us/community/posts/4403677440146-how-to-add-a-JBCefBrowser-in-toolWindow-)
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.intellij.codeInsight.TargetElementUtil;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.vfs.newvfs.BulkFileListener;
 import com.intellij.openapi.vfs.newvfs.events.VFileContentChangeEvent;
 import com.intellij.openapi.vfs.newvfs.events.VFileDeleteEvent;
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent;
-import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiManager;
 import com.intellij.ui.jcef.JBCefBrowser;
 import com.intellij.ui.jcef.JBCefBrowserBase;
 import com.intellij.ui.jcef.JBCefJSQuery;
@@ -37,16 +32,15 @@ import java.util.regex.Matcher;
 import static org.dochub.idea.arch.tools.Consts.*;
 
 public class DocHubToolWindow extends JBCefBrowser {
-  private JBCefJSQuery sourceQuery;
-  private Project project;
-  private MessageBusConnection eventBus;
+  private final JBCefJSQuery sourceQuery;
+  private final Project project;
   private Boolean doRepair = false;
-  private Timer timer;
   private TimerTask observer = null;
-  private Navigation navigation;
-  private JSGateway jsGateway = null;
+  private final Navigation navigation;
+  private final JSGateway jsGateway;
 
-  private void startObserver() {
+  private synchronized void startObserver() {
+    // todo ТУТ ПОХОДУ ТЕЧЕТ ПАМЯТЬ
     doRepair = false;
     if (observer == null) {
       observer = new TimerTask() {
@@ -55,15 +49,16 @@ public class DocHubToolWindow extends JBCefBrowser {
           doRepair = true;
         }
       };
-      timer = new Timer("DocHub observer");
+      Timer timer = new Timer("DocHub observer");
       timer.scheduleAtFixedRate(observer, 5000L, 5000L);
     }
   }
 
   private void reloadHtml() {
     InputStream input = getClass().getClassLoader().getResourceAsStream("html/plugin.html");
-    String html = "";
+    String html;
     try {
+      assert input != null;
       html = new String(input.readAllBytes(), StandardCharsets.UTF_8);
       String injectionCode = sourceQuery.inject("data","resolve","reject");
       html = html.replaceAll("\"API_INJECTION\"", Matcher.quoteReplacement(injectionCode));
@@ -110,7 +105,7 @@ public class DocHubToolWindow extends JBCefBrowser {
             (new RootManifest()).createRootManifest(project);
           }
           reloadHtml();
-        } else if ((url.length() > 20) && url.substring(0, 20).equals(ROOT_SOURCE_PATH)) {
+        } else if ((url.length() > 20) && url.startsWith(ROOT_SOURCE_PATH)) {
           String basePath = project.getBasePath() + "/";
           String parentPath = (new File(CacheBuilder.getRootManifestName(project))).getParent();
           String sourcePath = basePath + (parentPath != null ? parentPath + "/" : "") + url.substring(20);
@@ -143,10 +138,10 @@ public class DocHubToolWindow extends JBCefBrowser {
     return new JBCefJSQuery.Response(result.toString());
   }
 
-  public DocHubToolWindow(ToolWindow toolWindow, Project project) {
+  public DocHubToolWindow(Project project) {
     super("/");
 
-    eventBus = project.getMessageBus().connect();
+    MessageBusConnection eventBus = project.getMessageBus().connect();
     navigation = new Navigation(project);
     jsGateway = new JSGateway(project);
 
@@ -162,8 +157,8 @@ public class DocHubToolWindow extends JBCefBrowser {
                   )
           ) {
             String path = event.getFile().getPath();
-            Integer bpLength = project.getBasePath().length();
-            if (path != null && path.length() > bpLength) {
+            int bpLength = Objects.requireNonNull(project.getBasePath()).length();
+            if (path.length() > bpLength) {
               String source = path.substring(bpLength + 1);
               if (source.equals(rootManifest)) source = ROOT_SOURCE;
               jsGateway.appendMessage(ACTION_SOURCE_CHANGED, ROOT_SOURCE_PATH + source, null);
@@ -175,12 +170,11 @@ public class DocHubToolWindow extends JBCefBrowser {
 
     this.openDevtools();
     sourceQuery = JBCefJSQuery.create((JBCefBrowserBase)this);
-    sourceQuery.addHandler((params) -> requestProcessing(params));
+    sourceQuery.addHandler(this::requestProcessing);
 
     reloadHtml();
 
     this.project = project;
-
   }
 
   public JComponent getContent() {
