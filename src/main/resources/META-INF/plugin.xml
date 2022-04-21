@@ -28,6 +28,7 @@
          on how to target different products -->
     <depends>com.intellij.modules.platform</depends>
     <depends>org.jetbrains.plugins.yaml</depends>
+    <depends optional="true" config-file="java.xml">com.intellij.java</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <completion.contributor
@@ -74,7 +75,7 @@
         />
         <codeInsight.lineMarkerProvider
                 language="yaml"
-                implementationClass="org.dochub.idea.arch.tools.LineMarkerProvider"
+                implementationClass="org.dochub.idea.arch.markline.LineMarkerProvider"
         />
         <fileBasedIndex implementation="org.dochub.idea.arch.indexing.DocHubIndex"/>
         <!--

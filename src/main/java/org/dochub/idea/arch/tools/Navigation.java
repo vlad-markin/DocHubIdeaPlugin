@@ -32,7 +32,6 @@ public class Navigation {
     private Project project;
     private MessageBusConnection connBus;
 
-    @dochub
     private static String entityToSection(String entity) {
         String section = null;
         switch (entity) {

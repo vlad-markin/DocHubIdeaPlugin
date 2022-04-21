@@ -40,7 +40,7 @@ public class DocHubToolWindow extends JBCefBrowser {
   private final JSGateway jsGateway;
 
   private synchronized void startObserver() {
-    // todo ТУТ ПОХОДУ ТЕЧЕТ ПАМЯТЬ
+    // todo ТУТ ПОХОДУ ТЕЧЕТ ПАМЯТЬ ВЕРОЯТНО ПОСЛЕ СНА ЗАПУСКАЕТСЯ НЕСКОЛЬКО ТАЙМЕРОВ
     doRepair = false;
     if (observer == null) {
       observer = new TimerTask() {

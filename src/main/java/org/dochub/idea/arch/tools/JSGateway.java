@@ -3,11 +3,10 @@ package org.dochub.idea.arch.tools;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intellij.openapi.project.Project;
+import org.dochub.idea.arch.markline.LineMarkerProvider;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.dochub.idea.arch.tools.Consts.*;
 
 public class JSGateway {
     private Map<String, Map> message = new HashMap<>();

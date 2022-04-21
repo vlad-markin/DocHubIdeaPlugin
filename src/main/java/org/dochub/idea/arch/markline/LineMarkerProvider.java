@@ -1,4 +1,4 @@
-package org.dochub.idea.arch.tools;
+package org.dochub.idea.arch.markline;
 
 import com.intellij.codeInsight.daemon.*;
 import com.intellij.icons.AllIcons;
@@ -27,7 +27,7 @@ public class LineMarkerProvider extends LineMarkerProviderDescriptor {
         void go(String entity, String id);
     }
 
-    private class DocHubNavigationHandler implements GutterIconNavigationHandler {
+    public static class DocHubNavigationHandler implements GutterIconNavigationHandler {
         private String entity = null;
         private String id = null;
         public DocHubNavigationHandler(String entity, String id) {
@@ -61,7 +61,7 @@ public class LineMarkerProvider extends LineMarkerProviderDescriptor {
         return null;
     }
 
-    private LineMarkerInfo makeLineMarkerInfo(
+    public static LineMarkerInfo makeLineMarkerInfo(
             @NotNull DocHubNavigationHandler naviHandler,
             @NotNull PsiElement element) {
         return new LineMarkerInfo<>(
@@ -98,13 +98,13 @@ public class LineMarkerProvider extends LineMarkerProviderDescriptor {
         return true; // todo Здесь нужно проверять на действительную регистрацию компонента
     }
 
-    private interface ElementExplain {
+    public interface ElementExplain {
         default DocHubNavigationHandler register(String id) {
             return null;
         };
     }
 
-    private LineMarkerInfo explainElement(@NotNull PsiElement element, ElementExplain explain) {
+    public LineMarkerInfo explainElement(@NotNull PsiElement element, ElementExplain explain) {
         LineMarkerInfo result = null;
         String id = null;
         PsiElement markElement = element;

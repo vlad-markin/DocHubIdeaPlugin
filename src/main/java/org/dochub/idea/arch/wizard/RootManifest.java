@@ -3,18 +3,29 @@ package org.dochub.idea.arch.wizard;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiManager;
 import org.dochub.idea.arch.tools.Navigation;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 
 public class RootManifest {
-    public VirtualFile createExampleManifest(Project project) {
+    private void executeAction(@NotNull Runnable action) {
         Application app = ApplicationManager.getApplication();
         app.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                ApplicationManager.getApplication().runWriteAction(action);
+            }
+        });
+    }
+
+    public VirtualFile createExampleManifest(Project project) {
+        executeAction(new Runnable() {
             @Override
             public void run() {
                 VirtualFile vProject =  ProjectRootManager.getInstance(project).getContentRoots()[0];
@@ -27,13 +38,12 @@ public class RootManifest {
                     e.printStackTrace();
                 }
             }
-        }, ModalityState.NON_MODAL);
-
+        });
         return null;
     }
+
     public VirtualFile createRootManifest(Project project) {
-        Application app = ApplicationManager.getApplication();
-        app.invokeLater(new Runnable() {
+        executeAction(new Runnable() {
             @Override
             public void run() {
                 VirtualFile vProject =  ProjectRootManager.getInstance(project).getContentRoots()[0];
@@ -46,8 +56,7 @@ public class RootManifest {
                     e.printStackTrace();
                 }
             }
-        }, ModalityState.NON_MODAL);
-
+        });
         return null;
     }
 }
