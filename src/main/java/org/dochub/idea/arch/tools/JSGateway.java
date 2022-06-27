@@ -3,7 +3,8 @@ package org.dochub.idea.arch.tools;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intellij.openapi.project.Project;
-import org.dochub.idea.arch.markline.LineMarkerProvider;
+import org.dochub.idea.arch.markline.LineMarkerNavigator;
+import org.dochub.idea.arch.markline.LineMarkerYaml;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +14,7 @@ public class JSGateway {
     ObjectMapper mapper = new ObjectMapper();
 
     public JSGateway(Project project) {
-        project.getMessageBus().connect().subscribe(LineMarkerProvider.ON_NAVIGATE_MESSAGE, new LineMarkerProvider.NavigateMessage() {
+        project.getMessageBus().connect().subscribe(LineMarkerNavigator.ON_NAVIGATE_MESSAGE, new LineMarkerNavigator.NavigateMessage() {
             @Override
             public void go(String entity, String id) {
                 appendMessage("navigate/" + entity, id, null);

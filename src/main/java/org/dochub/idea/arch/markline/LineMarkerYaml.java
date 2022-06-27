@@ -19,28 +19,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class LineMarkerProvider extends LineMarkerProviderDescriptor {
+import static org.dochub.idea.arch.markline.LineMarkerNavigator.*;
 
-    public static Topic<NavigateMessage> ON_NAVIGATE_MESSAGE = Topic.create("Navigate to", NavigateMessage.class);
-
-    public interface NavigateMessage {
-        void go(String entity, String id);
-    }
-
-    public static class DocHubNavigationHandler implements GutterIconNavigationHandler {
-        private String entity = null;
-        private String id = null;
-        public DocHubNavigationHandler(String entity, String id) {
-            super();
-            this.entity = entity;
-            this.id = id;
-        }
-        @Override
-        public void navigate(MouseEvent e, com.intellij.psi.PsiElement elt) {
-            NavigateMessage publisher = elt.getProject().getMessageBus().syncPublisher(ON_NAVIGATE_MESSAGE);
-            publisher.go(entity, id);
-        }
-    }
+public class LineMarkerYaml extends LineMarkerProviderDescriptor {
 
     @Override
     public final void collectSlowLineMarkers(@NotNull List<? extends PsiElement> elements, @NotNull Collection<? super LineMarkerInfo<?>> result) {
@@ -61,30 +42,6 @@ public class LineMarkerProvider extends LineMarkerProviderDescriptor {
         return null;
     }
 
-    public static LineMarkerInfo makeLineMarkerInfo(
-            @NotNull DocHubNavigationHandler naviHandler,
-            @NotNull PsiElement element) {
-        return new LineMarkerInfo<>(
-                element,
-                element.getTextRange(),
-                AllIcons.Actions.Preview,
-                new Function<PsiElement, String>() {
-                    @Override
-                    public String fun(PsiElement element) {
-                        return "Показать в DocHub";
-                    }
-                },
-                naviHandler,
-                GutterIconRenderer.Alignment.LEFT,
-                new Supplier<String>() {
-                    @Override
-                    public String get() {
-                        return "DocHub";
-                    }
-                }
-        );
-    }
-
     private boolean isRegisteredComponent(@NotNull PsiElement element, String id) {
 //        Map<String, Object> cache = CacheBuilder.getProjectCache(element.getProject());
 //        Map<String, Object> components = cache == null ? null : (Map<String, Object>) cache.get("components");
@@ -99,7 +56,7 @@ public class LineMarkerProvider extends LineMarkerProviderDescriptor {
     }
 
     public interface ElementExplain {
-        default DocHubNavigationHandler register(String id) {
+        default LineMarkerNavigator.DocHubNavigationHandler register(String id) {
             return null;
         };
     }

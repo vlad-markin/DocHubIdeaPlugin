@@ -75,7 +75,7 @@
         />
         <codeInsight.lineMarkerProvider
                 language="yaml"
-                implementationClass="org.dochub.idea.arch.markline.LineMarkerProvider"
+                implementationClass="org.dochub.idea.arch.markline.LineMarkerYaml"
         />
         <fileBasedIndex implementation="org.dochub.idea.arch.indexing.DocHubIndex"/>
         <!--

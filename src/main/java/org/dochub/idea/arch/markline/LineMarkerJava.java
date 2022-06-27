@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.List;
 
-import static org.dochub.idea.arch.markline.LineMarkerProvider.*;
+import static org.dochub.idea.arch.markline.LineMarkerNavigator.*;
 
 public class LineMarkerJava extends LineMarkerProviderDescriptor {
 
