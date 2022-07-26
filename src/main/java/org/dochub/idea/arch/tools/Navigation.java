@@ -21,7 +21,6 @@ import org.dochub.idea.arch.indexing.CacheBuilder;
 import org.dochub.idea.arch.references.providers.RefBaseID;
 import org.dochub.idea.arch.utils.VirtualFileSystemUtils;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Map;
 

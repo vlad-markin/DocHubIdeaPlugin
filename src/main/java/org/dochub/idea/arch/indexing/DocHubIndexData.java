@@ -1,6 +1,7 @@
 package org.dochub.idea.arch.indexing;
 
 
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import org.yaml.snakeyaml.Yaml;
 
@@ -138,20 +139,23 @@ public final class DocHubIndexData extends HashMap<String, DocHubIndexData.Secti
     }
 
     public void makeCacheDataManifest(PsiFile file) {
-        String path = file.getVirtualFile().getPath();
-        try {
-            InputStream inputStream = new FileInputStream(path);
-            Yaml yaml = new Yaml();
-            Map<String, Object> sections = yaml.load(inputStream);
-            if (sections != null) {
-                makeCacheDataImports(sections);
-                makeCacheDataSection(sections, "components");
-                makeCacheDataSection(sections, "aspects");
-                makeCacheDataSection(sections, "contexts");
-                makeCacheDataSection(sections, "docs");
-                makeCacheDataSection(sections, "datasets");
-            }
-        } catch (Exception e) {}
+        VirtualFile vFile = file.getVirtualFile();
+        if (vFile != null) {
+            String path = vFile.getPath();
+            try {
+                InputStream inputStream = new FileInputStream(path);
+                Yaml yaml = new Yaml();
+                Map<String, Object> sections = yaml.load(inputStream);
+                if (sections != null) {
+                    makeCacheDataImports(sections);
+                    makeCacheDataSection(sections, "components");
+                    makeCacheDataSection(sections, "aspects");
+                    makeCacheDataSection(sections, "contexts");
+                    makeCacheDataSection(sections, "docs");
+                    makeCacheDataSection(sections, "datasets");
+                }
+            } catch (Exception e) {}
+        }
     }
 
     public DocHubIndexData(PsiFile file) {
