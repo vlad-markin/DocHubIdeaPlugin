@@ -13,7 +13,10 @@ public class Consts {
     public static final String ACTION_PULL_URI = "plugin:/idea/gateway/pull";
     public static final String ACTION_SOURCE_CHANGED = "source/changed";
 
+    public static final String ACTION_DOWNLOAD_URI = "plugin:/idea/gateway/download";
+
     public static final String DEVTOOL_SHOW_URI = "plugin:/idea/debugger/show";
 
     public static final String HTML_RELOAD_URI = "plugin:/idea/reload";
+
 }

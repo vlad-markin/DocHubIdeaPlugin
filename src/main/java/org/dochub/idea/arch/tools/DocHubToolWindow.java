@@ -39,6 +39,8 @@ public class DocHubToolWindow extends JBCefBrowser {
   private final Navigation navigation;
   private final JSGateway jsGateway;
 
+  private final Download download;
+
   private synchronized void startObserver() {
     // todo ТУТ ПОХОДУ ТЕЧЕТ ПАМЯТЬ ВЕРОЯТНО ПОСЛЕ СНА ЗАПУСКАЕТСЯ НЕСКОЛЬКО ТАЙМЕРОВ
     doRepair = false;
@@ -65,7 +67,6 @@ public class DocHubToolWindow extends JBCefBrowser {
     } catch (IOException e) {
       html = e.toString();
     }
-
     loadHTML(html);
   }
 
@@ -96,7 +97,7 @@ public class DocHubToolWindow extends JBCefBrowser {
           result.append(mapper.writeValueAsString(response));
         } else if (url.equals(NAVI_GOTO_SOURCE_URI)) {
           navigation.go(jsonObj);
-        }  else if (url.equals(WIZARD_INIT_URI)) {
+        } else if (url.equals(WIZARD_INIT_URI)) {
           JsonNode jsonMode = jsonObj.get("mode");
           String mode = jsonMode != null ? jsonMode.asText() : "production";
           if (mode.equals("example")) {
@@ -122,6 +123,17 @@ public class DocHubToolWindow extends JBCefBrowser {
           response.put("contentType", "json");
           response.put("data", jsGateway.pullJSONMessage());
           result.append(mapper.writeValueAsString(response));
+        } else if (url.equals(ACTION_DOWNLOAD_URI)) { // Сохранение файлов из WEB морды
+          JsonNode jsonContent = jsonObj.get("content");
+          JsonNode jsonTitle = jsonObj.get("title");
+          JsonNode jsonDescription = jsonObj.get("description");
+          if (jsonContent != null) {
+            download.download(
+                    jsonContent.asText(),
+                    jsonTitle != null ? jsonTitle.asText() : "",
+                    jsonDescription != null ? jsonDescription.asText() : ""
+            );
+          }
         } else if (url.equals(DEVTOOL_SHOW_URI)){
           openDevtools();
           getCefBrowser().executeJavaScript("console.info('GO!!');", "events.js", 0);
@@ -134,7 +146,7 @@ public class DocHubToolWindow extends JBCefBrowser {
     } catch (IOException e1) {
       return new JBCefJSQuery.Response("", 500, e1.toString());
     }
-    startObserver();
+    // startObserver();
     return new JBCefJSQuery.Response(result.toString());
   }
 
@@ -144,6 +156,7 @@ public class DocHubToolWindow extends JBCefBrowser {
     MessageBusConnection eventBus = project.getMessageBus().connect();
     navigation = new Navigation(project);
     jsGateway = new JSGateway(project);
+    download = new Download(project);
 
     eventBus.subscribe(VirtualFileManager.VFS_CHANGES, new BulkFileListener() {
       @Override
