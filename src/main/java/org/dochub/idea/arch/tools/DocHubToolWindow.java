@@ -39,8 +39,6 @@ public class DocHubToolWindow extends JBCefBrowser {
   private final Navigation navigation;
   private final JSGateway jsGateway;
 
-  private final Download download;
-
   private synchronized void startObserver() {
     // todo ТУТ ПОХОДУ ТЕЧЕТ ПАМЯТЬ ВЕРОЯТНО ПОСЛЕ СНА ЗАПУСКАЕТСЯ НЕСКОЛЬКО ТАЙМЕРОВ
     doRepair = false;
@@ -128,7 +126,7 @@ public class DocHubToolWindow extends JBCefBrowser {
           JsonNode jsonTitle = jsonObj.get("title");
           JsonNode jsonDescription = jsonObj.get("description");
           if (jsonContent != null) {
-            download.download(
+            Download.download(
                     jsonContent.asText(),
                     jsonTitle != null ? jsonTitle.asText() : "",
                     jsonDescription != null ? jsonDescription.asText() : ""
@@ -156,7 +154,6 @@ public class DocHubToolWindow extends JBCefBrowser {
     MessageBusConnection eventBus = project.getMessageBus().connect();
     navigation = new Navigation(project);
     jsGateway = new JSGateway(project);
-    download = new Download(project);
 
     eventBus.subscribe(VirtualFileManager.VFS_CHANGES, new BulkFileListener() {
       @Override
