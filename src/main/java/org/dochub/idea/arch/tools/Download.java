@@ -10,10 +10,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-
 public class Download {
     static public void download(String content, String title, String description) {
-        ApplicationManager.getApplication().invokeAndWait(new Runnable() {
+        ApplicationManager.getApplication().invokeLater(new Runnable() {
             @Override
             public void run() {
                 FileSaverDescriptor descriptor = new FileSaverDescriptor(title, description, new String[]{"svg"});
