@@ -54,7 +54,7 @@ public class DocHubToolWindow extends JBCefBrowser {
     }
   }
 
-  private void reloadHtml() {
+  public void reloadHtml() {
     InputStream input = getClass().getClassLoader().getResourceAsStream("html/plugin.html");
     String html;
     try {
