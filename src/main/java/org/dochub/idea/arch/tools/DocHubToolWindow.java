@@ -18,7 +18,6 @@ import org.dochub.idea.arch.manifests.PlantUMLDriver;
 import org.dochub.idea.arch.wizard.RootManifest;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +25,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.Timer;
 import java.util.regex.Matcher;
 
 import static org.dochub.idea.arch.tools.Consts.*;
@@ -34,25 +32,8 @@ import static org.dochub.idea.arch.tools.Consts.*;
 public class DocHubToolWindow extends JBCefBrowser {
   private final JBCefJSQuery sourceQuery;
   private final Project project;
-  private Boolean doRepair = false;
-  private TimerTask observer = null;
   private final Navigation navigation;
   private final JSGateway jsGateway;
-
-  private synchronized void startObserver() {
-    // todo ТУТ ПОХОДУ ТЕЧЕТ ПАМЯТЬ ВЕРОЯТНО ПОСЛЕ СНА ЗАПУСКАЕТСЯ НЕСКОЛЬКО ТАЙМЕРОВ
-    doRepair = false;
-    if (observer == null) {
-      observer = new TimerTask() {
-        public void run() {
-          if (doRepair) reloadHtml();
-          doRepair = true;
-        }
-      };
-      Timer timer = new Timer("DocHub observer");
-      timer.scheduleAtFixedRate(observer, 5000L, 5000L);
-    }
-  }
 
   public void reloadHtml() {
     InputStream input = getClass().getClassLoader().getResourceAsStream("html/plugin.html");
@@ -144,12 +125,13 @@ public class DocHubToolWindow extends JBCefBrowser {
     } catch (IOException e1) {
       return new JBCefJSQuery.Response("", 500, e1.toString());
     }
-    // startObserver();
     return new JBCefJSQuery.Response(result.toString());
   }
 
   public DocHubToolWindow(Project project) {
     super("/");
+
+    this.project = project;
 
     MessageBusConnection eventBus = project.getMessageBus().connect();
     navigation = new Navigation(project);
@@ -178,16 +160,9 @@ public class DocHubToolWindow extends JBCefBrowser {
       }
     });
 
-    this.openDevtools();
     sourceQuery = JBCefJSQuery.create((JBCefBrowserBase)this);
     sourceQuery.addHandler(this::requestProcessing);
 
     reloadHtml();
-
-    this.project = project;
-  }
-
-  public JComponent getContent() {
-    return getComponent();
   }
 }
