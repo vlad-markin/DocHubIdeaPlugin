@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'org.dochub.idea'
-version '1.19.2-beta'
+version '1.19.3-beta'
 
 sourceSets.main.java.srcDirs 'src/main/gen'
 
@@ -20,6 +20,7 @@ jar {
 
 dependencies {
     implementation 'com.ibm.jsonata4java:JSONata4Java:1.6.1'
+    // implementation files('jars/elk-full.jar')
     implementation files('jars/plantuml.jar')
     // implementation 'net.sourceforge.plantuml'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
@@ -43,7 +44,10 @@ patchPluginXml {
             <li>Fast navigation through manifests;</li>
             <li>Problems highlighting;</li>
             <li>JSONata file support;</li>
-            <li>Mapping architecture on the code.</li>
+            <li>Mapping architecture on the code;</li>
+            <li>Added the datasets and the table documents support;</li>
+            <li>(new) Refactored subsystem of metamodel validation;</li>
+            <li>(new) Document templates.</li>
           <ul>  
       </em>
       """

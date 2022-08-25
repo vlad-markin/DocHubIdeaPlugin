@@ -13,13 +13,16 @@
         <p>
             This release includes:
             <ul>
+                <li>DocHub core: v2.2.2;</li>
                 <li>Suggests for the structure of architecture manifests (yaml);</li>
                 <li>Suggests for the values of manifest fields;</li>
                 <li>Fast navigation through manifests;</li>
                 <li>Built-in architecture rendering;</li>
                 <li>JSONata file support;</li>
-                <li>(new) Mapping architecture on the code;</li>
-                <li>(new) Added the datasets and the table documents support.</li>
+                <li>Mapping architecture on the code;</li>
+                <li>Added the datasets and the table documents support;</li>
+                <li>(new) Refactored subsystem of metamodel validation;</li>
+                <li>(new) Document templates.</li>
             </ul>
         </p>
     ]]></description>
@@ -31,6 +34,15 @@
     <depends optional="true" config-file="java.xml">com.intellij.java</depends>
 
     <extensions defaultExtensionNs="com.intellij">
+        <applicationService
+                serviceImplementation="org.dochub.idea.arch.settings.SettingsState"/>
+
+        <applicationConfigurable
+                parentId="tools"
+                instance="org.dochub.idea.arch.settings.SettingConfigurable"
+                id="org.dochub.idea.arch.settings.SettingConfigurable"
+                displayName="DocHub: Render settings"/>
+
         <completion.contributor
                 language="yaml"
                 implementationClass="org.dochub.idea.arch.completions.YamlCompletion"

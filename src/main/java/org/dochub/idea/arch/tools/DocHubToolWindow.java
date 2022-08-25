@@ -1,5 +1,6 @@
 package org.dochub.idea.arch.tools;
 // JBCefBrowser (https://intellij-support.jetbrains.com/hc/en-us/community/posts/4403677440146-how-to-add-a-JBCefBrowser-in-toolWindow-)
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intellij.openapi.project.Project;
@@ -15,6 +16,8 @@ import com.intellij.util.messages.MessageBusConnection;
 import org.apache.commons.io.FilenameUtils;
 import org.dochub.idea.arch.indexing.CacheBuilder;
 import org.dochub.idea.arch.manifests.PlantUMLDriver;
+import org.dochub.idea.arch.settings.SettingComponent;
+import org.dochub.idea.arch.settings.SettingsState;
 import org.dochub.idea.arch.wizard.RootManifest;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,8 +35,27 @@ import static org.dochub.idea.arch.tools.Consts.*;
 public class DocHubToolWindow extends JBCefBrowser {
   private final JBCefJSQuery sourceQuery;
   private final Project project;
+
   private final Navigation navigation;
   private final JSGateway jsGateway;
+
+  private String getInjectionSettings() {
+    SettingsState settingsState = SettingsState.getInstance();
+    Map<String, Object> settings = new HashMap<>();
+    Map<String, Object> render = new HashMap<>();
+    render.put("mode", settingsState.renderMode);
+    render.put("external", settingsState.renderIsExternal);
+    render.put("server", settingsState.serverRendering);
+    settings.put("render", render);
+    try {
+      ObjectMapper mapper = new ObjectMapper();
+      return Matcher.quoteReplacement(
+              mapper.writeValueAsString(settings)
+      );
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
   public void reloadHtml() {
     InputStream input = getClass().getClassLoader().getResourceAsStream("html/plugin.html");
@@ -42,7 +64,9 @@ public class DocHubToolWindow extends JBCefBrowser {
       assert input != null;
       html = new String(input.readAllBytes(), StandardCharsets.UTF_8);
       String injectionCode = sourceQuery.inject("data","resolve","reject");
-      html = html.replaceAll("\"API_INJECTION\"", Matcher.quoteReplacement(injectionCode));
+      html =
+              html.replaceAll("\"API_INJECTION\"", Matcher.quoteReplacement(injectionCode))
+              .replaceAll("\"SETTING_INJECTION\"", getInjectionSettings());
     } catch (IOException e) {
       html = e.toString();
     }
