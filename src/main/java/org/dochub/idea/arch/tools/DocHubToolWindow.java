@@ -112,14 +112,22 @@ public class DocHubToolWindow extends JBCefBrowser {
         } else if ((url.length() > 20) && url.startsWith(ROOT_SOURCE_PATH)) {
           String basePath = project.getBasePath() + "/";
           String parentPath = (new File(CacheBuilder.getRootManifestName(project))).getParent();
-          String sourcePath = basePath + (parentPath != null ? parentPath + "/" : "") + url.substring(20);
+          String sourcePath =
+                  basePath
+                          + (parentPath != null ? parentPath + "/" : "")
+                          + url.substring(20).split("\\?")[0];
           File file = new File(sourcePath);
           if (!file.exists() || file.isDirectory()) {
             return new JBCefJSQuery.Response("", 404, "No found: " + url);
           }
           Map<String, Object> response = new HashMap<>();
-          response.put("contentType", FilenameUtils.getExtension(sourcePath).toLowerCase(Locale.ROOT));
-          response.put("data", Files.readString(Path.of(sourcePath)));
+          String contentType = FilenameUtils.getExtension(sourcePath).toLowerCase(Locale.ROOT);
+          response.put("contentType", contentType);
+          if (contentType.equals("jpg") || contentType.equals("jpeg") || contentType.equals("svg")
+                  || contentType.equals("npg")) {
+            response.put("data", Files.readAllBytes(Path.of(sourcePath)));
+          } else
+            response.put("data", Files.readString(Path.of(sourcePath)));
           result.append(mapper.writeValueAsString(response));
         } else if (url.equals(ACTION_PULL_URI)) {
           Map<String, Object> response = new HashMap<>();
