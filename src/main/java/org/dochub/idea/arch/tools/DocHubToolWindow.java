@@ -163,6 +163,8 @@ public class DocHubToolWindow extends JBCefBrowser {
   public DocHubToolWindow(Project project) {
     super("/");
 
+    PlantUMLDriver.init();
+
     this.project = project;
 
     MessageBusConnection eventBus = project.getMessageBus().connect();
