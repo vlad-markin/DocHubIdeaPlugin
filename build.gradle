@@ -54,8 +54,10 @@ patchPluginXml {
             <li>JSONata file support;</li>
             <li>Mapping architecture on the code;</li>
             <li>Added the datasets and the table documents support;</li>
-            <li>(new) Refactored subsystem of metamodel validation;</li>
-            <li>(new) Document templates.</li>
+            <li>Refactored subsystem of metamodel validation;</li>
+            <li>Document templates.</li>
+            <li>(new) Support Eclipse ELK render core;</li>
+            <li>(new) Fixed bags of pictures.</li>
           <ul>  
       </em>
       """
