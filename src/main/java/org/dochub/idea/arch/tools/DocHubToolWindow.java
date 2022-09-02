@@ -70,7 +70,9 @@ public class DocHubToolWindow extends JBCefBrowser {
     } catch (IOException e) {
       html = e.toString();
     }
-    loadHTML(html);
+    String currentURL = getCefBrowser().getURL();
+    if (currentURL.length() > 0) loadHTML(html, currentURL);
+      else loadHTML(html);
   }
 
   private JBCefJSQuery.Response requestProcessing(String json) {
