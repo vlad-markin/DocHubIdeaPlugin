@@ -6,16 +6,20 @@ import com.intellij.patterns.ElementPattern;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
+import org.dochub.idea.arch.completions.CompletionKey;
 import org.dochub.idea.arch.completions.providers.CustomProvider;
+import org.dochub.idea.arch.completions.providers.FilteredCustomProvider;
 import org.dochub.idea.arch.completions.providers.Technologies;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.yaml.psi.YAMLKeyValue;
 
-public class ItemsItem extends CustomProvider {
+import java.util.Collection;
+import java.util.List;
+
+public class ItemsItem extends FilteredCustomProvider {
     private static String keyword = "items";
-    private static final String[] keys = {
-            "title"
-    };
+
+    private static final Collection<CompletionKey> COMPLETION_KEYS = List.of(new CompletionKey("title"));
 
     public static final ElementPattern<? extends PsiElement> rootPattern = PlatformPatterns.or(
             PlatformPatterns.psiElement()
@@ -33,20 +37,17 @@ public class ItemsItem extends CustomProvider {
     );
 
     @Override
-    public void appendToCompletion(CompletionContributor completion) {
-        completion.extend(
-                CompletionType.BASIC,
-                rootPattern,
-                new CompletionProvider<>() {
-                    public void addCompletions(@NotNull CompletionParameters parameters,
-                                               @NotNull ProcessingContext context,
-                                               @NotNull CompletionResultSet resultSet) {
-                        for (final String key : keys) {
-                            resultSet.addElement(LookupElementBuilder.create(key));
-                        }
-                    }
-                }
-        );
+    protected @NotNull ElementPattern<? extends PsiElement> getRootPattern() {
+        return rootPattern;
     }
 
+    @Override
+    protected @NotNull Collection<CompletionKey> getKeys() {
+        return COMPLETION_KEYS;
+    }
+
+    @Override
+    protected int getKeyDocumentLevel() {
+        return 3;
+    }
 }

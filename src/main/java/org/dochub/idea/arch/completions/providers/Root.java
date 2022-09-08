@@ -7,7 +7,8 @@ import com.intellij.patterns.PatternCondition;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
-import org.dochub.idea.arch.utils.PsiUtils;
+import org.dochub.idea.arch.completions.CompletionKey;
+import org.dochub.idea.arch.completions.FormattingInsertHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.yaml.YAMLTokenTypes;
 import org.jetbrains.yaml.psi.YAMLDocument;
@@ -63,7 +64,9 @@ public class Root extends CustomProvider {
                                                @NotNull ProcessingContext context,
                                                @NotNull CompletionResultSet resultSet) {
                         for (final String key : rootKeys) {
-                            resultSet.addElement(LookupElementBuilder.create(key));
+                            LookupElementBuilder element = LookupElementBuilder.create(key)
+                                    .withInsertHandler(new FormattingInsertHandler(new CompletionKey(key, CompletionKey.ValueType.MAP), 0));
+                            resultSet.addElement(element);
                         }
                     }
                 }
