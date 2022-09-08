@@ -44,11 +44,16 @@ public abstract class FilteredCustomProvider extends CustomProvider {
                                                @NotNull CompletionResultSet resultSet) {
 
                         YAMLKeyValue parent = PsiTreeUtil.getParentOfType(parameters.getPosition(), YAMLKeyValue.class);
+                        PsiElement containerToScan = null;
+                        if(parent == null) {
+                            // Это корень файла
+                            containerToScan = parameters.getPosition().getParent().getContext();
+                        } else {
+                            containerToScan = PsiTreeUtil.getChildOfType(parent, YAMLMapping.class);
+                        }
                         // Тут возможны 2 варианта, либо наш родитель содержит уже филды, либо это просто имя компонента
-                        // Если child != null значит есть хоть 1 поле
-                        YAMLMapping child = PsiTreeUtil.getChildOfType(parent, YAMLMapping.class);
-
-                        Set<String> alreadyDefinedAttributes = Optional.ofNullable(child)
+                        // Если containerToScan != null значит есть хоть 1 поле
+                        Set<String> alreadyDefinedAttributes = Optional.ofNullable(containerToScan)
                                 .map(c -> getChildsOfClass(c, YAMLKeyValue.class).stream()
                                         .map(YAMLKeyValue::getKeyText).collect(Collectors.toSet()))
                                 .orElse(Collections.emptySet());
