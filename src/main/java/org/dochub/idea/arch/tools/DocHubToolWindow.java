@@ -16,7 +16,6 @@ import com.intellij.util.messages.MessageBusConnection;
 import org.apache.commons.io.FilenameUtils;
 import org.dochub.idea.arch.indexing.CacheBuilder;
 import org.dochub.idea.arch.manifests.PlantUMLDriver;
-import org.dochub.idea.arch.settings.SettingComponent;
 import org.dochub.idea.arch.settings.SettingsState;
 import org.dochub.idea.arch.wizard.RootManifest;
 import org.jetbrains.annotations.NotNull;
@@ -31,14 +30,11 @@ import java.util.*;
 import java.util.regex.Matcher;
 
 import static org.dochub.idea.arch.tools.Consts.*;
-
 public class DocHubToolWindow extends JBCefBrowser {
   private final JBCefJSQuery sourceQuery;
   private final Project project;
-
   private final Navigation navigation;
   private final JSGateway jsGateway;
-
   private String getInjectionSettings() {
     SettingsState settingsState = SettingsState.getInstance();
     Map<String, Object> settings = new HashMap<>();
@@ -56,7 +52,6 @@ public class DocHubToolWindow extends JBCefBrowser {
       throw new RuntimeException(e);
     }
   }
-
   public void reloadHtml() {
     InputStream input = getClass().getClassLoader().getResourceAsStream("html/plugin.html");
     String html;
@@ -74,7 +69,6 @@ public class DocHubToolWindow extends JBCefBrowser {
     if (currentURL.length() > 0) loadHTML(html, currentURL);
       else loadHTML(html);
   }
-
   private JBCefJSQuery.Response requestProcessing(String json) {
     // openDevtools();
     StringBuilder result = new StringBuilder();
@@ -126,7 +120,7 @@ public class DocHubToolWindow extends JBCefBrowser {
           String contentType = FilenameUtils.getExtension(sourcePath).toLowerCase(Locale.ROOT);
           response.put("contentType", contentType);
           if (contentType.equals("jpg") || contentType.equals("jpeg") || contentType.equals("svg")
-                  || contentType.equals("npg")) {
+                  || contentType.equals("png")) {
             response.put("data", Files.readAllBytes(Path.of(sourcePath)));
           } else
             response.put("data", Files.readString(Path.of(sourcePath)));
@@ -161,7 +155,6 @@ public class DocHubToolWindow extends JBCefBrowser {
     }
     return new JBCefJSQuery.Response(result.toString());
   }
-
   public DocHubToolWindow(Project project) {
     super("/");
 
@@ -172,7 +165,6 @@ public class DocHubToolWindow extends JBCefBrowser {
     MessageBusConnection eventBus = project.getMessageBus().connect();
     navigation = new Navigation(project);
     jsGateway = new JSGateway(project);
-
     eventBus.subscribe(VirtualFileManager.VFS_CHANGES, new BulkFileListener() {
       @Override
       public void after(@NotNull List<? extends VFileEvent> events) {

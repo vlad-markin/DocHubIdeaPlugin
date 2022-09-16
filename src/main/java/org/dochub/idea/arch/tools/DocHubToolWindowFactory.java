@@ -27,6 +27,13 @@ public class DocHubToolWindowFactory implements ToolWindowFactory {
       }
     });
 
+    group.add(new AnAction("Back", "Назад", AllIcons.Actions.Back) {
+      @Override
+      public void actionPerformed(AnActionEvent e) {
+        myToolWindow.getCefBrowser().goBack();
+      }
+    });
+
     final ActionToolbar actionBar = ActionManager.getInstance().createActionToolbar("DH Tools", group, true);
     actionBar.setTargetComponent(toolWindow.getComponent());
     toolWindow.getComponent().add(actionBar.getComponent(), BorderLayout.PAGE_START);

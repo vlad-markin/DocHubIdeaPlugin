@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'org.dochub.idea'
-version '1.19.5-beta'
+version '1.19.6-beta'
 
 sourceSets.main.java.srcDirs 'src/main/gen'
 
@@ -46,7 +46,7 @@ patchPluginXml {
       Bata version of DocHub Plugin<br>
       <em>
           <ul>
-            <li>DocHub core: v2.2.3;</li>
+            <li>DocHub core: v2.2.4;</li>
             <li>Suggests for the structure of architecture manifests (yaml);</li>
             <li>Suggests for the values of manifest fields;</li>
             <li>Fast navigation through manifests;</li>
@@ -56,8 +56,8 @@ patchPluginXml {
             <li>Added the datasets and the table documents support;</li>
             <li>Refactored subsystem of metamodel validation;</li>
             <li>Document templates.</li>
-            <li>(new) Support Eclipse ELK render core;</li>
-            <li>(new) Fixed bags of pictures.</li>
+            <li>Support Eclipse ELK render core;</li>
+            <li>(new) Stabilized current functionality.</li>
           <ul>  
       </em>
       """

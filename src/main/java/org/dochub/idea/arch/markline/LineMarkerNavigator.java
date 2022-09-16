@@ -11,15 +11,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.awt.event.MouseEvent;
 import java.util.function.Supplier;
-
 public class LineMarkerNavigator {
-
     public static Topic<NavigateMessage> ON_NAVIGATE_MESSAGE = Topic.create("Navigate to", NavigateMessage.class);
-
     public interface NavigateMessage {
         void go(String entity, String id);
     }
-
     public static class DocHubNavigationHandler implements GutterIconNavigationHandler {
         private String entity = null;
         private String id = null;
@@ -34,7 +30,6 @@ public class LineMarkerNavigator {
             publisher.go(entity, id);
         }
     }
-
     public static LineMarkerInfo makeLineMarkerInfo(
             @NotNull DocHubNavigationHandler naviHandler,
             @NotNull PsiElement element) {
