@@ -43,7 +43,7 @@ intellij {
 
 patchPluginXml {
     changeNotes = """
-      Bata version of DocHub Plugin<br>
+      Beta version of DocHub Plugin<br>
       <em>
           <ul>
             <li>DocHub core: v2.2.4;</li>
