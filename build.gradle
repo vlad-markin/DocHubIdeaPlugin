@@ -27,7 +27,7 @@ intellij {
 }
 patchPluginXml {
     changeNotes = """
-      Bata version of DocHub Plugin<br>
+      Beta version of DocHub Plugin<br>
       <em>
           <ul>
             <li>Suggests for the structure of architecture manifests (yaml);</li>
