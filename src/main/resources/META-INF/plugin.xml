@@ -7,19 +7,24 @@
         <p>
             The plugin is part of the DocHub project. This project allows you to describe the architecture
             of systems in code. You can learn more about the project in the
-            <a href="https://github.com/RabotaRu/DocHub/tree/archops-conception-v2">github</a> repository or
+            <a href="https://github.com/RabotaRu/DocHub/">github</a> repository or
                 on website <a href="https://dochub.info">dochub.info</a>.
         </p>
         <p>
             This release includes:
             <ul>
+                <li>DocHub core: v2.2.4;</li>
                 <li>Suggests for the structure of architecture manifests (yaml);</li>
                 <li>Suggests for the values of manifest fields;</li>
                 <li>Fast navigation through manifests;</li>
                 <li>Built-in architecture rendering;</li>
-                <li>(new) JSONata file support;</li>
-                <li>(new) Fresh release of DocHub frontend;</li>
-                <li>(new) Fixed bugs of YAML interpretation.</li>
+                <li>JSONata file support;</li>
+                <li>Mapping architecture on the code;</li>
+                <li>Added the datasets and the table documents support;</li>
+                <li>Refactored subsystem of metamodel validation;</li>
+                <li>Document templates;</li>
+                <li>Support Eclipse ELK render core;</li>
+                <li>(new) Stabilized current functionality.</li>
             </ul>
         </p>
     ]]></description>
@@ -28,8 +33,18 @@
          on how to target different products -->
     <depends>com.intellij.modules.platform</depends>
     <depends>org.jetbrains.plugins.yaml</depends>
+    <depends optional="true" config-file="java.xml">com.intellij.java</depends>
 
     <extensions defaultExtensionNs="com.intellij">
+        <applicationService
+                serviceImplementation="org.dochub.idea.arch.settings.SettingsState"/>
+
+        <applicationConfigurable
+                parentId="tools"
+                instance="org.dochub.idea.arch.settings.SettingConfigurable"
+                id="org.dochub.idea.arch.settings.SettingConfigurable"
+                displayName="DocHub: Render settings"/>
+
         <completion.contributor
                 language="yaml"
                 implementationClass="org.dochub.idea.arch.completions.YamlCompletion"
@@ -70,14 +85,20 @@
         />
         <lang.syntaxHighlighterFactory
                 language="JSONata"
-                implementationClass="org.dochub.idea.arch.jsonata.JSONataSyntaxHighlighterFactory"/>
+                implementationClass="org.dochub.idea.arch.jsonata.JSONataSyntaxHighlighterFactory"
+        />
+        <codeInsight.lineMarkerProvider
+                language="yaml"
+                implementationClass="org.dochub.idea.arch.markline.LineMarkerYaml"
+        />
+        <fileBasedIndex implementation="org.dochub.idea.arch.indexing.DocHubIndex"/>
         <!--
         <editorTabTitleProvider
                 implementation="org.dochub.idea.arch.views.PreviewEditorTabTitleProvider"
         />
                 key="inspection.display-name"
                 groupKey="inspection.group"
-        <fileBasedIndex implementation="org.dochub.idea.arch.indexing.YamlIndex"/>
+
         -->
     </extensions>
 

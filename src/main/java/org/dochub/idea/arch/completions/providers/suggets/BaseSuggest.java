@@ -14,7 +14,7 @@ public class BaseSuggest extends CustomProvider {
         return PlatformPatterns.psiElement();
     }
 
-    protected Map<String, Object> getProjectCache(Project project) {
+    protected Map<String, CacheBuilder.SectionData> getProjectCache(Project project) {
         return CacheBuilder.getProjectCache(project);
     }
 }

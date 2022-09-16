@@ -13,7 +13,7 @@ import org.jetbrains.yaml.psi.YAMLKeyValue;
 public class DocType extends CustomProvider {
     private static String keyword = "type";
     private static final String[] keys = {
-            "markdown", "openapi", "plantuml"
+            "markdown", "openapi", "plantuml", "table"
     };
 
     @Override

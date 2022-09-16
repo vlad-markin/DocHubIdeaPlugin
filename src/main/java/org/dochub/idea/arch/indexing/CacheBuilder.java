@@ -3,27 +3,20 @@ package org.dochub.idea.arch.indexing;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.Key;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
 import com.intellij.psi.util.CachedValueProvider;
 import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.psi.util.PsiModificationTracker;
+import com.intellij.util.indexing.FileBasedIndex;
+import org.dochub.idea.arch.utils.VirtualFileSystemUtils;
 import org.jetbrains.annotations.Nullable;
-import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class CacheBuilder {
-
-//    project.getMessageBus().connect().subscribe(ProjectTopics.PROJECT_ROOTS, new ModuleRootListener() {
-//        @Override
-//        public void rootsChanged(ModuleRootEvent event) {
-//        }
-//    });
-
-    private static Key cacheGlobalKey = Key.create("dochub-global-cache");
-
     private static boolean isFileExists(Project project, String filename) {
         return (new File(project.getBasePath() + "/" + filename)).exists();
     }
@@ -44,104 +37,70 @@ public class CacheBuilder {
         return result;
     }
 
-    private static Map<String, Object> getCacheSection(String section, Map<String, Object> context) {
-        try {
-            Map<String, Object> mapSection = (Map<String, Object>) context.get(section);
-            if (mapSection == null) {
-                mapSection = new HashMap<String, Object>();
-                context.put(section, mapSection);
+    public static class SectionData {
+        public ArrayList<String> locations = new ArrayList<>();
+        public Map<String, ArrayList> ids = new HashMap();
+    }
+
+     private static void manifestMerge(Map<String, SectionData> context, DocHubIndexData data, VirtualFile source) {
+        for (String sectionKey : data.keySet()) {
+
+            if (sectionKey.equals("imports")) continue;
+
+            // Получаем секцию
+            DocHubIndexData.Section section = data.get(sectionKey);
+            SectionData sectionData = context.get(sectionKey);
+            if (sectionData == null) {
+                sectionData = new SectionData();
+                context.put(sectionKey, sectionData);
             }
-            return mapSection;
-        } catch (ClassCastException e) {
-            return null;
+
+            // Разбираем секцию
+            // Идентификаторы
+            for (int i = 0; i < section.ids.size(); i++) {
+                String id = section.ids.get(i);
+                ArrayList sources = sectionData.ids.get(id);
+                if (sources == null) {
+                    sources = new ArrayList<String>();
+                    sectionData.ids.put(id, sources);
+                }
+                sources.add(source);
+            }
+            // Локации
+            for (int i = 0; i < section.locations.size(); i++) {
+                String location = section.locations.get(i);
+                if (!sectionData.locations.contains(location))
+                    section.locations.add(location);
+            }
         }
     }
 
-    private static void parseYamlManifestIDs(Map<String, Object> yaml,
-                                                 String section,
-                                                 String path,
-                                                 Map<String, Object> context) {
+    private static void parseYamlManifest(Project project, String path, Map<String, SectionData> context) {
+        VirtualFile vFile = VirtualFileSystemUtils.findFile(path, project);
 
-        try {
-            Map<String, Object> yamlSection = (Map<String, Object>) yaml.get(section);
-            Map<String, Object> cacheIDs = getCacheSection(section, context);
-            if (yamlSection != null && cacheIDs != null) {
-                for ( String id : yamlSection.keySet()) {
-                    Map<String, Object> files = getCacheSection(id, cacheIDs);
-                    String location = null;
-                    try {
-                        Map<String, Object> fields = (Map<String, Object>) yamlSection.get(id);
-                        if (fields != null)
-                            location = (String) fields.get("location");
-                    } catch (ClassCastException e) {}
-                    files.put(path, new CacheFileData(location));
+        if (vFile != null) {
+            PsiFile targetFile = PsiManager.getInstance(project).findFile(vFile);
+            if (targetFile != null) {
+                Map index = FileBasedIndex.getInstance().getFileData(DocHubIndex.INDEX_ID, vFile, project);
+
+                for (Object key : index.keySet()) {
+                    DocHubIndexData data = (DocHubIndexData) index.get(key);
+
+                    DocHubIndexData.Section imports = data.get("imports");
+                    if (imports != null) {
+                        for (int i = 0; i < imports.imports.size(); i ++) {
+                            String importPath =
+                                    (vFile.getParent().getPath() + "/" + imports.imports.get(i))
+                                            .substring(project.getBasePath().length());
+                            parseYamlManifest(project, importPath, context);
+                        }
+                    }
+
+                    manifestMerge(context, data, vFile);
                 }
             }
-        } catch (ClassCastException e) {}
-    }
-
-    private static void parseYamlManifestImports(Map<String, Object> yaml,
-                                                 String path,
-                                                 Map<String, Object> context) {
-        ArrayList<String> imports = (ArrayList) yaml.get("imports");
-        if (imports != null) {
-            for (String importManifest : imports) {
-                parseYamlManifest((new File(path)).getParent() + "/" + importManifest, context);
-            }
         }
     }
-
-
-
-    private static void manifestMerge(Map<String, Object> from, Map<String, Object> to) {
-        for (String keyName : from.keySet()) {
-            if (!to.containsKey(keyName)) {
-                to.put(keyName, from.get(keyName));
-            } else {
-                Object destination = to.get(keyName);
-                Object source = from.get(keyName);
-                if ((destination instanceof Map) && (source instanceof Map)) {
-                    manifestMerge((Map<String, Object>) source, (Map<String, Object>) destination);
-                } else if ((destination instanceof ArrayList) && (source instanceof ArrayList)) {
-                    ((ArrayList<?>) destination).addAll((ArrayList)source);
-                } else {
-                    to.put(keyName, from.get(keyName));
-                }
-            }
-        }
-    }
-
-    private static void parseYamlManifest(String path, Map<String, Object> context) {
-        try {
-            Yaml yaml = new Yaml();
-            Map<String, Object> manifest = (Map<String, Object>) context.get("$manifest");
-            if (manifest == null) {
-                manifest = new HashMap<String, Object>();
-                context.put("$manifest", manifest);
-            }
-            InputStream inputStream = new FileInputStream(path);
-            Map<String, Object> sections = yaml.load(inputStream);
-            manifestMerge(sections, manifest);
-            if (sections != null) {
-                parseYamlManifestImports(sections, path, context);
-                parseYamlManifestIDs(sections, "components", path, context);
-                parseYamlManifestIDs(sections, "aspects", path, context);
-                parseYamlManifestIDs(sections, "contexts", path, context);
-                parseYamlManifestIDs(sections, "docs", path, context);
-            }
-        } catch (Exception e) {
-            // todo тут нужно сделать предупреждение
-        }
-    }
-
-//    private static void appendMessageToSuggest(String message, Map<String, Object> context) {
-//        Map<String, CacheFileData> files = new HashMap<>();
-//        files.put("file", new CacheFileData(null));
-//        Map<String, Object> components = (Map<String, Object>) context.get("components");
-//        if (components == null) components = new HashMap<>();
-//        components.put("message:"  + message, files);
-//        context.put("components", components);
-//    }
 
     private static String getFromEnv(Project project) {
         String[] names = new String[]{".env.local", ".env"};
@@ -160,17 +119,7 @@ public class CacheBuilder {
             rootManifest = "dochub.yaml";
         else
             rootManifest = getFromEnv(project);
-        return rootManifest;
-    }
-
-    public static Map<String, Object> buildForProject(Project project)  {
-        Map<String, Object> context = new HashMap<>();
-        String rootManifest = getRootManifestName(project);
-
-        if (rootManifest != null)
-            parseYamlManifest(project.getBasePath() + "/" + rootManifest, context);
-
-        return context;
+        return rootManifest != null ? rootManifest : "dochub.yaml";
     }
 
     private static Key cacheProjectKey = Key.create("dochub-global");
@@ -184,22 +133,29 @@ public class CacheBuilder {
 
         @Override
         public @Nullable Result compute() {
+            Map<String, SectionData> manifest = new HashMap<>();
+            String rootManifest = getRootManifestName(project);
+
+            if (rootManifest != null)
+                parseYamlManifest(project, rootManifest, manifest);
+
             return Result.create(
-                    CacheBuilder.buildForProject(project),
+                    manifest,
                     PsiModificationTracker.MODIFICATION_COUNT,
                     ProjectRootManager.getInstance(project));
         }
     }
 
-    private static GlobalCacheProvider globalCacheProvider = null;
+    private static Map<Project, GlobalCacheProvider> globalCacheProviders = new HashMap<>();
 
-    public static Map<String, Object> getProjectCache(Project project) {
+    public static Map<String, SectionData> getProjectCache(Project project) {
+        GlobalCacheProvider globalCacheProvider = globalCacheProviders.get(project);
         if (globalCacheProvider == null) {
             globalCacheProvider = new GlobalCacheProvider(project);
+            globalCacheProviders.put(project, globalCacheProvider);
         }
         CachedValuesManager cacheManager = CachedValuesManager.getManager(project);
-        return (Map<String, Object>) cacheManager.getCachedValue(
-                // PsiManager.getInstance(project).findFile(projectFile),
+        return (Map<String, SectionData>) cacheManager.getCachedValue(
                 project,
                 cacheProjectKey,
                 globalCacheProvider,

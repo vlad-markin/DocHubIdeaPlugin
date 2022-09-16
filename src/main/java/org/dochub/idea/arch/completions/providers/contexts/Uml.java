@@ -14,7 +14,7 @@ import org.jetbrains.yaml.psi.YAMLKeyValue;
 public class Uml extends CustomProvider {
     private static String keyword = "uml";
     private static final String[] keys = {
-            "$notation", "$autor", "$moment"
+            "$notation", "$autor", "$moment", "$before", "$after"
     };
 
     public static final ElementPattern<? extends PsiElement> rootPattern = PlatformPatterns.or(

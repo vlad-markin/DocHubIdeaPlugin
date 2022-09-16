@@ -10,7 +10,6 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ProcessingContext;
 import org.dochub.idea.arch.indexing.CacheBuilder;
 import org.dochub.idea.arch.utils.PsiUtils;
-import org.dochub.idea.arch.utils.VirtualFileSystemUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.yaml.psi.YAMLDocument;
@@ -90,22 +89,15 @@ public class RefBaseID extends BaseReferencesProvider {
         else
             return PsiReference.EMPTY_ARRAY;
 
-        Map<String, Object> cache = CacheBuilder.getProjectCache(project);
-        Map<String, Object> components = cache == null ? null : (Map<String, Object>) cache.get(getKeyword());
+        Map<String, CacheBuilder.SectionData> cache = CacheBuilder.getProjectCache(project);
+        CacheBuilder.SectionData components = cache == null ? null : cache.get(getKeyword());
         List<PsiReference> refs = new ArrayList<>();
 
         if (id != null && components != null) {
-            Map<String, Object> files = (Map<String, Object>) components.get(id);
+            ArrayList<VirtualFile> files = (ArrayList<VirtualFile>) components.ids.get(id);
             if (files != null) {
-                for (String file : files.keySet()) {
-                    VirtualFile vTargetFile = VirtualFileSystemUtils.findFile(
-                            file.substring(project.getBasePath().length()),
-                            project
-                    );
-
-                    if (vTargetFile == null) continue;
-
-                    PsiFile targetFile = PsiManager.getInstance(element.getManager().getProject()).findFile(vTargetFile);
+                for (int i = 0; i < files.size(); i++) {
+                    PsiFile targetFile = PsiManager.getInstance(project).findFile(files.get(i));
                     refs.add(new FileSourceReference(element, id, targetFile));
                 }
             }

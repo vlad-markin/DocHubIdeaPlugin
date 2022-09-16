@@ -1,17 +1,14 @@
 package org.dochub.idea.arch.tools;
 // JBCefBrowser (https://intellij-support.jetbrains.com/hc/en-us/community/posts/4403677440146-how-to-add-a-JBCefBrowser-in-toolWindow-)
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.intellij.codeInsight.TargetElementUtil;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.vfs.newvfs.BulkFileListener;
 import com.intellij.openapi.vfs.newvfs.events.VFileContentChangeEvent;
+import com.intellij.openapi.vfs.newvfs.events.VFileDeleteEvent;
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent;
-import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiManager;
 import com.intellij.ui.jcef.JBCefBrowser;
 import com.intellij.ui.jcef.JBCefBrowserBase;
 import com.intellij.ui.jcef.JBCefJSQuery;
@@ -19,9 +16,10 @@ import com.intellij.util.messages.MessageBusConnection;
 import org.apache.commons.io.FilenameUtils;
 import org.dochub.idea.arch.indexing.CacheBuilder;
 import org.dochub.idea.arch.manifests.PlantUMLDriver;
+import org.dochub.idea.arch.settings.SettingsState;
+import org.dochub.idea.arch.wizard.RootManifest;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,60 +27,48 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.Timer;
 import java.util.regex.Matcher;
 
+import static org.dochub.idea.arch.tools.Consts.*;
 public class DocHubToolWindow extends JBCefBrowser {
-  private JBCefJSQuery sourceQuery;
-  private Project project;
-  private MessageBusConnection eventBus;
-  private Integer changeCounter = 0;
-  private static List<String> sourceChanged;
-  private Boolean doRepair = false;
-  private Timer timer;
-  private TimerTask observer = null;
-  private Navigation navigation;
-
-  private void startObserver() {
-    doRepair = false;
-    if (observer == null) {
-      observer = new TimerTask() {
-        public void run() {
-          if (doRepair) reloadHtml();
-          doRepair = true;
-        }
-      };
-      timer = new Timer("DocHub observer");
-      timer.scheduleAtFixedRate(observer, 5000L, 5000L);
+  private final JBCefJSQuery sourceQuery;
+  private final Project project;
+  private final Navigation navigation;
+  private final JSGateway jsGateway;
+  private String getInjectionSettings() {
+    SettingsState settingsState = SettingsState.getInstance();
+    Map<String, Object> settings = new HashMap<>();
+    Map<String, Object> render = new HashMap<>();
+    render.put("mode", settingsState.renderMode);
+    render.put("external", settingsState.renderIsExternal);
+    render.put("server", settingsState.serverRendering);
+    settings.put("render", render);
+    try {
+      ObjectMapper mapper = new ObjectMapper();
+      return Matcher.quoteReplacement(
+              mapper.writeValueAsString(settings)
+      );
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
     }
   }
-
-  private void reloadHtml() {
+  public void reloadHtml() {
     InputStream input = getClass().getClassLoader().getResourceAsStream("html/plugin.html");
-    String html = "";
+    String html;
     try {
+      assert input != null;
       html = new String(input.readAllBytes(), StandardCharsets.UTF_8);
       String injectionCode = sourceQuery.inject("data","resolve","reject");
-      html = html.replaceAll("\"API_INJECTION\"", Matcher.quoteReplacement(injectionCode));
+      html =
+              html.replaceAll("\"API_INJECTION\"", Matcher.quoteReplacement(injectionCode))
+              .replaceAll("\"SETTING_INJECTION\"", getInjectionSettings());
     } catch (IOException e) {
       html = e.toString();
     }
-
-    loadHTML(html);
+    String currentURL = getCefBrowser().getURL();
+    if (currentURL.length() > 0) loadHTML(html, currentURL);
+      else loadHTML(html);
   }
-
-  public static VirtualFile getGotoFile(final Project project, final VirtualFile file) {
-    PsiElement element = PsiManager.getInstance(project).findFile(file);
-    if (element != null) {
-      PsiElement navElement = element.getNavigationElement();
-      navElement = TargetElementUtil.getInstance().getGotoDeclarationTarget(element, navElement);
-      if (navElement != null && navElement.getContainingFile() != null) {
-        return navElement.getContainingFile().getVirtualFile();
-      }
-    }
-    return file;
-  }
-
   private JBCefJSQuery.Response requestProcessing(String json) {
     // openDevtools();
     StringBuilder result = new StringBuilder();
@@ -92,56 +78,73 @@ public class DocHubToolWindow extends JBCefBrowser {
       JsonNode jsonURL = jsonObj.get("url");
       if (jsonURL != null) {
         String url = jsonURL.asText();
-        if (url.equals("plugin:/idea/source/$root")) {
+        if (url.equals(ROOT_SOURCE_URI)) {
           Map<String, Object> response = new HashMap<>();
-          String rootManifest = CacheBuilder.getRootManifestName(project);
-          if (rootManifest == null || rootManifest.length() < 5) {
+          String rootName = project.getBasePath() + "/" + CacheBuilder.getRootManifestName(project);
+          File rootFile = new File(rootName);
+          if (!rootFile.exists()) {
             return new JBCefJSQuery.Response("", 404, "No found: " + url);
           }
-          response.put("contentType", rootManifest.substring(rootManifest.length() - 4).toLowerCase(Locale.ROOT));
-          response.put("data", Files.readString(Path.of(project.getBasePath() + "/" + rootManifest)));
+          response.put("contentType", rootName.substring(rootName.length() - 4).toLowerCase(Locale.ROOT));
+          response.put("data", Files.readString(Path.of(rootName)));
           result.append(mapper.writeValueAsString(response));
-        } else if (url.equals("plugin:/idea/plantuml/svg")) {
+        } else if (url.equals(PLANTUML_RENDER_SVG_URI)) {
           JsonNode jsonSource = jsonObj.get("source");
           String source = jsonSource != null ? jsonSource.asText() : "@startuml\n@enduml";
           Map<String, Object> response = new HashMap<>();
           response.put("data", PlantUMLDriver.makeSVG(source));
           result.append(mapper.writeValueAsString(response));
-        } else if (url.equals("plugin:/idea/goto")) {
-          JsonNode jsonSource = jsonObj.get("source");
-          JsonNode jsonID = jsonObj.get("id");
-          if ((jsonSource != null) && (jsonID != null)) {
-            String source = jsonSource.asText();
-            String id = jsonID.asText();
-            String basePath = project.getBasePath() + "/";
-            String parentPath = (new File(CacheBuilder.getRootManifestName(project))).getParent();
-            String sourcePath = basePath + (parentPath != null ? parentPath + "/" : "") + source.substring(20);
-            File file = new File(sourcePath);
-            if (file.exists() || !file.isDirectory()) {
-              navigation.go(sourcePath, "component", id);
-            }
+        } else if (url.equals(NAVI_GOTO_SOURCE_URI)) {
+          navigation.go(jsonObj);
+        } else if (url.equals(WIZARD_INIT_URI)) {
+          JsonNode jsonMode = jsonObj.get("mode");
+          String mode = jsonMode != null ? jsonMode.asText() : "production";
+          if (mode.equals("example")) {
+            (new RootManifest()).createExampleManifest(project);
+          } else {
+            (new RootManifest()).createRootManifest(project);
           }
-        } else if ((url.length() > 20) && url.substring(0, 20).equals("plugin:/idea/source/")) {
+          reloadHtml();
+        } else if ((url.length() > 20) && url.startsWith(ROOT_SOURCE_PATH)) {
           String basePath = project.getBasePath() + "/";
           String parentPath = (new File(CacheBuilder.getRootManifestName(project))).getParent();
-          String sourcePath = basePath + (parentPath != null ? parentPath + "/" : "") + url.substring(20);
+          String sourcePath =
+                  basePath
+                          + (parentPath != null ? parentPath + "/" : "")
+                          + url.substring(20).split("\\?")[0];
           File file = new File(sourcePath);
           if (!file.exists() || file.isDirectory()) {
             return new JBCefJSQuery.Response("", 404, "No found: " + url);
           }
           Map<String, Object> response = new HashMap<>();
-          response.put("contentType", FilenameUtils.getExtension(sourcePath).toLowerCase(Locale.ROOT));
-          response.put("data", Files.readString(Path.of(sourcePath)));
+          String contentType = FilenameUtils.getExtension(sourcePath).toLowerCase(Locale.ROOT);
+          response.put("contentType", contentType);
+          if (contentType.equals("jpg") || contentType.equals("jpeg") || contentType.equals("svg")
+                  || contentType.equals("png")) {
+            response.put("data", Files.readAllBytes(Path.of(sourcePath)));
+          } else
+            response.put("data", Files.readString(Path.of(sourcePath)));
           result.append(mapper.writeValueAsString(response));
-        } else if (url.equals("plugin:/idea/change/index")) {
+        } else if (url.equals(ACTION_PULL_URI)) {
           Map<String, Object> response = new HashMap<>();
-          response.put("data", changeCounter);
-          response.put("changed", new ArrayList<>(sourceChanged));
+          response.put("contentType", "json");
+          response.put("data", jsGateway.pullJSONMessage());
           result.append(mapper.writeValueAsString(response));
-          sourceChanged.clear();
-        } else if (url.equals("plugin:/idea/debugger/show")){
+        } else if (url.equals(ACTION_DOWNLOAD_URI)) { // Сохранение файлов из WEB морды
+          JsonNode jsonContent = jsonObj.get("content");
+          JsonNode jsonTitle = jsonObj.get("title");
+          JsonNode jsonDescription = jsonObj.get("description");
+          if (jsonContent != null) {
+            Download.download(
+                    jsonContent.asText(),
+                    jsonTitle != null ? jsonTitle.asText() : "",
+                    jsonDescription != null ? jsonDescription.asText() : ""
+            );
+          }
+        } else if (url.equals(DEVTOOL_SHOW_URI)){
           openDevtools();
-        } else if (url.equals("plugin:/idea/reload")){
+          getCefBrowser().executeJavaScript("console.info('GO!!');", "events.js", 0);
+        } else if (url.equals(HTML_RELOAD_URI)){
           reloadHtml();
         } else {
           return new JBCefJSQuery.Response("", 404, "No found: " + url);
@@ -150,43 +153,44 @@ public class DocHubToolWindow extends JBCefBrowser {
     } catch (IOException e1) {
       return new JBCefJSQuery.Response("", 500, e1.toString());
     }
-    startObserver();
     return new JBCefJSQuery.Response(result.toString());
   }
-
-  public DocHubToolWindow(ToolWindow toolWindow, Project project) {
+  public DocHubToolWindow(Project project) {
     super("/");
 
-    sourceChanged = new ArrayList<>();
-    eventBus = project.getMessageBus().connect();
-    navigation = new Navigation(project);
+    PlantUMLDriver.init();
 
+    this.project = project;
+
+    MessageBusConnection eventBus = project.getMessageBus().connect();
+    navigation = new Navigation(project);
+    jsGateway = new JSGateway(project);
     eventBus.subscribe(VirtualFileManager.VFS_CHANGES, new BulkFileListener() {
       @Override
       public void after(@NotNull List<? extends VFileEvent> events) {
         String rootManifest = CacheBuilder.getRootManifestName(project);
         events.forEach(event -> {
-          if (event instanceof VFileContentChangeEvent &&
-                  event.getFile() != null) {
-            String source = event.getFile().getPath().substring(project.getBasePath().length() + 1);
-            if (source.equals(rootManifest)) source = "$root";
-            sourceChanged.add("plugin:/idea/source/" + source);
-            changeCounter++;
+          if (event.getFile() != null &&
+                  (
+                          event instanceof VFileContentChangeEvent
+                          ||  event instanceof VFileDeleteEvent
+                  )
+          ) {
+            String path = event.getFile().getPath();
+            int bpLength = Objects.requireNonNull(project.getBasePath()).length();
+            if (path.length() > bpLength) {
+              String source = path.substring(bpLength + 1);
+              if (source.equals(rootManifest)) source = ROOT_SOURCE;
+              jsGateway.appendMessage(ACTION_SOURCE_CHANGED, ROOT_SOURCE_PATH + source, null);
+            }
           }
         });
       }
     });
 
-    this.openDevtools();
     sourceQuery = JBCefJSQuery.create((JBCefBrowserBase)this);
-    sourceQuery.addHandler((params) -> requestProcessing(params));
+    sourceQuery.addHandler(this::requestProcessing);
 
     reloadHtml();
-
-    this.project = project;
-  }
-
-  public JComponent getContent() {
-    return getComponent();
   }
 }

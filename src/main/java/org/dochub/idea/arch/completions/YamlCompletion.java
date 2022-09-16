@@ -6,6 +6,7 @@ import org.dochub.idea.arch.completions.providers.aspects.AspectID;
 import org.dochub.idea.arch.completions.providers.aspects.AspectLocation;
 import org.dochub.idea.arch.completions.providers.components.*;
 import org.dochub.idea.arch.completions.providers.contexts.*;
+import org.dochub.idea.arch.completions.providers.datasets.DatasetOrigin;
 import org.dochub.idea.arch.completions.providers.docs.*;
 import org.dochub.idea.arch.completions.providers.forms.FormItem;
 import org.dochub.idea.arch.completions.providers.forms.FormItemField;
@@ -48,11 +49,14 @@ public class YamlCompletion extends CompletionContributor {
                 new DocSubjects(),
                 new DocType(),
                 new DocLocation(),
+                new DocOrigin(),
             new Technologies(),
                 new SectionItem(),
                 new ItemsItem(),
             new Imports(),
-                new ImportItem()
+                new ImportItem(),
+            new Dataset(),
+                new DatasetOrigin()
     };
 
     public YamlCompletion() {

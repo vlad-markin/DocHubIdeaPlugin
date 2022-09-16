@@ -1,34 +1,34 @@
 package org.dochub.idea.arch.completions.providers;
 
-import com.intellij.codeInsight.completion.*;
-import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.patterns.ElementPattern;
 import com.intellij.psi.PsiElement;
-import com.intellij.util.ProcessingContext;
+import org.dochub.idea.arch.completions.CompletionKey;
 import org.jetbrains.annotations.NotNull;
 
-public class Aspects extends CustomProvider {
-    private static final String keyword = "aspects";
-    private static final String[] keys = {
-            "title", "location"
-    };
+import java.util.Collection;
+import java.util.List;
 
-    public static final ElementPattern<? extends PsiElement> rootPattern = Root.makeRootPattern(keyword);
+public class Aspects extends FilteredCustomProvider {
+    private static final String KEYWORD = "aspects";
+    private static final Collection<CompletionKey> COMPLETION_KEYS = List.of(
+            new CompletionKey("title"),
+            new CompletionKey("location")
+    );
+
+    public static final ElementPattern<? extends PsiElement> rootPattern = Root.makeRootPattern(KEYWORD);
 
     @Override
-    public void appendToCompletion(CompletionContributor completion) {
-        completion.extend(
-                CompletionType.BASIC,
-                rootPattern,
-                new CompletionProvider<>() {
-                    public void addCompletions(@NotNull CompletionParameters parameters,
-                                               @NotNull ProcessingContext context,
-                                               @NotNull CompletionResultSet resultSet) {
-                        for (final String key : keys) {
-                            resultSet.addElement(LookupElementBuilder.create(key));
-                        }
-                    }
-                }
-        );
+    protected @NotNull ElementPattern<? extends PsiElement> getRootPattern() {
+        return rootPattern;
+    }
+
+    @Override
+    protected @NotNull Collection<CompletionKey> getKeys() {
+        return COMPLETION_KEYS;
+    }
+
+    @Override
+    protected int getKeyDocumentLevel() {
+        return 2;
     }
 }
