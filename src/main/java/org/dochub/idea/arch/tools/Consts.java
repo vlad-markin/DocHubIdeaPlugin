@@ -19,4 +19,6 @@ public class Consts {
 
     public static final String HTML_RELOAD_URI = "plugin:/idea/reload";
 
+    public static final String ENTITIES_APPLY_SCHEMA = "plugin:/idea/entities/applyschema";
+
 }

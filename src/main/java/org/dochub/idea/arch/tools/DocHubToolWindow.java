@@ -15,6 +15,7 @@ import com.intellij.ui.jcef.JBCefJSQuery;
 import com.intellij.util.messages.MessageBusConnection;
 import org.apache.commons.io.FilenameUtils;
 import org.dochub.idea.arch.indexing.CacheBuilder;
+import org.dochub.idea.arch.jsonschema.EntityManager;
 import org.dochub.idea.arch.manifests.PlantUMLDriver;
 import org.dochub.idea.arch.settings.SettingsState;
 import org.dochub.idea.arch.wizard.RootManifest;
@@ -146,6 +147,9 @@ public class DocHubToolWindow extends JBCefBrowser {
           getCefBrowser().executeJavaScript("console.info('GO!!');", "events.js", 0);
         } else if (url.equals(HTML_RELOAD_URI)){
           reloadHtml();
+        } else if (url.equals(ENTITIES_APPLY_SCHEMA)) {
+          JsonNode schema = jsonObj.get("schema");
+          EntityManager.applySchema(project, schema.asText());
         } else {
           return new JBCefJSQuery.Response("", 404, "No found: " + url);
         }
