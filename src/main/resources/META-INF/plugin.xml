@@ -13,7 +13,7 @@
         <p>
             This release includes:
             <ul>
-                <li>DocHub core: v2.2.4;</li>
+                <li>DocHub core: v2.3.2 (beta);</li>
                 <li>Suggests for the structure of architecture manifests (yaml);</li>
                 <li>Suggests for the values of manifest fields;</li>
                 <li>Fast navigation through manifests;</li>
@@ -24,7 +24,8 @@
                 <li>Refactored subsystem of metamodel validation;</li>
                 <li>Document templates;</li>
                 <li>Support Eclipse ELK render core;</li>
-                <li>(new) Stabilized current functionality.</li>
+                <li>Custom entities;</li>
+                <li>(new) Added embedding custom entities in markdown documents.</li>
             </ul>
         </p>
     ]]></description>

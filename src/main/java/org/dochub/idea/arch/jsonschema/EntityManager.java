@@ -1,5 +1,7 @@
 package org.dochub.idea.arch.jsonschema;
 
+import com.intellij.openapi.application.Application;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
@@ -28,9 +30,12 @@ public class EntityManager {
             currentSchema = VfsUtil.findFileByIoFile(file, true);
             schemas.put(projectHash, currentSchema);
 
-            GuiUtils.invokeLaterIfNeeded(() -> {
-                PsiManager.getInstance(project).dropResolveCaches();
-                PsiManager.getInstance(project).dropPsiCaches();
+            ApplicationManager.getApplication().invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    PsiManager.getInstance(project).dropResolveCaches();
+                    PsiManager.getInstance(project).dropPsiCaches();
+                }
             }, ModalityState.defaultModalityState());
         } catch (IOException e) {
             throw new RuntimeException(e);
