@@ -21,4 +21,6 @@ public class Consts {
 
     public static final String ENTITIES_APPLY_SCHEMA = "plugin:/idea/entities/applyschema";
 
+    public static final String CLIPBOARD_COPY = "plugin:/idea/clipboard/copy";
+
 }

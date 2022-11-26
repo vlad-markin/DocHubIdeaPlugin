@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'org.dochub.idea'
-version '1.20.2-beta'
+version '1.21.3-beta'
 
 sourceSets.main.java.srcDirs 'src/main/gen'
 
@@ -46,7 +46,7 @@ patchPluginXml {
       Beta version of DocHub Plugin<br>
       <em>
           <ul>
-            <li>DocHub core: v2.3.2 (beta);</li>
+            <li>DocHub core: v2.4.2;</li>
             <li>Suggests for the structure of architecture manifests (yaml);</li>
             <li>Suggests for the values of manifest fields;</li>
             <li>Fast navigation through manifests;</li>
@@ -58,7 +58,9 @@ patchPluginXml {
             <li>Document templates.</li>
             <li>Support Eclipse ELK render core;</li>
             <li>Custom entities;</li>
-            <li>(new) Added embedding custom entities in markdown documents.</li>
+            <li>Mermaid support;</li>
+            <li>Network diagram support;</li>
+            <li>(new) Stabilization release.</li>
           <ul>  
       </em>
       """
