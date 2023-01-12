@@ -1,10 +1,11 @@
 package org.dochub.idea.arch.tools;
 
-import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.*;
 import com.intellij.openapi.fileChooser.*;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFileWrapper;
+import org.springframework.beans.factory.annotation.*;
 
 import java.io.BufferedWriter;
 import java.io.File;

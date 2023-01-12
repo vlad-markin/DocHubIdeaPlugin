@@ -2,6 +2,9 @@ package org.dochub.idea.arch.tools;
 
 import com.intellij.openapi.editor.event.*;
 import com.intellij.ui.jcef.JBCefBrowser;
+import org.cef.*;
+import org.cef.callback.*;
+import org.cef.handler.*;
 import org.jetbrains.annotations.NotNull;
 
 

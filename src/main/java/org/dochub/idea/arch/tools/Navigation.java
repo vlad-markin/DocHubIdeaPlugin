@@ -112,12 +112,7 @@ public class Navigation {
 
     public void go(String source, String entity, String id) {
         Application app = ApplicationManager.getApplication();
-        app.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                gotoByID(source, entity, id);
-            }
-        }, ModalityState.NON_MODAL);
+        app.invokeLater(() -> gotoByID(source, entity, id), ModalityState.NON_MODAL);
     }
 
     public void go(String source, int pos) {

@@ -14,6 +14,9 @@ import com.intellij.ui.jcef.JBCefBrowserBase;
 import com.intellij.ui.jcef.JBCefJSQuery;
 import com.intellij.util.messages.MessageBusConnection;
 import org.apache.commons.io.FilenameUtils;
+import org.cef.*;
+import org.cef.callback.*;
+import org.cef.handler.*;
 import org.dochub.idea.arch.indexing.CacheBuilder;
 import org.dochub.idea.arch.manifests.PlantUMLDriver;
 import org.dochub.idea.arch.settings.SettingsState;
@@ -53,21 +56,24 @@ public class DocHubToolWindow extends JBCefBrowser {
     }
   }
   public void reloadHtml() {
-    InputStream input = getClass().getClassLoader().getResourceAsStream("html/plugin.html");
-    String html;
-    try {
-      assert input != null;
-      html = new String(input.readAllBytes(), StandardCharsets.UTF_8);
-      String injectionCode = sourceQuery.inject("data","resolve","reject");
-      html =
-              html.replaceAll("\"API_INJECTION\"", Matcher.quoteReplacement(injectionCode))
-              .replaceAll("\"SETTING_INJECTION\"", getInjectionSettings());
-    } catch (IOException e) {
-      html = e.toString();
-    }
-    String currentURL = getCefBrowser().getURL();
-    if (currentURL.length() > 0) loadHTML(html, currentURL);
-      else loadHTML(html);
+//    InputStream input = getClass().getClassLoader().getResourceAsStream("html/plugin.html");
+//    String html;
+//    try {
+//      assert input != null;
+//      html = new String(input.readAllBytes(), StandardCharsets.UTF_8);
+//      String injectionCode = sourceQuery.inject("data","resolve","reject");
+//      html =
+//              html.replaceAll("\"API_INJECTION\"", Matcher.quoteReplacement(injectionCode))
+//              .replaceAll("\"SETTING_INJECTION\"", getInjectionSettings());
+//    } catch (IOException e) {
+//      html = e.toString();
+//    }
+//    String currentURL = getCefBrowser().getURL();
+//    if (currentURL.length() > 0) {
+//      loadHTML(html, currentURL);
+//    } else {
+//      loadHTML(html);
+//    }
   }
   private JBCefJSQuery.Response requestProcessing(String json) {
     // openDevtools();
@@ -160,6 +166,7 @@ public class DocHubToolWindow extends JBCefBrowser {
 
     PlantUMLDriver.init();
 
+
     this.project = project;
 
     MessageBusConnection eventBus = project.getMessageBus().connect();
@@ -193,4 +200,6 @@ public class DocHubToolWindow extends JBCefBrowser {
 
     reloadHtml();
   }
+
+
 }
