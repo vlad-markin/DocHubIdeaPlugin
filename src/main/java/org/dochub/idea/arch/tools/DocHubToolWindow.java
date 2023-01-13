@@ -11,6 +11,7 @@ import com.intellij.ui.jcef.*;
 import com.intellij.util.messages.*;
 import org.apache.commons.io.*;
 import org.dochub.idea.arch.indexing.*;
+import org.dochub.idea.arch.jsonschema.*;
 import org.dochub.idea.arch.manifests.*;
 import org.dochub.idea.arch.settings.*;
 import org.dochub.idea.arch.wizard.*;
