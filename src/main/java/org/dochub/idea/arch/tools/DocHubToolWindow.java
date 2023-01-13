@@ -55,17 +55,16 @@ public class DocHubToolWindow extends JBCefBrowser {
       html =
               html.replaceAll("\"API_INJECTION\"", Matcher.quoteReplacement(injectionCode))
               .replaceAll("\"SETTING_INJECTION\"", getInjectionSettings());
-      getCefBrowser().getUIComponent().setFocusable(false);
     } catch (IOException e) {
       html = e.toString();
     }
-    getCefBrowser().getUIComponent().setFocusable(false);
     String currentURL = getCefBrowser().getURL();
     if (currentURL.length() > 0) {
       loadHTML(html, currentURL);
     } else {
       loadHTML(html);
     }
+    getCefBrowser().getUIComponent().setFocusable(false);
   }
   private JBCefJSQuery.Response requestProcessing(String json) {
     // openDevtools();
