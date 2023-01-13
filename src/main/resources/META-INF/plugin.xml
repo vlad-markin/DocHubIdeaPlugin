@@ -13,7 +13,7 @@
         <p>
             This release includes:
             <ul>
-                <li>DocHub core: v2.4.2;</li>
+                <li>DocHub core: v2.5.2;</li>
                 <li>Suggests for the structure of architecture manifests (yaml);</li>
                 <li>Suggests for the values of manifest fields;</li>
                 <li>Fast navigation through manifests;</li>
@@ -27,7 +27,7 @@
                 <li>Custom entities;</li>
                 <li>Mermaid support;</li>
                 <li>Network diagram support;</li>
-                <li>(new) Stabilization release.</li>
+                <li>(new) Widgets.</li>
             </ul>
         </p>
     ]]></description>
