@@ -143,6 +143,11 @@ public class DocHubToolWindow extends JBCefBrowser {
           getCefBrowser().executeJavaScript("console.info('GO!!');", "events.js", 0);
         } else if (url.equals(HTML_RELOAD_URI)){
           reloadHtml();
+        } else if (url.equals(ENTITIES_APPLY_SCHEMA)) {
+          JsonNode schema = jsonObj.get("schema");
+          EntityManager.applySchema(project, schema.asText());
+        } else if (url.equals(CLIPBOARD_COPY)) {
+          Clipboard.copy(jsonObj.get("data").asText());
         } else {
           return new JBCefJSQuery.Response("", 404, "No found: " + url);
         }
