@@ -36,9 +36,8 @@ public class DocHubToolWindowFactory implements ToolWindowFactory {
     final ActionToolbar actionBar = ActionManager.getInstance().createActionToolbar("DH Tools", group, true);
     actionBar.setTargetComponent(toolWindow.getComponent());
     toolWindow.getComponent().add(actionBar.getComponent(), BorderLayout.PAGE_START);
-//    toolWindow.getComponent().add(myToolWindow.getComponent());
-//    myToolWindow.getComponent().setEnabled(false);
-
+    toolWindow.getComponent().add(myToolWindow.getComponent());
+    toolWindow.getComponent().setVisible(true);
   }
 
 
