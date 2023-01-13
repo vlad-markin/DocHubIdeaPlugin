@@ -1,11 +1,10 @@
 package org.dochub.idea.arch.tools;
 
-import com.intellij.icons.AllIcons;
+import com.intellij.icons.*;
 import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowFactory;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.project.*;
+import com.intellij.openapi.wm.*;
+import org.jetbrains.annotations.*;
 
 import java.awt.*;
 
@@ -38,5 +37,8 @@ public class DocHubToolWindowFactory implements ToolWindowFactory {
     actionBar.setTargetComponent(toolWindow.getComponent());
     toolWindow.getComponent().add(actionBar.getComponent(), BorderLayout.PAGE_START);
     toolWindow.getComponent().add(myToolWindow.getComponent());
+    toolWindow.getComponent().setVisible(true);
   }
+
+
 }

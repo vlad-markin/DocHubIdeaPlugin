@@ -13,18 +13,21 @@
         <p>
             This release includes:
             <ul>
-                <li>DocHub core: v2.2.4;</li>
+                <li>DocHub core: v2.5.2;</li>
                 <li>Suggests for the structure of architecture manifests (yaml);</li>
                 <li>Suggests for the values of manifest fields;</li>
                 <li>Fast navigation through manifests;</li>
                 <li>Built-in architecture rendering;</li>
                 <li>JSONata file support;</li>
                 <li>Mapping architecture on the code;</li>
-                <li>Added the datasets and the table documents support;</li>
+                <li>The datasets and the table documents support;</li>
                 <li>Refactored subsystem of metamodel validation;</li>
                 <li>Document templates;</li>
                 <li>Support Eclipse ELK render core;</li>
-                <li>(new) Stabilized current functionality.</li>
+                <li>Custom entities;</li>
+                <li>Mermaid support;</li>
+                <li>Network diagram support;</li>
+                <li>(new) Widgets.</li>
             </ul>
         </p>
     ]]></description>
@@ -32,6 +35,7 @@
     <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html
          on how to target different products -->
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.java</depends>
     <depends>org.jetbrains.plugins.yaml</depends>
     <depends optional="true" config-file="java.xml">com.intellij.java</depends>
 
@@ -100,6 +104,9 @@
                 groupKey="inspection.group"
 
         -->
+    </extensions>
+    <extensions defaultExtensionNs="JavaScript.JsonSchema">
+        <ProviderFactory implementation="org.dochub.idea.arch.jsonschema.EntityJSONSchemaProviderFactory"/>
     </extensions>
 
     <actions>

@@ -1,33 +1,27 @@
 package org.dochub.idea.arch.tools;
 // JBCefBrowser (https://intellij-support.jetbrains.com/hc/en-us/community/posts/4403677440146-how-to-add-a-JBCefBrowser-in-toolWindow-)
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFileManager;
-import com.intellij.openapi.vfs.newvfs.BulkFileListener;
-import com.intellij.openapi.vfs.newvfs.events.VFileContentChangeEvent;
-import com.intellij.openapi.vfs.newvfs.events.VFileDeleteEvent;
-import com.intellij.openapi.vfs.newvfs.events.VFileEvent;
-import com.intellij.ui.jcef.JBCefBrowser;
-import com.intellij.ui.jcef.JBCefBrowserBase;
-import com.intellij.ui.jcef.JBCefJSQuery;
-import com.intellij.util.messages.MessageBusConnection;
-import org.apache.commons.io.FilenameUtils;
-import org.dochub.idea.arch.indexing.CacheBuilder;
-import org.dochub.idea.arch.manifests.PlantUMLDriver;
-import org.dochub.idea.arch.settings.SettingsState;
-import org.dochub.idea.arch.wizard.RootManifest;
-import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.databind.*;
+import com.intellij.openapi.project.*;
+import com.intellij.openapi.vfs.*;
+import com.intellij.openapi.vfs.newvfs.*;
+import com.intellij.openapi.vfs.newvfs.events.*;
+import com.intellij.ui.jcef.*;
+import com.intellij.util.messages.*;
+import org.apache.commons.io.*;
+import org.dochub.idea.arch.indexing.*;
+import org.dochub.idea.arch.jsonschema.*;
+import org.dochub.idea.arch.manifests.*;
+import org.dochub.idea.arch.settings.*;
+import org.dochub.idea.arch.wizard.*;
+import org.jetbrains.annotations.*;
+
+import java.io.*;
+import java.nio.charset.*;
+import java.nio.file.*;
 import java.util.*;
-import java.util.regex.Matcher;
+import java.util.regex.*;
 
 import static org.dochub.idea.arch.tools.Consts.*;
 public class DocHubToolWindow extends JBCefBrowser {
@@ -66,8 +60,12 @@ public class DocHubToolWindow extends JBCefBrowser {
       html = e.toString();
     }
     String currentURL = getCefBrowser().getURL();
-    if (currentURL.length() > 0) loadHTML(html, currentURL);
-      else loadHTML(html);
+    if (currentURL.length() > 0) {
+      loadHTML(html, currentURL);
+    } else {
+      loadHTML(html);
+    }
+    getCefBrowser().getUIComponent().setFocusable(false);
   }
   private JBCefJSQuery.Response requestProcessing(String json) {
     // openDevtools();
@@ -146,6 +144,11 @@ public class DocHubToolWindow extends JBCefBrowser {
           getCefBrowser().executeJavaScript("console.info('GO!!');", "events.js", 0);
         } else if (url.equals(HTML_RELOAD_URI)){
           reloadHtml();
+        } else if (url.equals(ENTITIES_APPLY_SCHEMA)) {
+          JsonNode schema = jsonObj.get("schema");
+          EntityManager.applySchema(project, schema.asText());
+        } else if (url.equals(CLIPBOARD_COPY)) {
+          Clipboard.copy(jsonObj.get("data").asText());
         } else {
           return new JBCefJSQuery.Response("", 404, "No found: " + url);
         }
@@ -159,6 +162,7 @@ public class DocHubToolWindow extends JBCefBrowser {
     super("/");
 
     PlantUMLDriver.init();
+
 
     this.project = project;
 
@@ -193,4 +197,6 @@ public class DocHubToolWindow extends JBCefBrowser {
 
     reloadHtml();
   }
+
+
 }
