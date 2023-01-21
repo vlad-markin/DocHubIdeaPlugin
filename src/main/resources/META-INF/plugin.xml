@@ -13,21 +13,22 @@
         <p>
             This release includes:
             <ul>
-                <li>DocHub core: v2.5.2;</li>
+                <li>DocHub core: v2.6.1;</li>
                 <li>Suggests for the structure of architecture manifests (yaml);</li>
                 <li>Suggests for the values of manifest fields;</li>
                 <li>Fast navigation through manifests;</li>
-                <li>Built-in architecture rendering;</li>
+                <li>Problems highlighting;</li>
                 <li>JSONata file support;</li>
                 <li>Mapping architecture on the code;</li>
-                <li>The datasets and the table documents support;</li>
+                <li>Added the datasets and the table documents support;</li>
                 <li>Refactored subsystem of metamodel validation;</li>
-                <li>Document templates;</li>
+                <li>Document templates.</li>
                 <li>Support Eclipse ELK render core;</li>
                 <li>Custom entities;</li>
                 <li>Mermaid support;</li>
                 <li>Network diagram support;</li>
-                <li>(new) Widgets.</li>
+                <li>Widgets;</li>
+                <li>Added syntax color support in Markdown documents.</li>
             </ul>
         </p>
     ]]></description>

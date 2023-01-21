@@ -4,6 +4,7 @@ package org.dochub.idea.arch.tools;
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.*;
 import com.intellij.openapi.project.*;
+import com.intellij.openapi.util.SystemInfoRt;
 import com.intellij.openapi.vfs.*;
 import com.intellij.openapi.vfs.newvfs.*;
 import com.intellij.openapi.vfs.newvfs.events.*;
@@ -65,7 +66,8 @@ public class DocHubToolWindow extends JBCefBrowser {
     } else {
       loadHTML(html);
     }
-    getCefBrowser().getUIComponent().setFocusable(false);
+    if (!SystemInfoRt.isWindows)
+      getCefBrowser().getUIComponent().setFocusable(false);
   }
   private JBCefJSQuery.Response requestProcessing(String json) {
     // openDevtools();
