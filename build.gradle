@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'org.dochub.idea'
-version '2.2.0-beta'
+version '2.2.2-beta'
 
 sourceSets.main.java.srcDirs 'src/main/gen'
 
@@ -51,7 +51,7 @@ patchPluginXml {
       Beta version of DocHub Plugin<br>
       <em>
           <ul>
-            <li>DocHub core: v2.6.2;</li>
+            <li>DocHub core: v2.6.3;</li>
             <li>Suggests for the structure of architecture manifests (yaml);</li>
             <li>Suggests for the values of manifest fields;</li>
             <li>Fast navigation through manifests;</li>
@@ -66,8 +66,10 @@ patchPluginXml {
             <li>Mermaid support;</li>
             <li>Network diagram support;</li>
             <li>Widgets;</li>
-            <li>Added syntax color support to Markdown documents;</li>
-            <li>Added syntax color support to JSOBata DevTool.</li>
+            <li>Syntax color support to Markdown documents;</li>
+            <li>Syntax color support to JSONata DevTool;</li>
+            <li>Tracing of JSONata queries;</li>
+            <li>Added the SmartAnts diagram.</li>
           <ul>  
       </em>
       """
