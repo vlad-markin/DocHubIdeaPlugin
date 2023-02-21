@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'org.dochub.idea'
-version '2.2.2-beta'
+version '2.2.4-beta'
 
 sourceSets.main.java.srcDirs 'src/main/gen'
 
@@ -38,7 +38,7 @@ dependencies {
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
     type = 'IC'
-    version = '2022.3.1'
+    version = '2022.2.4'
     plugins = ['yaml', 'com.intellij.java']
 }
 
@@ -51,7 +51,7 @@ patchPluginXml {
       Beta version of DocHub Plugin<br>
       <em>
           <ul>
-            <li>DocHub core: v2.6.3;</li>
+            <li>DocHub core: v2.6.4;</li>
             <li>Suggests for the structure of architecture manifests (yaml);</li>
             <li>Suggests for the values of manifest fields;</li>
             <li>Fast navigation through manifests;</li>
@@ -73,7 +73,7 @@ patchPluginXml {
           <ul>  
       </em>
       """
-    sinceBuild = "223"
+    sinceBuild = "222"
     untilBuild = "223.*"
 }
 test {
