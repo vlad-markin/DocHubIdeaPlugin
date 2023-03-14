@@ -11,14 +11,32 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
-import org.dochub.idea.arch.jsonata.psi.JSONataTypes;
+import org.dochub.idea.arch.jsonata.psi.*;
 import org.jetbrains.annotations.NotNull;
+
+import static org.dochub.idea.arch.jsonata.psi.JSONataTypes.*;
+
 
 public class JSONataParserDefinition implements ParserDefinition {
     public static final TokenSet WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE);
-    public static final TokenSet COMMENTS = TokenSet.create(JSONataTypes.COMMENT);
+    public static final TokenSet BRACKETS = TokenSet.create(LBRACKET, RBRACKET);
+    public static final TokenSet IDENTIFIERS = TokenSet.create(ID);
+    public static final TokenSet COMMENTS = TokenSet.create(COMMENT);
+    public static final TokenSet STRING_LITERALS = TokenSet.create(STRING);
+    public static final TokenSet OPERATORS = TokenSet.create(
+                CHAIN, DOUBLE_QUOTE,
+                COLON, VERTICAL_BAR,
+                EQ, NOT_EQ,
+                QUESTION_MARK, COMMA,
+                SEMICOLON, DOT,
+                BACKSLASH
+        );
 
+    public static final TokenSet KEYWORDS = TokenSet.create(IN, AND, OR, FUNCTION);
+    public static final TokenSet NUMBERS = TokenSet.create(NUMBER);
+    public static final TokenSet VARIABLES = TokenSet.create(VARIABLE);
     public static final IFileElementType FILE = new IFileElementType(JSONataLanguage.INSTANCE);
+
 
     @NotNull
     @Override
