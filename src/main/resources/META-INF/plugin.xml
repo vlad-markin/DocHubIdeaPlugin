@@ -91,6 +91,14 @@
                 language="JSONata"
                 implementationClass="org.dochub.idea.arch.jsonata.JSONataSyntaxHighlighterFactory"
         />
+
+        <lang.braceMatcher language="JSONata" implementationClass="org.dochub.idea.arch.editor.JSONataBraceMatcher"/>
+
+        <annotator language="JSONata" implementationClass="org.dochub.idea.arch.annotator.JSONataAnnotator"/>
+
+        <completion.contributor language="JSONata"
+                                implementationClass="org.dochub.idea.arch.completion.JSONataKeywordCompletionContributor"/>
+
         <codeInsight.lineMarkerProvider
                 language="yaml"
                 implementationClass="org.dochub.idea.arch.markline.LineMarkerYaml"
