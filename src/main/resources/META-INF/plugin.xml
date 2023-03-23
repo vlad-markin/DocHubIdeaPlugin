@@ -37,6 +37,8 @@
          on how to target different products -->
     <depends>com.intellij.modules.platform</depends>
     <depends>org.jetbrains.plugins.yaml</depends>
+
+
     <depends optional="true" config-file="java.xml">com.intellij.java</depends>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -91,6 +93,8 @@
                 language="JSONata"
                 implementationClass="org.dochub.idea.arch.jsonata.JSONataSyntaxHighlighterFactory"
         />
+
+        <languageInjectionContributor implementationClass="org.dochub.idea.arch.jsonata.JSONataInjector" language="yaml"/>
 
         <lang.braceMatcher language="JSONata" implementationClass="org.dochub.idea.arch.editor.JSONataBraceMatcher"/>
 
