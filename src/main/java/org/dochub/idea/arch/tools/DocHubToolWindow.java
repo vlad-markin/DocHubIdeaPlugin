@@ -19,6 +19,7 @@ import org.dochub.idea.arch.wizard.*;
 import org.jetbrains.annotations.*;
 
 import java.io.*;
+import java.net.URL;
 import java.nio.charset.*;
 import java.nio.file.*;
 import java.util.*;
@@ -50,22 +51,30 @@ public class DocHubToolWindow extends JBCefBrowser {
   public void reloadHtml() {
     InputStream input = getClass().getClassLoader().getResourceAsStream("html/plugin.html");
     String html;
+    String currentURL = getCefBrowser().getURL();
+    String url = currentURL.length() > 0 ? currentURL : "http://127.0.0.1:8081/";
     try {
       assert input != null;
-      html = new String(input.readAllBytes(), StandardCharsets.UTF_8);
+
+      BufferedInputStream devSite = new BufferedInputStream(new URL(url).openStream());
+
+      html = new String(devSite.readAllBytes(), StandardCharsets.UTF_8);
+
+      // html = new String(input.readAllBytes(), StandardCharsets.UTF_8);
       String injectionCode = sourceQuery.inject("data","resolve","reject");
-      html =
-              html.replaceAll("\"API_INJECTION\"", Matcher.quoteReplacement(injectionCode))
-              .replaceAll("\"SETTING_INJECTION\"", getInjectionSettings());
+      html = html.replaceAll("\"API_INJECTION\"", Matcher.quoteReplacement(injectionCode))
+             .replaceAll("\"SETTING_INJECTION\"", getInjectionSettings());
     } catch (IOException e) {
       html = e.toString();
     }
-    String currentURL = getCefBrowser().getURL();
+    loadHTML(html, url);
+    /*
     if (currentURL.length() > 0) {
       loadHTML(html, currentURL);
     } else {
       loadHTML(html);
     }
+    */
     if (!SystemInfoRt.isWindows)
       getCefBrowser().getUIComponent().setFocusable(false);
   }
