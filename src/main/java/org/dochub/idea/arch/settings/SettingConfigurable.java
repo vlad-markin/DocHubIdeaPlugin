@@ -1,8 +1,10 @@
 package org.dochub.idea.arch.settings;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.util.NlsContexts;
+import org.dochub.idea.arch.markline.LineMarkerNavigator;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,6 +37,8 @@ public class SettingConfigurable implements Configurable {
         boolean modified = !settingComponent.getRenderServerText().equals(settingsState.serverRendering);
         modified |= !settingComponent.getRenderModeText().equals(settingsState.renderMode);
         modified |= settingComponent.getIsExternalRenderBool() != settingsState.renderIsExternal;
+        modified |= settingComponent.getEnterprisePortalText() != settingsState.enterprisePortal;
+        modified |= !settingComponent.getUsingModeText().equals(settingsState.usingMode);
         return modified;
     }
 
@@ -44,6 +48,11 @@ public class SettingConfigurable implements Configurable {
         settingsState.renderMode = settingComponent.getRenderModeText();
         settingsState.serverRendering = settingComponent.getRenderServerText();
         settingsState.renderIsExternal = settingComponent.getIsExternalRenderBool();
+        settingsState.usingMode = settingComponent.getUsingModeText();
+        settingsState.enterprisePortal = settingComponent.getEnterprisePortalText();
+        SettingsState.DocHubSettingsMessage publisher = ApplicationManager.getApplication().getMessageBus()
+                .syncPublisher(SettingsState.ON_SETTING_CHANGED);
+        publisher.on();
     }
 
     @Override
@@ -52,6 +61,8 @@ public class SettingConfigurable implements Configurable {
         settingComponent.setRenderModeText(settingsState.renderMode);
         settingComponent.setRenderServerText(settingsState.serverRendering);
         settingComponent.setIsExternalRenderBool(settingsState.renderIsExternal);
+        settingComponent.setUsingModeText(settingsState.usingMode);
+        settingComponent.setEnterprisePortalText(settingsState.enterprisePortal);
     }
 
     @Override

@@ -3,6 +3,7 @@ package org.dochub.idea.arch.tools;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.*;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.*;
 import com.intellij.openapi.util.SystemInfoRt;
 import com.intellij.openapi.vfs.*;
@@ -19,7 +20,6 @@ import org.dochub.idea.arch.wizard.*;
 import org.jetbrains.annotations.*;
 
 import java.io.*;
-import java.net.URL;
 import java.nio.charset.*;
 import java.nio.file.*;
 import java.util.*;
@@ -48,7 +48,31 @@ public class DocHubToolWindow extends JBCefBrowser {
       throw new RuntimeException(e);
     }
   }
-  public void reloadHtml() {
+
+  public void reloadHtml(Boolean root) {
+    SettingsState settingsState = SettingsState.getInstance();
+    String currentURL = root ? "" : getCefBrowser().getURL();
+    // Если используем корпоративный портал или портал в режиме DEV mode
+    if (settingsState.isEnterprise()) {
+      loadURL(currentURL.length() > 0 ? currentURL : settingsState.enterprisePortal);
+    } else {
+      // Если НЕ используем, то грузим из собственных ресурсов
+      InputStream input = getClass().getClassLoader().getResourceAsStream("html/plugin.html");
+      String html;
+      try {
+        assert input != null;
+        html = new String(input.readAllBytes(), StandardCharsets.UTF_8);
+      } catch (IOException e) {
+        html = e.toString();
+      }
+      if (currentURL.length() > 0) {
+        loadHTML(html, currentURL);
+      } else {
+        loadHTML(html);
+      }
+    }
+
+    /*
     InputStream input = getClass().getClassLoader().getResourceAsStream("html/plugin.html");
     String html;
     String currentURL = getCefBrowser().getURL();
@@ -67,14 +91,14 @@ public class DocHubToolWindow extends JBCefBrowser {
     } catch (IOException e) {
       html = e.toString();
     }
-    loadHTML(html, url);
-    /*
+
     if (currentURL.length() > 0) {
       loadHTML(html, currentURL);
     } else {
       loadHTML(html);
     }
     */
+
     if (!SystemInfoRt.isWindows)
       getCefBrowser().getUIComponent().setFocusable(false);
   }
@@ -113,7 +137,7 @@ public class DocHubToolWindow extends JBCefBrowser {
           } else {
             (new RootManifest()).createRootManifest(project);
           }
-          reloadHtml();
+          reloadHtml(false);
         } else if ((url.length() > 20) && url.startsWith(ROOT_SOURCE_PATH)) {
           String basePath = project.getBasePath() + "/";
           String parentPath = (new File(CacheBuilder.getRootManifestName(project))).getParent();
@@ -154,7 +178,7 @@ public class DocHubToolWindow extends JBCefBrowser {
           openDevtools();
           getCefBrowser().executeJavaScript("console.info('GO!!');", "events.js", 0);
         } else if (url.equals(HTML_RELOAD_URI)){
-          reloadHtml();
+          reloadHtml(false);
         } else if (url.equals(ENTITIES_APPLY_SCHEMA)) {
           JsonNode schema = jsonObj.get("schema");
           EntityManager.applySchema(project, schema.asText());
@@ -174,6 +198,12 @@ public class DocHubToolWindow extends JBCefBrowser {
 
     PlantUMLDriver.init();
 
+    ApplicationManager.getApplication().getMessageBus().connect().subscribe(SettingsState.ON_SETTING_CHANGED, new SettingsState.DocHubSettingsMessage() {
+      @Override
+      public void on() {
+        reloadHtml(true);
+      }
+    });
 
     this.project = project;
 
@@ -206,7 +236,7 @@ public class DocHubToolWindow extends JBCefBrowser {
     sourceQuery = JBCefJSQuery.create((JBCefBrowserBase)this);
     sourceQuery.addHandler(this::requestProcessing);
 
-    reloadHtml();
+    reloadHtml(true);
   }
 
 
