@@ -23,4 +23,6 @@ public class Consts {
 
     public static final String CLIPBOARD_COPY = "plugin:/idea/clipboard/copy";
 
+    public static final String GET_SETTINGS = "plugin:/idea/settings/get";
+
 }

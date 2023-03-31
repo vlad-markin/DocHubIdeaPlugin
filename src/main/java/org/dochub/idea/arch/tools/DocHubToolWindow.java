@@ -184,6 +184,19 @@ public class DocHubToolWindow extends JBCefBrowser {
           EntityManager.applySchema(project, schema.asText());
         } else if (url.equals(CLIPBOARD_COPY)) {
           Clipboard.copy(jsonObj.get("data").asText());
+        } else if (url.equals(GET_SETTINGS)) {
+          SettingsState settingsState = SettingsState.getInstance();
+          Map<String, Object> response = new HashMap<>();
+          response.put("isEnterprise", settingsState.isEnterprise());
+
+          Map<String, Object> render = new HashMap<>();
+          render.put("external", settingsState.renderIsExternal);
+          render.put("mode", settingsState.renderMode);
+          render.put("server", settingsState.serverRendering);
+          render.put("request_type", "GET");
+          response.put("render", render);
+
+          result.append(mapper.writeValueAsString(response));
         } else {
           return new JBCefJSQuery.Response("", 404, "No found: " + url);
         }
