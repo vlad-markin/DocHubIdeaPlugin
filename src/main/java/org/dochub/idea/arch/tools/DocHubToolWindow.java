@@ -188,6 +188,8 @@ public class DocHubToolWindow extends JBCefBrowser {
           SettingsState settingsState = SettingsState.getInstance();
           Map<String, Object> response = new HashMap<>();
           response.put("isEnterprise", settingsState.isEnterprise());
+          // todo Нужно перенести в какой-то конфиг
+          response.put("api", "1.0.0");
 
           Map<String, Object> render = new HashMap<>();
           render.put("external", settingsState.renderIsExternal);
