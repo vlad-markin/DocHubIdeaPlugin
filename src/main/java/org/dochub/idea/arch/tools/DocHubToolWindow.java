@@ -1,7 +1,6 @@
 package org.dochub.idea.arch.tools;
 // JBCefBrowser (https://intellij-support.jetbrains.com/hc/en-us/community/posts/4403677440146-how-to-add-a-JBCefBrowser-in-toolWindow-)
 
-import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.*;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.*;
@@ -12,6 +11,7 @@ import com.intellij.openapi.vfs.newvfs.events.*;
 import com.intellij.ui.jcef.*;
 import com.intellij.util.messages.*;
 import org.apache.commons.io.*;
+import org.apache.http.client.utils.URIBuilder;
 import org.dochub.idea.arch.indexing.*;
 import org.dochub.idea.arch.jsonschema.*;
 import org.dochub.idea.arch.manifests.*;
@@ -20,10 +20,10 @@ import org.dochub.idea.arch.wizard.*;
 import org.jetbrains.annotations.*;
 
 import java.io.*;
+import java.net.URISyntaxException;
 import java.nio.charset.*;
 import java.nio.file.*;
 import java.util.*;
-import java.util.regex.*;
 
 import static org.dochub.idea.arch.tools.Consts.*;
 public class DocHubToolWindow extends JBCefBrowser {
@@ -31,30 +31,20 @@ public class DocHubToolWindow extends JBCefBrowser {
   private final Project project;
   private final Navigation navigation;
   private final JSGateway jsGateway;
-  private String getInjectionSettings() {
-    SettingsState settingsState = SettingsState.getInstance();
-    Map<String, Object> settings = new HashMap<>();
-    Map<String, Object> render = new HashMap<>();
-    render.put("mode", settingsState.renderMode);
-    render.put("external", settingsState.renderIsExternal);
-    render.put("server", settingsState.serverRendering);
-    settings.put("render", render);
-    try {
-      ObjectMapper mapper = new ObjectMapper();
-      return Matcher.quoteReplacement(
-              mapper.writeValueAsString(settings)
-      );
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
   public void reloadHtml(Boolean root) {
     SettingsState settingsState = SettingsState.getInstance();
     String currentURL = root ? "" : getCefBrowser().getURL();
     // Если используем корпоративный портал или портал в режиме DEV mode
     if (settingsState.isEnterprise()) {
-      loadURL(currentURL.length() > 0 ? currentURL : settingsState.enterprisePortal);
+      String url = currentURL.length() > 0 ? currentURL : settingsState.enterprisePortal;
+      try {
+        URIBuilder urlBuilder = new URIBuilder(url);
+        urlBuilder.addParameter("$dochub-api-interface-func", sourceQuery.getFuncName());
+        url = urlBuilder.toString();
+      } catch (URISyntaxException e) {
+        throw new RuntimeException(e);
+      }
+      loadURL(url);
     } else {
       // Если НЕ используем, то грузим из собственных ресурсов
       InputStream input = getClass().getClassLoader().getResourceAsStream("html/plugin.html");
@@ -65,40 +55,15 @@ public class DocHubToolWindow extends JBCefBrowser {
       } catch (IOException e) {
         html = e.toString();
       }
+
+      html = html.replaceAll("\\%\\$dochub-api-interface-func\\%", sourceQuery.getFuncName());
+
       if (currentURL.length() > 0) {
         loadHTML(html, currentURL);
       } else {
         loadHTML(html);
       }
     }
-
-    /*
-    InputStream input = getClass().getClassLoader().getResourceAsStream("html/plugin.html");
-    String html;
-    String currentURL = getCefBrowser().getURL();
-    String url = currentURL.length() > 0 ? currentURL : "http://127.0.0.1:8081/";
-    try {
-      assert input != null;
-
-      BufferedInputStream devSite = new BufferedInputStream(new URL(url).openStream());
-
-      html = new String(devSite.readAllBytes(), StandardCharsets.UTF_8);
-
-      // html = new String(input.readAllBytes(), StandardCharsets.UTF_8);
-      String injectionCode = sourceQuery.inject("data","resolve","reject");
-      html = html.replaceAll("\"API_INJECTION\"", Matcher.quoteReplacement(injectionCode))
-             .replaceAll("\"SETTING_INJECTION\"", getInjectionSettings());
-    } catch (IOException e) {
-      html = e.toString();
-    }
-
-    if (currentURL.length() > 0) {
-      loadHTML(html, currentURL);
-    } else {
-      loadHTML(html);
-    }
-    */
-
     if (!SystemInfoRt.isWindows)
       getCefBrowser().getUIComponent().setFocusable(false);
   }
@@ -247,12 +212,8 @@ public class DocHubToolWindow extends JBCefBrowser {
         });
       }
     });
-
     sourceQuery = JBCefJSQuery.create((JBCefBrowserBase)this);
     sourceQuery.addHandler(this::requestProcessing);
-
     reloadHtml(true);
   }
-
-
 }

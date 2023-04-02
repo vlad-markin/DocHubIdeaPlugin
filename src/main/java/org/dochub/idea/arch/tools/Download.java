@@ -7,10 +7,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFileWrapper;
 import org.springframework.beans.factory.annotation.*;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
+import java.util.Base64;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -20,8 +19,27 @@ public class Download {
         timer.schedule(new TimerTask() {
             public void run() {
                 ApplicationManager.getApplication().invokeLater(() -> {
+                        byte payload[] = null;
+                        String exts[] = new String[]{};
+                        if (content.startsWith("data:")) {
+                            String[] parts = content.split(",");
+                            payload = Base64.getDecoder().decode(parts[1]);
+                            String header = parts[0];
+                            String mimeType = header.split(":")[1].split(";")[0];
+                            switch (mimeType) {
+                                case "image/jpeg":
+                                    exts = new String[]{"jpeg"};
+                                    break;
+                                case "image/svg+xml":
+                                    exts = new String[]{"svg"};
+                                    break;
+                                case "image/png":
+                                    exts = new String[]{"png"};
+                                    break;
+                            }
+                        } else payload = content.getBytes();
 
-                        FileSaverDescriptor descriptor = new FileSaverDescriptor(title, description, new String[]{"svg"});
+                        FileSaverDescriptor descriptor = new FileSaverDescriptor(title, description, exts);
                         FileSaverDialog dialog = FileChooserFactory.getInstance().createSaveFileDialog(descriptor, (Project) null);
                         VirtualFileWrapper vf = dialog.save((VirtualFile) null, "diagram");
 
@@ -30,9 +48,7 @@ public class Download {
                         }
                         File file = vf.getFile();
                         try {
-                            BufferedWriter writer = new BufferedWriter(new FileWriter(file, false));
-                            writer.append(content);
-                            writer.close();
+                            Files.write(file.toPath(), payload);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
