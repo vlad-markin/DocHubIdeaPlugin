@@ -26,6 +26,9 @@ public class Download {
                             payload = Base64.getDecoder().decode(parts[1]);
                             String header = parts[0];
                             String mimeType = header.split(":")[1].split(";")[0];
+                            String ext = MimeTypes.getDefaultExt(mimeType);
+                            if (ext != null) exts = new String[]{ext};
+                            /*
                             switch (mimeType) {
                                 case "image/jpeg":
                                     exts = new String[]{"jpeg"};
@@ -37,11 +40,12 @@ public class Download {
                                     exts = new String[]{"png"};
                                     break;
                             }
+                            */
                         } else payload = content.getBytes();
 
                         FileSaverDescriptor descriptor = new FileSaverDescriptor(title, description, exts);
                         FileSaverDialog dialog = FileChooserFactory.getInstance().createSaveFileDialog(descriptor, (Project) null);
-                        VirtualFileWrapper vf = dialog.save((VirtualFile) null, "diagram");
+                        VirtualFileWrapper vf = dialog.save((VirtualFile) null, "dh_" + System.currentTimeMillis());
 
                         if (vf == null) {
                             return;
