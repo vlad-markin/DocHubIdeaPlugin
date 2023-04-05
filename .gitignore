@@ -1,5 +1,6 @@
 /build
 /.idea
+**/gen/*
 
 # Editor directories and files
 .idea
