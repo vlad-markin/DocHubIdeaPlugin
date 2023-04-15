@@ -31,7 +31,7 @@ root ::= !<<eof>> jsonata
 
 block_item ::= decl_function | set_variable | sys_function | jsonata
 block_body ::=  block_item ( [SEMICOLON] block_item )*
-block ::= LPARENTH [block_body] [SEMICOLON] RPARENTH
+block ::= LPARENTH [block_body] [SEMICOLON] [NEW_LINE] RPARENTH
 
 set_variable ::= VARIABLE ASSIGN jsonata
 sys_function ::= VARIABLE LPARENTH [jsonata] RPARENTH
