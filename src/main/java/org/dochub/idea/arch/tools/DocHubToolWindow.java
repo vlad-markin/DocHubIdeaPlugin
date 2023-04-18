@@ -23,6 +23,7 @@ import java.io.*;
 import java.net.URISyntaxException;
 import java.nio.charset.*;
 import java.nio.file.*;
+import java.nio.file.FileSystem;
 import java.util.*;
 
 import static org.dochub.idea.arch.tools.Consts.*;
@@ -40,7 +41,7 @@ public class DocHubToolWindow extends JBCefBrowser {
       try {
         URIBuilder urlBuilder = new URIBuilder(url);
         urlBuilder.addParameter("$dochub-api-interface-func", sourceQuery.getFuncName());
-        url = urlBuilder.toString();
+        url = urlBuilder.toString() + "#/root/";
       } catch (URISyntaxException e) {
         throw new RuntimeException(e);
       }
@@ -103,6 +104,21 @@ public class DocHubToolWindow extends JBCefBrowser {
             (new RootManifest()).createRootManifest(project);
           }
           reloadHtml(false);
+        } else if ((url.length() > 23) && url.startsWith(METAMODEL_PATH)) {
+          String sourcePath =  url.substring(23).split("\\?")[0];
+          Path path = Paths.get("metamodel", sourcePath);
+          InputStream input = getClass().getClassLoader().getResourceAsStream(path.toString());
+          try {
+            assert input != null;
+            Map<String, Object> response = new HashMap<>();
+            String content = new String(input.readAllBytes(), StandardCharsets.UTF_8);
+            response.put("data", content);
+            String contentType = FilenameUtils.getExtension(path.toString()).toLowerCase(Locale.ROOT);
+            response.put("contentType", contentType);
+            result.append(mapper.writeValueAsString(response));
+          } catch (IOException e) {
+            return new JBCefJSQuery.Response("", 500, "Error: " + e.toString());
+          }
         } else if ((url.length() > 20) && url.startsWith(ROOT_SOURCE_PATH)) {
           String basePath = project.getBasePath() + "/";
           String parentPath = (new File(CacheBuilder.getRootManifestName(project))).getParent();
