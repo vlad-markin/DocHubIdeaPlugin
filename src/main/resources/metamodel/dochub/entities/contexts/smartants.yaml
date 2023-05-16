@@ -110,16 +110,16 @@ entities:
           title: Требуемые параметры для презентации
           type: object
           properties:
-            id:
+            "dh-context-id":
               title: Идентификатор контекста
               type: string
               pattern: ^[a-zA-Z][a-zA-Z0-9_-]*(\.[a-zA-Z][a-zA-Z0-9_-]*)*$
           required:
-            - id
+            - dh-context-id
         type: smartants
         source: >
           (
-            $id := $params.id;
+            $id := $params."dh-context-id";
             $manifest := $;
             $context := $lookup($manifest.contexts, $id);
             $isExtraLinks := $not($string($context."extra-links") = "false");

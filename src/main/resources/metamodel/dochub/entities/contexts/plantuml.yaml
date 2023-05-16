@@ -22,13 +22,14 @@ entities:
           $join($map($areas, function($domain, $index) {(
               $result := "";
               $component := $lookup($components, $domain);
+              $originComponent := $lookup($manifest.components, $domain);
               $context := $lookup($manifest.contexts, $domain);
         
               /* Определяем является ли элемент областью */
               $isAreaBegin := $areas[$index + 1].$substring(0, $domain.$length() + 1) = $domain & ".";
         
               $result := $result & ($isAreaBegin ? (
-                  $title := $component.title ? $component.title : (
+                  $title := $originComponent.title ? $originComponent.title : (
                       $context.title ? $context.title : $domain
                   );
                       "$Region("
@@ -105,16 +106,16 @@ entities:
           title: Требуемые параметры для презентации
           type: object
           properties:
-            id:
+            "dh-context-id":
               title: Идентификатор контекста
               type: string
               pattern: ^[a-zA-Z][a-zA-Z0-9_-]*(\.[a-zA-Z][a-zA-Z0-9_-]*)*$
           required:
-            - id
+            - dh-context-id
         type: plantuml
         $constructor: >  # Переносим необходимую информацию из контекста в презентацию 
           (
-            $id := $params.id;
+            $id := $params."dh-context-id";
             $context := $lookup(contexts, $id);
             $prototype := entities.contexts.presentations.plantuml;
           
@@ -124,7 +125,7 @@ entities:
             };
 
             /* Если явно указан puml файл, просто рендерим его */
-            $substring($context.uml, -5) = ".puml" ? (
+            ($type($context.uml) = "string") and ($substring($context.uml, -5) = ".puml") ? (
                 {
                   "type": "plantuml",
                   "source": $toDirectRes($context.uml)
@@ -143,7 +144,7 @@ entities:
         template: templates/template.puml
         source: >
           (
-            $id := $params.id;
+            $id := $params."dh-context-id";
             /* Получаем доступ к оригинальным данным */
             $manifest := _origin ? _origin : $;
             /* Получаем контекст */
@@ -166,12 +167,12 @@ entities:
             }, $defConfig.renderCore);
 
             /* Формируем заголовок */
-            $header := "$Header(\"" & ($context.title ? $context.title : $id ) & "\", , , )\n";
+            $header := "$Header(\"" & ($context.title ? $context.title : $id ) & "\", \"" & $context.uml."$autor" & "\", \"" & $context.uml."$version" & "\" , \"" & $context.uml."$moment" & "\")\n";
 
             /* Получаем все компоненты входящие в контекст */
             $components := $eval($defFunctions.fetchComponents, {
               "manifest": $manifest,
-              "contextId": $params.id,
+              "contextId": $id,
               "extra-links": $isExtraLinks,
               "componentId": $params.componentId
             });

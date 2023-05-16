@@ -15,7 +15,7 @@ entities:
           docs.$spread().(
               *.location ? {
                   "location": "Документы/" & *.location,
-                  "link": "entities/docs/blank?id=" & $keys()[0]
+                  "link": "entities/docs/blank?dh-doc-id=" & $keys()[0]
               }
           )
         )
