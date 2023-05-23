@@ -65,8 +65,10 @@ public class DocHubToolWindow extends JBCefBrowser {
         loadHTML(html);
       }
     }
+    /*
     if (!SystemInfoRt.isWindows)
       getCefBrowser().getUIComponent().setFocusable(false);
+     */
   }
   private JBCefJSQuery.Response requestProcessing(String json) {
     // openDevtools();
