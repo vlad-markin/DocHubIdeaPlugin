@@ -48,9 +48,8 @@ public class DocHubToolWindow extends JBCefBrowser {
       loadURL(url);
     } else {
       // Если НЕ используем, то грузим из собственных ресурсов
-      InputStream input = getClass().getClassLoader().getResourceAsStream("html/plugin.html");
       String html;
-      try {
+      try(InputStream input = getClass().getClassLoader().getResourceAsStream("html/plugin.html");) {
         assert input != null;
         html = new String(input.readAllBytes(), StandardCharsets.UTF_8);
       } catch (IOException e) {
