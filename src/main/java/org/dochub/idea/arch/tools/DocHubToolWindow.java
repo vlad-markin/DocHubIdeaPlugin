@@ -111,10 +111,9 @@ public class DocHubToolWindow extends JBCefBrowser {
 
           String path = Paths.get("metamodel", sourcePath).toString();
 
-          if (SystemInfoRt.isWindows) path = path.replace('/', '\\');
+          if (SystemInfoRt.isWindows) path = path.replace('\\', '/');
 
-          InputStream input = getClass().getClassLoader().getResourceAsStream(path);
-          try {
+          try(InputStream input = getClass().getClassLoader().getResourceAsStream(path)) {
             assert input != null;
             Map<String, Object> response = new HashMap<>();
             String content = new String(input.readAllBytes(), StandardCharsets.UTF_8);
