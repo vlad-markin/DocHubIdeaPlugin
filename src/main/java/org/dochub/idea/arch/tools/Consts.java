@@ -4,6 +4,7 @@ public class Consts {
     public static final String ROOT_FILE = "dochub.yaml";
     public static final String ROOT_SOURCE = "$root";
     public static final String ROOT_SOURCE_PATH = "plugin:/idea/source/";
+    public static final String METAMODEL_PATH = "plugin:/idea/metamodel/";
     public static final String ROOT_SOURCE_URI = "plugin:/idea/source/$root";
     public static final String PLANTUML_RENDER_SVG_URI = "plugin:/idea/plantuml/svg";
     public static final String NAVI_GOTO_SOURCE_URI = "plugin:/idea/goto";

@@ -38,6 +38,8 @@ public class Navigation {
             case "document": section = "docs"; break;
             case "context": section = "contexts"; break;
             case "aspect": section = "aspects"; break;
+            default:
+                section = entity;
         }
         return section;
     }
