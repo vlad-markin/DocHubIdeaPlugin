@@ -8,10 +8,8 @@ import org.jetbrains.yaml.psi.*;
 public class JSONataInjector implements LanguageInjectionContributor {
     @Override
     public @Nullable Injection getInjection(@NotNull PsiElement context) {
-        if(context instanceof YAMLScalar) {
-            YAMLScalar scalar = YAMLScalar.class.cast(context);
-            String rawString = scalar.getTextValue();
-            if(rawString.matches("[(][^+]*[)]\\s*")) {
+        if(context instanceof YAMLScalar scalar) {
+            if(scalar.getTextValue().matches("[(][^+]*[)]\\s*")) {
                 return new SimpleInjection(JSONataLanguage.INSTANCE,"", "", "JSONata");
             }
         }
