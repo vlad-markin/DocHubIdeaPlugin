@@ -103,7 +103,7 @@
         <annotator language="JSONata" implementationClass="org.dochub.idea.arch.annotator.JSONataAnnotator"/>
 
         <codeInsight.lineMarkerProvider language="JSONata" implementationClass="org.dochub.idea.arch.markline.JSONataLineMarkerProvider"/>
-        <!--Костыль. Вложенные jsonata в yaml, которые нормально обрабатываются
+        <!-- todo: Костыль. Требуются правки в определении элементов JSONata. Вложенные jsonata в yaml, которые нормально обрабатываются
             в lang.syntaxHighlighterFactory, в расширении выше (codeInsight.lineMarkerProvider language="JSONata") не отрабатывают -->
         <codeInsight.lineMarkerProvider language="yaml" implementationClass="org.dochub.idea.arch.markline.InjectedJSONataLineMarkerProvider"/>
 
