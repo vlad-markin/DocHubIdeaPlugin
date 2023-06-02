@@ -142,8 +142,7 @@ public final class DocHubIndexData extends HashMap<String, DocHubIndexData.Secti
         VirtualFile vFile = file.getVirtualFile();
         if (vFile != null) {
             String path = vFile.getPath();
-            try {
-                InputStream inputStream = new FileInputStream(path);
+            try(InputStream inputStream = new FileInputStream(path)) {
                 Yaml yaml = new Yaml();
                 Map<String, Object> sections = yaml.load(inputStream);
                 if (sections != null) {

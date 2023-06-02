@@ -115,8 +115,9 @@
 
         -->
     </extensions>
-    <extensions defaultExtensionNs="JavaScript.JsonSchema">
-        <ProviderFactory implementation="org.dochub.idea.arch.jsonschema.EntityJSONSchemaProviderFactory"/>
+
+    <extensions defaultExtensionNs="JavaScript">
+        <JsonSchema.ProviderFactory implementation="org.dochub.idea.arch.jsonschema.EntityJSONSchemaProviderFactory"/>
     </extensions>
 
     <actions>

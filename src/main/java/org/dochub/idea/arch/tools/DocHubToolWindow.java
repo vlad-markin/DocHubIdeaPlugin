@@ -48,9 +48,8 @@ public class DocHubToolWindow extends JBCefBrowser {
       loadURL(url);
     } else {
       // Если НЕ используем, то грузим из собственных ресурсов
-      InputStream input = getClass().getClassLoader().getResourceAsStream("html/plugin.html");
       String html;
-      try {
+      try (InputStream input = getClass().getClassLoader().getResourceAsStream("html/plugin.html")) {
         assert input != null;
         html = new String(input.readAllBytes(), StandardCharsets.UTF_8);
       } catch (IOException e) {
@@ -166,8 +165,10 @@ public class DocHubToolWindow extends JBCefBrowser {
         } else if (url.equals(HTML_RELOAD_URI)){
           reloadHtml(false);
         } else if (url.equals(ENTITIES_APPLY_SCHEMA)) {
+
           JsonNode schema = jsonObj.get("schema");
           EntityManager.applySchema(project, schema.asText());
+
         } else if (url.equals(CLIPBOARD_COPY)) {
           Clipboard.copy(jsonObj.get("data").asText());
         } else if (url.equals(GET_SETTINGS)) {

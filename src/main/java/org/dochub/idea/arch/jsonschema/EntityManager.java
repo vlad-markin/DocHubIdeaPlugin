@@ -9,34 +9,41 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.ui.GuiUtils;
+import com.intellij.util.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
+import java.nio.file.*;
+import java.util.*;
 
 public class EntityManager {
-    private static HashMap<String, VirtualFile> schemas = new HashMap<>();
+    private static Map<String, VirtualFile> schemas = new HashMap<>();
 
     // Применяет JSONSchema для проекта
     public static VirtualFile applySchema(Project project, String schema) {
+
         String projectHash = project.getLocationHash();
         VirtualFile currentSchema = schemas.get(projectHash);
+
         if (currentSchema != null) {
             (new File(currentSchema.getPath())).delete();
+            schemas.remove(projectHash);
         }
+
         try {
-            File file = File.createTempFile("EntityDocHubJSONSchema", ".json");
+            String tempDir = System.getProperty("java.io.tmpdir");
+
+            File file = new File(String.format("%s/%s",tempDir,"EntityDocHubJSONSchema.json"));
+
             FileUtil.writeToFile(file, String.valueOf(schema));
             currentSchema = VfsUtil.findFileByIoFile(file, true);
             schemas.put(projectHash, currentSchema);
 
-            ApplicationManager.getApplication().invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    PsiManager.getInstance(project).dropResolveCaches();
-                    PsiManager.getInstance(project).dropPsiCaches();
-                }
-            }, ModalityState.defaultModalityState());
+            ModalityUiUtil.invokeLaterIfNeeded(ModalityState.defaultModalityState(), () -> {
+                PsiManager.getInstance(project).  dropResolveCaches();
+                PsiManager.getInstance(project).dropPsiCaches();
+            });
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
