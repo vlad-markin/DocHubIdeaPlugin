@@ -33,7 +33,7 @@ public class EntityManager {
         try {
             String tempDir = System.getProperty("java.io.tmpdir");
 
-            File file = new File(String.format("%s/%s",tempDir,"EntityDocHubJSONSchema.json"));
+            File file = new File(String.format("%s%s%s",tempDir,File.separator,"EntityDocHubJSONSchema.json"));
 
             FileUtil.writeToFile(file, String.valueOf(schema));
             currentSchema = VfsUtil.findFileByIoFile(file, true);
