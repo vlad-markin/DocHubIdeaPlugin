@@ -15,7 +15,6 @@ class JSONataAnnotator: Annotator {
 
         val isJsonataFunction = element is JSONataSysFunction
         val isCallFunction = element is JSONataCall
-        val isDeep = element is JSONataDeep
         val firstChild = element.firstChild
 
         if (isJsonataFunction || isCallFunction) {
