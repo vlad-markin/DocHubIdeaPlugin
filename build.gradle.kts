@@ -1,7 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.grammarkit.tasks.GenerateLexerTask
 import org.jetbrains.grammarkit.tasks.GenerateParserTask
-import org.jetbrains.intellij.mainSourceSet
 
 plugins {
     id("java")
@@ -60,7 +59,11 @@ intellij {
 
 
 sourceSets {
-    mainSourceSet(project).java.srcDir(genPath)
+    main {
+        java {
+            srcDir(genPath)
+        }
+    }
 }
 
 tasks.jar {

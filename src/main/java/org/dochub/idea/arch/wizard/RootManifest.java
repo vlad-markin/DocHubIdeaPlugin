@@ -29,8 +29,7 @@ public class RootManifest {
             @Override
             public void run() {
                 VirtualFile vProject =  ProjectRootManager.getInstance(project).getContentRoots()[0];
-                try {
-                    InputStream input = getClass().getClassLoader().getResourceAsStream("wizard/example.yaml");
+                try(InputStream input = getClass().getClassLoader().getResourceAsStream("wizard/example.yaml")) {
                     VirtualFile root = vProject.createChildData(this, "dochub.yaml");
                     root.setBinaryContent(input.readAllBytes());
                     (new Navigation(project)).gotoPsiElement(PsiManager.getInstance(project).findFile(root));
@@ -47,8 +46,7 @@ public class RootManifest {
             @Override
             public void run() {
                 VirtualFile vProject =  ProjectRootManager.getInstance(project).getContentRoots()[0];
-                try {
-                    InputStream input = getClass().getClassLoader().getResourceAsStream("wizard/dochub.yaml");
+                try(InputStream input = getClass().getClassLoader().getResourceAsStream("wizard/dochub.yaml")) {
                     VirtualFile root = vProject.createChildData(this, "dochub.yaml");
                     root.setBinaryContent(input.readAllBytes());
                     (new Navigation(project)).gotoPsiElement(PsiManager.getInstance(project).findFile(root));
