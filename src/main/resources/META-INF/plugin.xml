@@ -39,6 +39,8 @@
          on how to target different products -->
     <depends>com.intellij.modules.platform</depends>
     <depends>org.jetbrains.plugins.yaml</depends>
+
+
     <depends optional="true" config-file="java.xml">com.intellij.java</depends>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -94,9 +96,16 @@
                 implementationClass="org.dochub.idea.arch.jsonata.JSONataSyntaxHighlighterFactory"
         />
 
+        <languageInjectionContributor implementationClass="org.dochub.idea.arch.jsonata.JSONataInjector" language="yaml"/>
+
         <lang.braceMatcher language="JSONata" implementationClass="org.dochub.idea.arch.editor.JSONataBraceMatcher"/>
 
         <annotator language="JSONata" implementationClass="org.dochub.idea.arch.annotator.JSONataAnnotator"/>
+
+        <codeInsight.lineMarkerProvider language="JSONata" implementationClass="org.dochub.idea.arch.markline.JSONataLineMarkerProvider"/>
+        <!-- todo: Костыль. Требуются правки в определении элементов JSONata. Вложенные jsonata в yaml, которые нормально обрабатываются
+            в lang.syntaxHighlighterFactory, в расширении выше (codeInsight.lineMarkerProvider language="JSONata") не отрабатывают -->
+        <codeInsight.lineMarkerProvider language="yaml" implementationClass="org.dochub.idea.arch.markline.InjectedJSONataLineMarkerProvider"/>
 
         <completion.contributor language="JSONata"
                                 implementationClass="org.dochub.idea.arch.completion.JSONataKeywordCompletionContributor"/>
@@ -121,6 +130,10 @@
     </extensions>
 
     <actions>
-        <!-- Add your actions here -->
+        <action id="PopupJSONataRunAction" class="org.dochub.idea.arch.actions.PopupJSONataRunAction"
+                text="Run selection as JSONata" description="Run selection as JSONata in DocHub plugin developer tool"
+                icon="AllIcons.Actions.Execute">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
     </actions>
 </idea-plugin>
