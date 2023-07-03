@@ -8,7 +8,10 @@ import org.jetbrains.annotations.*;
 
 import java.util.*;
 
-public class EntityJSONSchemaProviderFactory implements JsonSchemaProviderFactory, DumbAware {
+import static com.intellij.openapi.util.NullableLazyValue.*;
+
+
+public class EntityJSONSchemaProviderFactory implements JsonSchemaProviderFactory {
 
     @Override
     public @NotNull List<JsonSchemaFileProvider> getProviders(@NotNull Project project) {
@@ -28,11 +31,15 @@ public class EntityJSONSchemaProviderFactory implements JsonSchemaProviderFactor
             @Nullable
             @Override
             public VirtualFile getSchemaFile(){
-                VirtualFile result = EntityManager.getSchema(project);
-                if (result == null) {
-                    result = JsonSchemaProviderFactory.getResourceFile(getClass(), "/schemas/empty.json");
-                }
-                return  result;
+
+
+               return lazyNullable(() -> {
+                    VirtualFile result = EntityManager.getSchema(project);
+                    if(result == null) {
+                        return JsonSchemaProviderFactory.getResourceFile(getClass(), "/schemas/empty.json");
+                    }
+                    return  result;
+                }).getValue();
             }
 
             @NotNull
@@ -40,7 +47,6 @@ public class EntityJSONSchemaProviderFactory implements JsonSchemaProviderFactor
             public SchemaType getSchemaType() {
                 return SchemaType.embeddedSchema;
             }
-
         });
     }
 
