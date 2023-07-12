@@ -1,0 +1,5 @@
+(
+    $getComponentType := function($component) {(
+              [$self.types.$spread().(
+                $context := $mergedeep([{"sber": {"type": "Внутренняя"}}))
+)

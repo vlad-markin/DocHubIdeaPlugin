@@ -1,0 +1,56 @@
+(
+    $mainfest := $;
+        $merge([$, {
+          "components": $mergedeep([
+              components.$spread()[*.entity!="system" or $not($exists(*.domain))],
+              $mergedeep((components.$spread())@$d[*.entity="boundary" and $exists(*.domain)].
+              {
+                "components": $merge($mainfest.components.$spread()[*.domain = $d.*.domain and *.entity="system"].
+                {
+                  $replace($.$keys(), "sberfactoring.systems", $d.$keys()): $.*
+                })
+              }).components
+          ])
+        }])
+      )
+
+    $getComponentType := function($component) {(
+          [$self.types.$spread().(
+            $context := $mergedeep([{"sber": {"type": "Внутренняя"}}, $component]);
+            $eval($.*, $context) ? $keys()[0];
+          )][0];
+        )};
+        $getComponentEntity := function($entity) {(
+          $result := $lookup({
+            "component": "system",
+            "actor": "person"
+          }, $entity);
+          $exists($result) ? $result: $entity
+        )};
+        $ ~> | $ | {
+          "aspects": $merge([aspects.$spread().({
+            $keys()[0]: $merge([$.*, (
+                $icon := [$lookup({
+                  "Удаляется": "❌",
+                  "Создается": "➕",
+                  "Используется": "",
+                  "Дорабатывается": "✴️"
+                }, *.sber.status), ""][0];
+                {
+                  "title": $trim($icon & " " & *.title)
+                }
+            )])
+          })]),
+          "components": $merge(components.$spread().(
+            $status := *.sber.status;
+            {
+              $keys()[0]: $merge([$.*, {
+                "type": $getComponentType($.*),
+                "entity": $getComponentEntity(*.entity),
+                "domain": *.domain
+                "test": Other.Over 18 ?
+              }])
+            }
+          ))
+        } |
+)

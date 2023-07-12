@@ -1,0 +1,9 @@
+(
+    /* Мои комментарии */
+    $value := 4 + 3 + 34 + 34 / 4 * 4 -4;
+    $fdf := 3;
+    Value.Ver.Ver();
+    [1..3, 7..9];
+    $test.$te.$fds.$dsdfsd.$sdfsf(5 * 4 * 3 + 3 - 3);
+    $test.$te.$fds.$dsdfsd.$sdfsf(sdf + value);
+)
