@@ -100,7 +100,7 @@
 
         <lang.braceMatcher language="JSONata" implementationClass="org.dochub.idea.arch.editor.JSONataBraceMatcher"/>
 
-<!--        <annotator language="JSONata" implementationClass="org.dochub.idea.arch.annotator.JSONataAnnotator"/>-->
+        <annotator language="JSONata" implementationClass="org.dochub.idea.arch.annotator.JSONataAnnotator"/>
 
         <codeInsight.lineMarkerProvider language="JSONata" implementationClass="org.dochub.idea.arch.markline.JSONataLineMarkerProvider"/>
         <!-- todo: Костыль. Требуются правки в определении элементов JSONata. Вложенные jsonata в yaml, которые нормально обрабатываются

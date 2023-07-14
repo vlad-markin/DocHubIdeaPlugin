@@ -1,112 +1,87 @@
-// https://github.com/JetBrains/Grammar-Kit/blob/master/TUTORIAL.md
-/*
-(
-    $strin(1, 2, 3) + 10;
-    $substring("Hello World", /test\//);
-    $a := ($a:=1; $b:=1) + $b;
-    $string := function() {1};
-    $test ~> |test|{a:1}, []| ~> |test|{a:1}, []|;
-    $uppertrim := $trim ~> $uppercase ~> $test ~> |test.test_|1,[1,2]|;
-    $transform := (a ~> |test.test_|1,[1,2]|).a + 1 + a.$string(1, 2, ($d:= function() {1}; $d()));
-    $TEST := function($a,$b) {
-        {
-            q: 1+(1+2+(11*2))+3,
-            u: a.$string().$string(),
-            z: $test ~> |test|{a:1}, []| ~> |test|{a:1}, []|,
-            f: $uppertrim(1, {}^(1=2)),
-            n: {}#$i@$a.test[1=1].{s:1},
-            a: a^({a:1}[1], aa).a,
-            b: [1..2].a[a+2+(10*[1..2])].a^(>a),
-            u: 1 + [1],
-            c: {
-                a: [1..2].test,
-                d: $TEST_[1=2] + (a + 1)
-            }.test,
-            n: -2 and 2 and (a+1),
-            z: 10&20 ? 1+[1]+{a:1}.test ? 1 : 2 : 2+2
-        }
-        {
-            a : 10
-        }
-    };
-    $a;
-    $PEST := 1
-)
- */
+// Метаинформация
 {
-    parserClass="org.dochub.idea.arch.jsonata.JSONataParser"
-    extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
-    psiClassPrefix="JSONata"
-    psiImplClassSuffix="Impl"
-    psiPackage="org.intellij.sdk.language.psi"
-    psiImplPackage="org.intellij.sdk.language.psi.impl"
+  // Название и расположение генерируемого класса парсера
+  parserClass="org.dochub.idea.arch.jsonata.JSONataParser"
+  // Ссылка на базовый класс, от которого будут наследоваться все PSI-элементы(узлы дерева).
+  // обычно ASTWrapperPsiElement или его наследники.
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
 
-    elementTypeHolderClass="org.dochub.idea.arch.jsonata.psi.JSONataTypes"
-    elementTypeClass="org.dochub.idea.arch.jsonata.psi.JSONataElementType"
-    tokenTypeClass="org.dochub.idea.arch.jsonata.psi.JSONataTokenType"
+  //префикс классов и интерфейсов(обычно по имени языка) и
+  //суффикс для реализации интерфейсов(как правило - Impl)
+  psiClassPrefix="JSONata"
+  psiImplClassSuffix="Impl"
 
-    tokens = [
-        comment="regexp:\/\*[\s\S]*?\*\/"
-        space='regexp:\s+'
-        string = "regexp:\"[^\"]*\"|'[^']*'"
-        number = "regexp:-?(?=[1-9]|0(?!\d))\d+(\.\d+)?([eE][+-]?\d+)?"
-        boolean = "regexp:true|false|null"
-        id = "regexp:\p{Alpha}+\w*"
-        //range = "regexp:\[([1-9]|0)+\.\.([1-9]|0)+\]*"
-        variable = "regexp:\$([a-z]|[A-Z]|\_)*|"
-        sys_variable = "regexp:\*\*|\*|\%"
-        regex = "regexp:\/.+[^\\]/"
+  //пакет для интерфейсов и их реализаций.
+  psiPackage="org.intellij.sdk.language.psi"
+  psiImplPackage="org.intellij.sdk.language.psi.impl"
 
-        comma = ","
-        colon = ":"
-        brace1 = "{"
-        brace2 = "}"
-        brack1 = "["
-        brack2 = "]"
-    ]
+  // генерируемое хранилище всех типов элементов
+  elementTypeHolderClass="org.dochub.idea.arch.jsonata.psi.JSONataTypes"
+  // класс типов элементов (не генерируется, наследник IElementType)
+  elementTypeClass="org.dochub.idea.arch.jsonata.psi.JSONataElementType"
+  //класс для токенов
+  tokenTypeClass="org.dochub.idea.arch.jsonata.psi.JSONataTokenType"
+  //класс с набором статических методов, которые используются как имплементация требуемых методов для psi-элементов.
+  psiImplUtilClass="org.intellij.sdk.language.psi.impl.JSONataPsiImplUtil"
 }
 
-root ::= jsonata
+// Грамматика языка
 
-block_item ::= function | set_variable | jsonata
-block_body ::= block_item (';' block_item) *;
-block ::= '(' block_body [';'] ')'
+root ::= !<<eof>> jsonata
 
-private math_operators ::= '+' | '-' | '*' | '/' | '%'
-private comp_operators ::= '=' | '!=' | '>' | '<' | '>=' | '<=' | ' in ' | ' and ' | ' or '
-private concat_operators ::= '&'
-private cond_operators ::= '?' jsonata ':'
-operators ::= cond_operators | math_operators | comp_operators | concat_operators
+jsonata ::= topDecl (SEMICOLON topDecl)* SEMICOLON?
 
-func_word ::= 'function'
-func_params ::= [variable (',' variable) *]
-function ::= variable ':=' func_word '(' func_params ')' '{' jsonata '}'
-call_params ::= [jsonata (',' jsonata) *]
-call ::= variable + '(' call_params ')'
+topDecl ::= block | statement
 
-set_variable ::= variable ':=' jsonata;
+statement ::= defFunction | binding | expression
 
-private deep_left ::= (id | variable | sys_variable | string | block | call | range | array | object) [modifier]
-deep ::= deep_left ('.' (id | sys_variable | call | array | object) [modifier])*
+expression ::= expressionBase (binaryOperator expressionAdditional | filterExpr | ifThenElse)*
 
-mod_filter ::= '[' jsonata ']'
-mod_order ::= '^' '(' (['>'|'<'] jsonata (',' ['>'|'<'] jsonata)*) ')'
-mod_bind_index ::= '#' variable
-mod_bind_self ::= '@' variable
-modifier ::= (mod_filter | mod_order | mod_bind_index | mod_bind_self) *
+expressionBase ::= filterExpr | expressionAdditional
 
-transform_location ::= id ('.' id) *
-transform ::= '|' transform_location '|' jsonata [','  array] '|'
-transform_do ::= '~>' (transform | call | variable)
+expressionAdditional ::= block | object | term
 
-range ::= '[' jsonata '..' jsonata ']'
+term ::= (LPARENTH expression RPARENTH) | useOfVariableOrFunction | STRING | REGEX | ID | numb | MUL // MUL is Wildcard here
 
-array ::= '[' [!']' jsonata (!']' ',' jsonata) *] ']' {pin(".*")=1}
-prop ::= [] (id | string) ':' jsonata {pin=1}
-object ::= '{' [!'}' prop (!'}' ',' prop) *] '}' {pin(".*")=1}
+binaryOperator ::= DOT | DOUBLE_DOT | PLUS | MINUS | MUL | QUOTIENT | REMAINDER | CONCAT | IN | EQ | NOT_EQ | GREATER | GREATER_OR_EQUAL | LESS | LESS_OR_EQUAL | OR | AND | CONTEXT
 
-argument ::= (number | call | deep | block | array | object) [modifier]
+ifThenElse ::= QUESTION_MARK expression (COLON expression)?
 
-jsonata ::= regex | chain | transform | argument (operators argument | transform_do) * {pin=1}
+filterExpr ::= LBRACKET filterBody? RBRACKET
 
+filterBody ::= expression (COMMA expression)*
 
+binding ::= VARIABLE ASSIGN statement
+
+object ::= LBRACE objectBody? RBRACE
+
+objectBody ::= objectStatement (COMMA objectStatement)*
+
+objectStatement ::= topDecl COLON expression
+
+block ::= LPARENTH blockBody RPARENTH
+
+blockBody ::= blockStatement (SEMICOLON blockStatement)* SEMICOLON?
+
+blockStatement ::= statement
+
+numb ::= (MINUS)? NUMBER
+
+useOfVariableOrFunction ::= VARIABLE useFunctionPart?
+
+useFunctionPart ::= LPARENTH useFunctionArguments? RPARENTH
+
+useFunctionArguments ::= useFunctionArg (COMMA useFunctionArg)*
+
+useFunctionArg ::= expression
+
+defFunction ::= FUNCTION LPARENTH defFunctionArguments? RPARENTH LBRACE defFunctionBody RBRACE
+
+defFunctionArguments ::= VARIABLE (COMMA VARIABLE)*
+
+defFunctionBody ::= expression
+
+// TODO: delete after full support
+all ::= LINE_COMMENT | SEMICOLON | ASSIGN | LBRACE | RBRACE | FUNCTION | STRING | ID | SYS_VARIABLE | ORDER_BY | LPARENTH | RPARENTH | DOT | POSITIONAL | CONTEXT | VARIABLE | VERTICAL_BAR | COMMA | CHAIN | PLUS | MINUS | QUOTIENT | REMAINDER | LBRACKET | DOUBLE_DOT | RBRACKET | EQ | NOT_EQ | GREATER | LESS | GREATER_OR_EQUAL | LESS_OR_EQUAL | IN | AND | OR | CONCAT | COLON | COMMENT | DOUBLE_QUOTE | BACKSLASH | QUOTE | BACKTICK | BOOLEAN | QUESTION_MARK | NUMBER | REGEX
+
+unusedInBnf ::= COMMENT | NEW_LINE | DOUBLE_QUOTE | BACKSLASH | QUOTE | BACKTICK | BOOLEAN | QUESTION_MARK
