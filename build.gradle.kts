@@ -44,11 +44,13 @@ dependencies {
     implementation("org.eclipse.elk:org.eclipse.elk.alg.layered:$elkVersion")
     implementation("org.eclipse.elk:org.eclipse.elk.core:$elkVersion")
     implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
+    implementation("org.javassist:javassist:3.29.2-GA")
+
     /**
      * Тестовые зависимости
      */
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
 }
 
 intellij {
@@ -118,7 +120,6 @@ tasks {
         untilBuild.set(pluginUntilBuild)
         changeNotes.set(file("src/main/resources/html/change-notes.html").readText())
     }
-
 
     test {
         useJUnitPlatform()

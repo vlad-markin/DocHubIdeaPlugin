@@ -1,0 +1,15 @@
+(
+    "Hello" & "World";
+    Price < 50 ? "Cheap" : "Expensive";
+    $five := 5;
+    $square := function($n) { $n * $n };
+    $uppercase($substringBefore($substringAfter(Customer.Email, "@"), "."));
+    $sum(Account.Order.Product.(Price * Quantity));
+    Customer.Email ~> $substringAfter("@") ~> $substringBefore(".") ~> $uppercase();
+    Account.Order.Product.(Price * Quantity) ~> $sum();
+    | Account.Order.Product | {'Price': Price * 1.2} |;
+    payload ~> |Account.Order.Product|{'Price': Price * 1.2}|;
+    $increasePrice := |Account.Order.Product|{'Price': Price * 1.2}|;
+    |Account.Order.Product|{'Price': Price * 1.2, 'Total': Price * Quantity}|;
+    $ ~> |Account.Order.Product|{'Total': Price * Quantity}, ['Price', 'Quantity']|;
+)

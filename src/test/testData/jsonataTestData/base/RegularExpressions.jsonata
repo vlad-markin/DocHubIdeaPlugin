@@ -1,0 +1,6 @@
+(
+    path.to.object[stringProperty ~> /regex/];
+    Account.Order.Product[`Product Name` ~> /hat/i ];
+    $matcher := /[a-z]*an[a-z]*/i;
+    $matcher('A man, a plan, a canal, Panama!')
+)

@@ -1,0 +1,7 @@
+(
+    /*Query using predicate expressions*/
+    Address.City;
+    Phone[0].number;
+    Phone[type='home'].number;
+    Phone[type='office'].number
+)

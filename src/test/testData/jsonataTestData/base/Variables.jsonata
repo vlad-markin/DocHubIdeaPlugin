@@ -1,0 +1,12 @@
+(
+    $; /*The variable with no name refers to the context value at any point in the input JSON hierarchy.*/
+    $$; /* The root of the input JSON. Only needed if you need to break out of the current context to temporarily navigate down a different path. E.g. for cross-referencing or joining data. Examples*/
+    /*Variable binding*/
+    $var_name := "value";
+
+    Invoice.(
+      $p := Product.Price;
+      $q := Product.Quantity;
+      $p * $q
+    )
+)

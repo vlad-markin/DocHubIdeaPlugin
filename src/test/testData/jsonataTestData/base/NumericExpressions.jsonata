@@ -1,0 +1,7 @@
+(
+    Numbers[0] + Numbers[1];
+    Numbers[0] - Numbers[4];
+    Numbers[0] * Numbers[5];
+    Numbers[0] / Numbers[4];
+    Numbers[2] % Numbers[5]
+)

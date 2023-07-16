@@ -1,0 +1,30 @@
+(
+        $business_entities := $.business_entities;
+        $makeLocation := function($id) {(
+            $arrleft := function($arr ,$count) {
+                $map($arr, function($v, $i) {
+                $i <= $count ? $v
+                })
+            };
+            $domains := $split($id, ".");
+            "Документы/Моё болото/Бизнес-сущности/" & $join($map($domains, function($domain, $index) {(
+                $lookup(business_entities, $join($arrleft($domains, $index), ".")).title
+            )}), "/");
+        )};
+        $append(
+        [{
+            "icon": *.icon,                                                 /* Получаем иконку */
+            "link": "entities/business_entities/business_entities_list",
+            "location": "Документы/Моё болото/1. Бизнес-сущности"
+        }],
+        [{
+            "icon": *.icon,                                                 /* Получаем иконку */
+            "link": "entities/business_entities/business_entities_in_systems",
+            "location": "Документы/Моё болото/2. Список бизнес-сущностей в системах"
+        }]
+        );
+
+        $entities := [$.business_entities.$spread().$merge([$.*, {"id": $keys($)}])];
+        $entities [id=$params.id];
+        $[system_id=$params.system_id]
+)

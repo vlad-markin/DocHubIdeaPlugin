@@ -1,0 +1,9 @@
+(
+    $strings  := "hello world";
+    $numbers  := 34.5;
+    $booleanTrue := true;
+    $booleanFalse := false;
+    $nulls := null;
+    $objects := {"key1": "value1", "key2": "value2"};
+    $arrays := ["value1", "value2"]
+)

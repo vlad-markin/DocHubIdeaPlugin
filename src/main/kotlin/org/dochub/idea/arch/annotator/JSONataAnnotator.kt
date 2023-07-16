@@ -5,19 +5,16 @@ import com.intellij.lang.annotation.Annotator
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors
 import com.intellij.psi.PsiElement
-import org.intellij.sdk.language.psi.JSONataCall
-import org.intellij.sdk.language.psi.JSONataDeep
-import org.intellij.sdk.language.psi.JSONataSysFunction
+import org.intellij.sdk.language.psi.JSONataUseOfVariableOrFunction
 
 class JSONataAnnotator: Annotator {
 
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
 
-        val isJsonataFunction = element is JSONataSysFunction
-        val isCallFunction = element is JSONataCall
+        val isJsonataFunction = element is JSONataUseOfVariableOrFunction
         val firstChild = element.firstChild
 
-        if (isJsonataFunction || isCallFunction) {
+        if (isJsonataFunction) {
             holder.newSilentAnnotation(HighlightSeverity.INFORMATION)
                 .range(firstChild)
                 .textAttributes(DefaultLanguageHighlighterColors.FUNCTION_DECLARATION)

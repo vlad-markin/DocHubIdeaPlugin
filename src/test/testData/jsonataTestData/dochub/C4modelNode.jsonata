@@ -1,0 +1,135 @@
+(
+        [{
+          /* Размещение в пользовательском меню */
+          "location": "C4 Model",
+          /* URI представления context см. ниже.*/
+          "link": "entities/c4model/context"
+        }];
+
+       /* В переменной $parent содержатся переданные параметры из URI */
+       $parent_id := $params.parent;
+       /* Определяем уровень диаграммы */
+       $levels := $split($parent_id, ".");
+       $level := $count($levels);
+       /* Сохраняем корень данных */
+       $c4model := c4model;
+       /* Получаем компонент, который ходим раскрыть. Для L1 = undefined */
+       $parent := $lookup($c4model, $parent_id);
+       /* Генерируем шаблон для выбора компонентов диаграммы */
+       $pattern := $eval("/^" & ($parent_id != "" ? $parent_id & "." : "") & "[a-zA-Z0-9\\_]*$/");
+
+       /* Обходим все компоненты сущности C4Model */
+       $nodes := $c4model.$spread().(
+         $id := $keys()[0];
+         /* Обрабатываем компонент, если идентификатор компонента соответствует искомому */
+         $match($id, $pattern) ? $merge([$.*, {
+           /* Сохраняем идентификатор компонента в массиве компонентов диаграммы */
+           "$id": $id
+         }])
+       );
+
+       /* Находим связь выбранных копонентов с внешними */
+       $extraNodes := $distinct([$nodes.links.(
+         $not($exists($match(id, $pattern))) ? $merge([
+           $lookup($c4model, id),
+           {
+             "$id": id,
+             "links": [],
+             "boundary": "*"
+           }
+         ])
+       )]);
+
+       /* Генерируем код Mermaid компонентов */
+       $node2code := function($nodes, $bid) {(
+         $join([$nodes[$bid ? boundary = $bid : $not($exists(boundary))].(
+           /* Формируем заголовок компонента */
+           $title := $level < 2
+               /* Если уровень выше L2, даем возможность "провалиться" глубже */
+               ? "![" & title & "](/entities/c4model/context?parent=" & $."$id" & ")"
+               /* иначе нет */
+               : title;
+           entity & "(" & $."$id" & ", \"" & $title & "\", \"" & description & "\")"
+         )], "\n") & "\n"
+       )};
+
+       /* Генерируем код Mermaid границ и их наполнения */
+       $components := function($parent) {(
+         $pattern := $eval("/^" & $parent & "[a-zA-Z0-9\\_]*$/");
+         $boundaries := $distinct($nodes.boundary)^(boundary);
+         $join($boundaries[$match($, $pattern)].(
+           "Boundary(" & $ & ", \"" & $ & "\") {\n"
+           & $node2code($nodes, $)
+           & $join($components($ & "."), "\n")
+           & "\n}"
+         ), "\n") & "\n"
+       )};
+
+       /* Парсим связи компонентов */
+       $relations := function() {(
+         $join([$nodes.(
+             $from := $."$id";
+             links.{
+               "from": $from,
+               "to": id,
+               "direction": direction,
+               "title": title,
+               "description": description
+             }
+           )].(
+             (direction = "<->" ? "BiRel" : "Rel")
+             & "("
+             & from
+             & ", " & to
+             & ", \"" & title & "\""
+             & ", \"" & description & "\""
+             & ")"
+           )
+         , "\n") & "\n"
+       )};
+
+       /* Генерируем код диаграммы Mermaid */
+       $code := function () {(
+         /* Сначала выводим вгешние компонент обнаруженные в связях */
+         $node2code($extraNodes, "*")
+         /* Если уровень глубже L1, создаем контейнер */
+         & ($level > 0 ? "Container_Boundary(" & $parent_id & ", \"\") {\n" : "")
+         /* Выводим обнаруженные без областей */
+         & $node2code($nodes)
+         /* Выводим обнаруженные компоненты разложенные в области */
+         & $components("")
+         /* Если нужно, завершаем контейнер */
+         & ($level > 0 ? "}\n" : "")
+         /* Генерируем связи компонентов на диаграмме */
+         & $relations()
+       )};
+
+       /* Возвращаем результирующие данные */
+       {
+         /* Определяем уровень представления */
+         "notation": $lookup({
+           "0": "C4Context",
+           "1": "C4Container",
+           "2": "C4Component"
+         }, $string($level)),
+
+         /* Генерируем код */
+         "code":
+             /* Если количество компонентов на диаграмме есть */
+             $count($nodes) > 0
+             /* выводом */
+             ? $code()
+             /* иначе сообщаем, что внутри пусто */
+             : "\nBoundary(bempty, \"\") {\nSystem(sempty, \"Здесь пусто\")\n}"
+             ,
+
+         /* Генерируем заголовок диаграммы */
+         "title":
+           /* Если есть компонент верхнего уровня */
+           $parent
+           /* Возвращаем его название */
+           ? $parent.title
+           /* Иначе идентификатор, а если он пустой, то считаем диаграмму L1 */
+           : ($parent_id ? $parent_id : "Context")
+       }
+)
