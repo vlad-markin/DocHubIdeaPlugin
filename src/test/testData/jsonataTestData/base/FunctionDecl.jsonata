@@ -1,0 +1,78 @@
+(
+    /* Мои комментарии */
+    $value := 4 + 3 + 34 + 34 / 4 * 4 -4;
+    [1..3, 7..9];
+    $test.$te.$fds.$dsdfsd.$sdfsf(5 * 4 * 3 + 3 - 3);
+    $test.$te.$fds.$dsdfsd.$sdfsf(sdf + value);
+    $uppercase("Hello");
+    $substring("hello world", 0, 5);
+    $sum([1,2,3]);
+
+    /*Defining a function*/
+    function($l, $w, $h){ $l * $w * $h };
+    function($l, $w, $h){ $l * $w * $h }(10, 10, 5);
+    $volume := function($l, $w, $h){ $l * $w * $h };
+    $volume(10, 10, 5);
+
+    /*Recursive functions*/
+    $factorial:= function($x){ $x <= 1 ? 1 : $x * $factorial($x-1) };
+    $factorial(4);
+
+    /*Tail call optimization*/
+    $factorial := function($x) {
+        $x <= 1 ? 1 : $x * $factorial($x-1)
+      };
+    $factorial(170);
+
+    /*example*/
+    $factorial := function($x){(
+        $iter := function($x, $acc) {
+          $x <= 1 ? $acc : $iter($x - 1, $x * $acc)
+        };
+        $iter($x, 1)
+      )};
+    $factorial(170);
+
+    /*Higher order functions*/
+    $twice := function($f) { function($x){ $f($f($x)) } };
+    $add3 := function($y){ $y + 3 };
+    $add6 := $twice($add3);
+    $add6(7);
+
+    /*Functions are closures*/
+    Account.(
+      $AccName := function() { $.'Account Name' };
+
+      Order[OrderID = 'order104'].Product.{
+        'Account': $AccName(),
+        'SKU-' & $string(ProductID): $.'Product Name'
+      }
+    );
+
+    /*Partial function application*/
+    $first5 := $substring(?, 0, 5);
+    $first5("Hello, World");
+
+    $firstN := $substring(?, 0, ?);
+    $first5 := $firstN(?, 5);
+    $first5("Hello, World");
+
+    /*Function chaining*/
+
+    value ~> $funcA ~> $funcB;
+    $funcB($funcA(value));
+
+    $normalize := $uppercase ~> $trim;
+    $normalize("   Some   Words   ");
+
+    /*Functions as first class values*/
+    $first5Capitalized := $substring(?, 0, 5) ~> $uppercase(?);
+    $first5Capitalized(Address.City);
+
+    /*The Y-combinator*/
+    $Y := λ($f) { λ($x) { $x($x) }( λ($g) { $f( (λ($a) {$g($g)($a)}))})};
+    [1,2,3,4,5,6,7,8,9].$Y(λ($f) { λ($n) { $n <= 1 ? $n : $f($n-1) + $f($n-2) } }) ($);
+
+    $fib := λ($n) { $n <= 1 ? $n : $fib($n-1) + $fib($n-2) };
+    [1,2,3,4,5,6,7,8,9] . $fib($);
+)

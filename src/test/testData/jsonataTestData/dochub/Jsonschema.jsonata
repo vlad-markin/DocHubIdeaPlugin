@@ -1,0 +1,21 @@
+ (
+          /* Создаем валидатор JSON schema */
+          $validator := $jsonschema(rules.validators.system.schema);  /* Схему валидата получаем из контекста отклонения (rules.validators.system.schema)*/
+          /* Формируем базу для проверки */
+          ([([
+            components.$spread().( /* Сканируем все компоненты */
+              $ID := $keys()[0];
+              {                                                               /* Генерируем массив признаков проблем */
+                "isSystem": *.entity = "system",                           /* Это система */
+                "isFitDomain": $boolean($match($ID, /samolet\.*\.*/)),
+                "id": $ID,                                                    /* Запоминаем идентификатор компонента */
+                "isvalid": $validator($.*)                                    /* Валидируем компонент по схеме */
+              }
+            )
+          ][isFitDomain and isSystem and isvalid != true]).isvalid.{    /* Генерируем отклонения по выявленным нарушениям */
+            "uid": %.id  & "-" & $replace($replace(instancePath, "/", "-"), "-", "",1),           /* Уникальный идентификатор выявленной ошибки */
+            "location": "/architect/components/" & %.id,                      /* Ссылка на расположение объекта ошибки */
+            "correction": "Корректно заполните реквизит: "& $replace(instancePath, "/", "",1),                       /* Рекомендации как исправить проблему */
+            "description": message
+          }])
+)

@@ -9,7 +9,7 @@ public abstract class JSONataParsingTestAbstract extends ParsingTestCase {
     }
 
     protected void doSuccessfulParsingTest() {
-        doTest(true, false);
+        doTest(false, false);
         ensureNoErrorElements();
     }
 

@@ -1,0 +1,5 @@
+(
+    /* Aggregation */
+    $sum(Account.Order.Product.Price);
+    $sum(Account.Order.Product.(Price * Price))
+)

@@ -1,5 +1,5 @@
 (
-    $mainfest := $;
+        $mainfest := $;
         $merge([$, {
           "components": $mergedeep([
               components.$spread()[*.entity!="system" or $not($exists(*.domain))],
@@ -11,8 +11,8 @@
                 })
               }).components
           ])
-        }])
-      )
+        }]);
+
 
     $getComponentType := function($component) {(
           [$self.types.$spread().(
@@ -27,6 +27,7 @@
           }, $entity);
           $exists($result) ? $result: $entity
         )};
+
         $ ~> | $ | {
           "aspects": $merge([aspects.$spread().({
             $keys()[0]: $merge([$.*, (
@@ -47,8 +48,8 @@
               $keys()[0]: $merge([$.*, {
                 "type": $getComponentType($.*),
                 "entity": $getComponentEntity(*.entity),
-                "domain": *.domain
-                "test": Other.Over 18 ?
+                "domain": *.domain,
+                "test": `Other.Over 18 ?`
               }])
             }
           ))

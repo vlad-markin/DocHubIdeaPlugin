@@ -9,7 +9,10 @@ class JSONataKeywordCompletionContributor: CompletionContributor() {
 
 
     init {
-
+        registerStandardCompletion(JSONataPatterns.ExpressionPatterns.inPattern(), true, JSONataKeywords.IN)
+        registerStandardCompletion(JSONataPatterns.ExpressionPatterns.orPattern(), true, JSONataKeywords.OR)
+        registerStandardCompletion(JSONataPatterns.ExpressionPatterns.andPattern(), true, JSONataKeywords.AND)
+        registerStandardCompletion(JSONataPatterns.ExpressionPatterns.functionPattern(), false, JSONataKeywords.FUNCTION)
     }
 
     private fun registerStandardCompletion(pattern: ElementPattern<out PsiElement?>, needSpace: Boolean, vararg keywords: String) {

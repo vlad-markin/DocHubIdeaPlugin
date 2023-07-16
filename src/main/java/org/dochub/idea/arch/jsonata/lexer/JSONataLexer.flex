@@ -25,25 +25,23 @@ import org.dochub.idea.arch.jsonata.psi.JSONataTypes;
 
 
 
-//new_line            = \r|\n|\r\n
 white_space         = \s+
 /* comment */
-comment             = "/*"~"*/" // \/\*[\s\S]*?\*\/
+comment             = "/*"~"*/"
 line_comment        = {quotient}{quotient}[^\n]*
 
 space               = [ \t\n\x0B\f\r]+
 /* string literal */
-string              = \"[^\"]*\"|'[^']*'
+escapeSequence      = {backslash}\S
+string              = \"([^\"\\] | {escapeSequence})*\"|'([^\'\\] | {escapeSequence})*'|\`([^\`\\] | {escapeSequence})*\`
 /* number literal */
 number              = (0|[1-9][[:digit:]]*)(\.[[:digit:]]+)?([eE][+-]?[[:digit:]]+)?
 boolean             = true|false|null
 /* identifier */
-id                  = [:letter:]+[a-zA-Z_0-9]*
-//range               = \[([1-9]|0)+\.\.([1-9]|0)+\]*
-variable            = \$([a-z]|[A-Z]|\_)*
-//sys_variable        = \*\*|\*|\%
+id                  = [a-zA-Z_0-9]+
+variable            = \${id}?
 /* regex literal */
-regex               = \/[^\*] ~"/" [im]{0,2} //\/.+[^\\]\/
+regex               = \/([^\/\\\n\r] | {escapeSequence})*\/[im]{0,2}
 
 /* operators */
 colon               = :
@@ -56,6 +54,7 @@ order_by            = "^"
 positional          = "#"
 context             = "@"
 chain               = "~>"
+root                = \$\$
 assign              = :=
 question_mark       = \?
 plus                = \+
@@ -80,10 +79,8 @@ rbracket            = \]
 lbrace              = \{
 rbrace              = \}
 
-/* quotes */
-quote               = \'
-double_quote        = \"
-backtick            = \`
+/* function */
+function            = "function" | \u03BB
 
 
 %%
@@ -94,10 +91,10 @@ backtick            = \`
         "in"                    { return JSONataTypes.IN; }
         "and"                   { return JSONataTypes.AND; }
         "or"                    { return JSONataTypes.OR; }
-        "function"              { return JSONataTypes.FUNCTION; }
+
+        {function}              { return JSONataTypes.FUNCTION; }
 
 
-        //{new_line}              { return JSONataTypes.NEW_LINE; }
         {white_space}           { return TokenType.WHITE_SPACE; }
         {comment}               { return JSONataTypes.COMMENT; }
         {line_comment}          { return JSONataTypes.LINE_COMMENT; }
@@ -106,9 +103,7 @@ backtick            = \`
         {number}                { return JSONataTypes.NUMBER; }
         {boolean}               { return JSONataTypes.BOOLEAN; }
         {id}                    { return JSONataTypes.ID; }
-        //{range}                 { return JSONataTypes.RANGE; }
         {variable}              { return JSONataTypes.VARIABLE; }
-        //{sys_variable}          { return JSONataTypes.SYS_VARIABLE; }
         {regex}                 { return JSONataTypes.REGEX; }
 
         /* special symbols */
@@ -122,6 +117,7 @@ backtick            = \`
         {positional}            { return JSONataTypes.POSITIONAL; }
         {context}               { return JSONataTypes.CONTEXT; }
         {chain}                 { return JSONataTypes.CHAIN; }
+        {root}                  { return JSONataTypes.ROOT; }
         {assign}                { return JSONataTypes.ASSIGN; }
         {question_mark}         { return JSONataTypes.QUESTION_MARK; }
         {plus}                  { return JSONataTypes.PLUS; }
@@ -137,9 +133,6 @@ backtick            = \`
         {greater}               { return JSONataTypes.GREATER; }
         {less_or_equal}         { return JSONataTypes.LESS_OR_EQUAL; }
         {greater_or_equal}      { return JSONataTypes.GREATER_OR_EQUAL; }
-        {quote}                 { return JSONataTypes.QUOTE; }
-        {double_quote}          { return JSONataTypes.DOUBLE_QUOTE; }
-        {backtick}              { return JSONataTypes.BACKTICK; }
 
 //        /* parentheses */
         {lparenth}              { return JSONataTypes.LPARENTH; }

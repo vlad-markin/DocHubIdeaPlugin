@@ -1,8 +1,0 @@
-(
-    /* Manipulating data with expressions */
-    $sum := Numbers[0] + Numbers[1]
-    $sub := Numbers[0] - Numbers[4]
-    $mul := Numbers[0] * Numbers[5]
-    $div := Numbers[0] / Numbers[4]
-    $rem := Numbers[2] % Numbers[5]
-)

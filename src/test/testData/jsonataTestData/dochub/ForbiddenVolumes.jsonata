@@ -1,0 +1,25 @@
+(
+          $self := $self ? $self : $.self;
+          $forbiddenVolumes := ["persistentVolumeClaim"];
+          $toArray := function($x) { $eval(functions.global.toArray, {'x': $x}) };
+          $workload := function($f) { $eval(functions.global.k8s.applyWorkload, {'f': $f, 'ctx': $}) };
+          $findViolation := function($kind, $baseObject, $shift) {(
+            $baseObject.*.{
+              "name": metadata.name,
+              "namespace": metadata.namespace,
+              "original": original,
+              "kind": $kind,
+              "forbiddenCount": $count($shift($).spec.volumes.$keys()[$ in $forbiddenVolumes])
+            }[forbiddenCount > 0]
+          )};
+          $res := $workload($findViolation);
+          $res
+          ? [$res.{
+                "uid": "sber.standards.v3.p8." & $self.uid & "." & $.namespace & "." & name,
+                "title": $self.title & "." & name,
+                "location": original,
+                "correction": "Тип объекта: " & kind & ". " & $self.correction,
+                "description": $self.description
+          }]
+          : []
+)

@@ -53,6 +53,8 @@
                 id="org.dochub.idea.arch.settings.SettingConfigurable"
                 displayName="DocHub: Render settings"/>
 
+        <lang.commenter language="JSONata" implementationClass="org.dochub.idea.arch.jsonata.JSONataCommenter"/>
+
         <completion.contributor
                 language="yaml"
                 implementationClass="org.dochub.idea.arch.completions.YamlCompletion"
@@ -107,8 +109,7 @@
             в lang.syntaxHighlighterFactory, в расширении выше (codeInsight.lineMarkerProvider language="JSONata") не отрабатывают -->
         <codeInsight.lineMarkerProvider language="yaml" implementationClass="org.dochub.idea.arch.markline.InjectedJSONataLineMarkerProvider"/>
 
-        <completion.contributor language="JSONata"
-                                implementationClass="org.dochub.idea.arch.completion.JSONataKeywordCompletionContributor"/>
+        <completion.contributor language="JSONata" implementationClass="org.dochub.idea.arch.completion.JSONataKeywordCompletionContributor"/>
 
         <codeInsight.lineMarkerProvider
                 language="yaml"

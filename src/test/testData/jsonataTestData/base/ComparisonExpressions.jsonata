@@ -1,0 +1,9 @@
+(
+    Numbers[0] = Numbers[5];
+    Numbers[0] != Numbers[4];
+    Numbers[1] < Numbers[5];
+    Numbers[1] <= Numbers[5];
+    Numbers[2] > Numbers[4];
+    Numbers[2] >= Numbers[4];
+    "01962 001234" in Phone.number
+)

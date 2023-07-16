@@ -29,59 +29,64 @@
 
 root ::= !<<eof>> jsonata
 
-jsonata ::= topDecl (SEMICOLON topDecl)* SEMICOLON?
+jsonata ::= expression (SEMICOLON expression)* SEMICOLON?
 
-topDecl ::= block | statement
+expression ::= MINUS? expressionItem (transform | filterExpr | ternaryExpr | orderByExpr | positionalBinding | contextBinding | object | callExpr | binaryOperator MINUS? expressionItem)*
 
-statement ::= defFunction | binding | expression
+expressionItem ::= substitution | defFunction | filterExpr | block | object | binding | transformRightPart | term
 
-expression ::= expressionBase (binaryOperator expressionAdditional | filterExpr | ifThenElse)*
+term ::= (LPARENTH expression RPARENTH) | useOfVariableOrFunction | STRING | REGEX | ID | BOOLEAN | MINUS? NUMBER | MUL | REMAINDER
 
-expressionBase ::= filterExpr | expressionAdditional
+binaryOperator ::= DOT | DOUBLE_DOT | PLUS | MINUS | MUL | QUOTIENT | REMAINDER | CONCAT | IN | EQ | NOT_EQ | GREATER | GREATER_OR_EQUAL | LESS | LESS_OR_EQUAL | OR | AND | CHAIN
 
-expressionAdditional ::= block | object | term
+substitution ::= QUESTION_MARK
 
-term ::= (LPARENTH expression RPARENTH) | useOfVariableOrFunction | STRING | REGEX | ID | numb | MUL // MUL is Wildcard here
-
-binaryOperator ::= DOT | DOUBLE_DOT | PLUS | MINUS | MUL | QUOTIENT | REMAINDER | CONCAT | IN | EQ | NOT_EQ | GREATER | GREATER_OR_EQUAL | LESS | LESS_OR_EQUAL | OR | AND | CONTEXT
-
-ifThenElse ::= QUESTION_MARK expression (COLON expression)?
+ternaryExpr ::= QUESTION_MARK expression (COLON expression)?
 
 filterExpr ::= LBRACKET filterBody? RBRACKET
 
 filterBody ::= expression (COMMA expression)*
 
-binding ::= VARIABLE ASSIGN statement
+orderByExpr ::= ORDER_BY LPARENTH orderByBody RPARENTH
+
+orderByBody ::= orderByItem (COMMA orderByItem)*
+
+orderByItem ::= (GREATER | LESS)? expression
+
+transform ::= CHAIN VERTICAL_BAR expression transformRightPart
+
+transformRightPart ::= VERTICAL_BAR expression VERTICAL_BAR expression (COMMA expression)* VERTICAL_BAR
+
+contextBinding ::= CONTEXT VARIABLE
+
+positionalBinding ::= POSITIONAL VARIABLE
+
+binding ::= VARIABLE ASSIGN expression
 
 object ::= LBRACE objectBody? RBRACE
 
-objectBody ::= objectStatement (COMMA objectStatement)*
+objectBody ::= objectItem (COMMA objectItem)*
 
-objectStatement ::= topDecl COLON expression
+objectItem ::= expression COLON expression
 
 block ::= LPARENTH blockBody RPARENTH
 
-blockBody ::= blockStatement (SEMICOLON blockStatement)* SEMICOLON?
+blockBody ::= blockItem (SEMICOLON blockItem)* SEMICOLON?
 
-blockStatement ::= statement
+blockItem ::= expression
 
-numb ::= (MINUS)? NUMBER
+useOfVariableOrFunction ::= ROOT | VARIABLE
 
-useOfVariableOrFunction ::= VARIABLE useFunctionPart?
+callExpr ::= LPARENTH functionArguments? RPARENTH
 
-useFunctionPart ::= LPARENTH useFunctionArguments? RPARENTH
+functionArguments ::= functionArg (COMMA functionArg)*
 
-useFunctionArguments ::= useFunctionArg (COMMA useFunctionArg)*
-
-useFunctionArg ::= expression
+functionArg ::= expression
 
 defFunction ::= FUNCTION LPARENTH defFunctionArguments? RPARENTH LBRACE defFunctionBody RBRACE
 
-defFunctionArguments ::= VARIABLE (COMMA VARIABLE)*
+defFunctionArguments ::= VARIABLE (COMMA (VARIABLE))*
 
 defFunctionBody ::= expression
 
-// TODO: delete after full support
-all ::= LINE_COMMENT | SEMICOLON | ASSIGN | LBRACE | RBRACE | FUNCTION | STRING | ID | SYS_VARIABLE | ORDER_BY | LPARENTH | RPARENTH | DOT | POSITIONAL | CONTEXT | VARIABLE | VERTICAL_BAR | COMMA | CHAIN | PLUS | MINUS | QUOTIENT | REMAINDER | LBRACKET | DOUBLE_DOT | RBRACKET | EQ | NOT_EQ | GREATER | LESS | GREATER_OR_EQUAL | LESS_OR_EQUAL | IN | AND | OR | CONCAT | COLON | COMMENT | DOUBLE_QUOTE | BACKSLASH | QUOTE | BACKTICK | BOOLEAN | QUESTION_MARK | NUMBER | REGEX
-
-unusedInBnf ::= COMMENT | NEW_LINE | DOUBLE_QUOTE | BACKSLASH | QUOTE | BACKTICK | BOOLEAN | QUESTION_MARK
+unusedInBnf ::= COMMENT | LINE_COMMENT | DOUBLE_QUOTE | BACKSLASH | QUOTE | BACKTICK
