@@ -1,0 +1,39 @@
+(
+         $validator := $jsonschema($lookup(entities.kadzo.schema.patternProperties, $self.schema_pattern));
+         $regex := $eval("/" & sber."as-filter" & "/");
+
+            /* Отбираем компоненты для проверки */
+            $components := [components.$spread().{
+                            "id": $keys()[0],
+                            "component": $.*
+                           }][$regex(id)];
+
+            $bp := $merge([$lookup(kadzo, sber.domain & ".v2022.r2_2").code].{$:true});
+            $errors := [$components.(
+                $componentId := id;
+                [component.links.(
+                  $isvalid := $validator($);
+                  $linkID := id;
+                  /* Линки проверяем на структуру */
+                  $isvalid != true ? $isvalid.({
+                      "uid": "ka-err." & $self._id & ".[" & $componentId & ".links." & $linkID & "]"
+                        & $replace(instancePath, "/", ".")
+                        & (params.missingProperty ? "." & params.missingProperty),
+                      "location": "/architect/components/" & $componentId,
+                      "correction": message,
+                      "description": params.allowedValues ? "Доступны варианты значений:\n\n"
+                        & $join(params.allowedValues, "\n")
+                  }) : (
+                    /* и на связи с БП */
+                    sber.processes.(
+                      $not($exists($lookup($bp, $))) ? {
+                         "uid": "ka-err." & $self._id & ".[" & $componentId & ".links." & $linkID & "].processes." & $,
+                         "location": "/architect/components/" & $componentId,
+                         "correction": "Укажите действительный код бизнес-процесса",
+                         "description": "Бизнес-процесс с кодом [" & $ & "] не найден"
+                     }
+                    )
+                  );
+                )];
+         )];
+        )

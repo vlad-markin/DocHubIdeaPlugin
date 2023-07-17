@@ -1,0 +1,13 @@
+(
+            [$distinct(components.$spread().(
+              $id := $keys()[0];
+              $title := *.title;
+              $links := $distinct($.*.links[id=$params.component].("" & direction));
+              $links.{
+                "id": $id,
+                "title": $title,
+                "direction": $links,
+                "link": "/architect/components/" & $id
+              }
+            ))^(id)]
+)

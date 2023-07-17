@@ -1,0 +1,4 @@
+(
+    library.books["Aho" in authors and price < 50].title;
+    library.books[price < 10 or section="diy"].title
+)

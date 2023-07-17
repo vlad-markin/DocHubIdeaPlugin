@@ -1,0 +1,7 @@
+(
+    Account.Order.Product{`Product Name`: Price};
+    Account.Order.Product {`Product Name`: {"Price": Price, "Qty": Quantity}};
+    Account.Order.Product {`Product Name`: $.{"Price": Price, "Qty": Quantity}};
+    Account.Order.Product{`Product Name`: $.(Price*Quantity)};
+    Account.Order.Product{`Product Name`: $sum($.(Price*Quantity))}
+)

@@ -1,0 +1,49 @@
+(
+          $manifest := $;
+          $merge([$, {
+            "components": $merge([components.$spread().(
+              $exists($lookup({
+                "person": {}
+              }, *.entity))
+              or
+               $contains($keys()[0], "channels.")
+              or
+                $contains($keys()[0], "sber.ecosystem.")
+              or
+              $exists($lookup({
+                "Модифицируется": {},
+                "Выводится из эксплуатации": {},
+                "Используется": {}
+              }, *.sber.status."change-type"))
+              or
+              $not($exists(*.sber))
+              ? { $keys()[0]:
+                  $merge([$.*, {
+                    "aspects": [
+                      $.*.aspects.(
+                        $aspect := $lookup($manifest.aspects, $);
+                        $exists($aspect.sber)
+                        and $not($aspect.sber.status = "Создается")
+                        and $not($aspect.sber.status = "Удаляется") ? $
+                      )
+                    ],
+                    "links": [
+                      $.*.links[$not(sber.status = "Создается")].(
+                        $merge([$,
+                          {
+                            "title": $trim(sber.code),
+                            "direction":
+                              $length(direction) = 1 ? direction & "[#000]" : (
+                                $end := $substring(direction, -1);
+                                $end = "-" ? direction & "[#000]" :
+                                $substringBefore(direction, $end) & "[#black]" & $substring(direction, -1)
+                              )
+                          }
+                        ]);
+                      )
+                    ]
+                  }])
+                }
+            )])
+          }])
+)

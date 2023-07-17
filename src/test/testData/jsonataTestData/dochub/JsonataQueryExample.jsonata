@@ -1,0 +1,126 @@
+(
+    /*Если у вас статический параметр фильтрации, то вы можете в функцию просто передать параметр жестко указав его в функции или через переменную.*/
+    $matcher := /swamp\.crocodile\..*/; /*Задаем параметр фильтрации запроса*/
+	components.$sift(function($v, $k) {$k ~> $matcher}).$spread().{"id": $keys()[0],"component": $.*};
+
+    /*Если у вас динамический параметр фильтрации, то предыдущий вариант работать не будет и нужно преобразовать параметр через функцию $eval().*/
+    $bu_id := $params.id; /*Так должно быть в оригинале*/
+    $bu_id := "crocodile"; /*Для теста перебиваем значение*/
+    $pattern := $eval("/swamp\\." & $bu_id & "\\..*/");
+    components.$sift(function($v, $k) {$k ~> $pattern}).$spread().{"id": $keys()[0],"component": $.*};
+
+        /*Формируем строку поиска через регулярное выражение*/
+    	$matcher := /swamp\.crocodile\..*/;
+        /*Выбираем все системы*/
+    	components.$spread(). /*$spread() используется в том случае, если мы хотим получть ключ через функцию $keys()[0]. Если не ходим, то $spread() можно не использовать*/
+            {"id": $keys()[0], /*Помещаем ключ внутрь запроса*/
+            "component": $.*
+            }[$matcher(id)];/*Фильтруемся по ключу*/
+
+
+    	$level := "business_critical";
+    	components.$filter($.*, function($v, $i, $a) {$contains($v."critical_level", $level)}).(
+    	$
+    	);
+
+
+
+        /*Формируем строку поиска через регулярное выражение*/
+    	$matcher := /business_critical/;
+        /*Выбираем все системы*/
+    	components.(
+            	$.*
+            )[$matcher(critical_level)]; /*Фильтруемся по полю critical_level*/
+
+
+    	$level := "business_critical";
+    	components.$filter($.*, function($v, $i, $a) {$contains($v."critical_level", $level)}).(
+    	$
+    	);
+
+
+    	$distinct([components.$spread().(
+    	$COMPONENT_ID := $keys()[0];
+    	$systems := $.*.{
+            "id": $COMPONENT_ID,
+            "link_to_system": "/architect/components/" & $COMPONENT_ID,
+            "title": title,
+            "entity": entity,
+            "description": description,
+            "owner": owner
+             };
+    	$systems[entity="system"]; /*Устанавливаем фильтр*/
+          )])^(id); /*Сортируем по полю id*/
+
+        $MANIFEST := $;
+        $distinct($distinct(components.*.technologies).(
+            $TECHKEY := $;
+            $TECHNOLOGY := $lookup($MANIFEST.technologies.items, $type($)="string" ? $ : undefined);
+            $TECHNOLOGY := $TECHNOLOGY ? $merge([$TECHNOLOGY, {"id": $TECHKEY}]) : $single(
+                $spread(
+                    $sift($MANIFEST.technologies.items, function($v, $k) {
+                        [$TECHKEY in $v.aliases]}
+                    )
+                ), function($v, $k){ $k=0 }).$merge([$.*, {"id": $keys($)}]);
+            $TECHNOLOGY := $TECHNOLOGY ? $TECHNOLOGY : {
+                "id": $TECHKEY,
+                "section": "UNKNOWN",
+                "title": "Не определено"
+            };
+            $SECTION := $lookup($MANIFEST.technologies.sections, $TECHNOLOGY.section);
+            {
+                "label": $TECHNOLOGY.id,
+                "key": $TECHNOLOGY.id,
+                "hint": $TECHNOLOGY.title,
+                "link": $TECHNOLOGY.link,
+                "status": $TECHNOLOGY.status,
+                "section" : {
+                    "key": $TECHNOLOGY.section,
+                    "title": $SECTION.title ? $SECTION.title : "Не определено"
+                }
+            }
+        ));
+
+    $_manifest := $;
+    /* Делаем регулярку на выбор только латинских букв */
+    $matcher := /^[a-z]/;
+    /* Создаем массив со списком имен полей из которых будем выбирать логины */
+    $scan_fields := ["budget_holder", "application_owner", "business_owners"];
+    /* Выбираем системы */
+    $system_accounts := $distinct($_manifest.components.*.(
+        $component := $; /* Получаем конкретную систему*/
+        $scan_fields.(
+            $lookup($component, $); /* Внутри конкретной системы берем значение конкретного реквизиты для каждого поля указанного в $scan_fields*/
+        )[$matcher($)]; /*Каждое полученное значение свяряем с регуляркой и лишнее игнорируем*/
+    ))[$];/*В предыдущей выборке будут nill-ы, для того чтобы избавиться от них делаем фильтр*/
+
+    /* Повторяем предыдущий алгоритм для версий архитектуры */
+    $arch_versions_accounts := $distinct($_manifest.arch_versions.*.changed_data.*.(
+        $component := $;
+        $scan_fields.($lookup($component, $);)[$matcher($)];
+    ))[$];
+
+    /*Соединяем два полученных выше массива*/
+    $all_accounts := $distinct($append($system_accounts, $arch_versions_accounts ));
+
+    $_manifest := $;
+    $arch_version := $_manifest.arch_versions;
+    $components := $_manifest.components;
+
+    $pattern := $eval("/^[a-z]/");
+    $sys_accounts := $distinct($components.*.(
+        $account := $append($account, budget_holder);
+        $account := $append($account, application_owner);
+        $account := $append($account, $.business_owners);
+    ));
+
+    $arch_versions_accounts := $distinct($arch_version.*.changed_data.*.(
+       budget_holder;
+    ));
+    $all_accounts := $append($sys_accounts, $sys_accounts);
+
+    $accounts := $distinct($all_accounts.(
+         $contains($, $pattern) = true
+         ?  $append($account, $);
+    ));
+)

@@ -11,6 +11,9 @@ import org.dochub.idea.arch.jsonata.JSONataFile
 class JSONataLineMarkerProvider: LineMarkerProvider {
     override fun getLineMarkerInfo(element: PsiElement) =
         (element as? JSONataFile)?.run {
+            //todo: костыль. Обрабатываю только расширение jsonata, требуется доработка разбора языка JSONata
+            if (!element.viewProvider.virtualFile.name.endsWith(".jsonata")) return null
+
             LineMarkerInfo(
                 element,
                 element.textRange,

@@ -1,0 +1,4 @@
+(
+    (Numbers[2] != 0) and (Numbers[5] != Numbers[1]);
+    (Numbers[2] != 0) or (Numbers[5] = Numbers[1])
+)

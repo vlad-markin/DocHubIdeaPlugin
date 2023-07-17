@@ -1,0 +1,37 @@
+(
+    Address.City;
+    Phone.number;
+    Account.Order.Product.(Price * Quantity);
+    Account.Order.OrderID.$uppercase();
+
+    /*Order-by*/
+    Account.Order.Product^(Price);
+    Account.Order.Product^(>Price);
+    Account.Order.Product^(>Price, <Quantity);
+    Account.Order.Product^(Price * Quantity);
+    student[type='fulltime']^(DoB).name;
+
+    /*Parent*/
+    Account.Order.Product.{
+      'Product': `Product Name`,
+      'Order': %.OrderID,
+      'Account': %.%.`Account Name`
+    };
+
+    /*Positional variable binding */
+    library.books#$i['Kernighan' in authors].{
+      'title': title,
+      'index': $i
+    };
+
+    /*Context variable binding*/
+    library.loans@$l.books@$b[$l.isbn=$b.isbn].{
+      'title': $b.title,
+      'customer': $l.customer
+    };
+
+    (library.loans)@$l.(catalog.books)@$b[$l.isbn=$b.isbn].{
+      'title': $b.title,
+      'customer': $l.customer
+    };
+)
