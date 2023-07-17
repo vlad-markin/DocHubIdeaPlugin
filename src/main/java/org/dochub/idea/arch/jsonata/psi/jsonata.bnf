@@ -63,17 +63,17 @@ positionalBinding ::= POSITIONAL VARIABLE
 
 binding ::= VARIABLE ASSIGN expression
 
-object ::= LBRACE objectBody? RBRACE
+object ::= LBRACE objectBody? RBRACE {pin=1}
 
 objectBody ::= objectItem (COMMA objectItem)*
 
-objectItem ::= expression COLON expression
+objectItem ::= expression COLON expression {recoverWhile=expr_recover}
 
-block ::= LPARENTH blockBody RPARENTH
+block ::= LPARENTH blockBody RPARENTH {pin=1}
 
 blockBody ::= blockItem (SEMICOLON blockItem)* SEMICOLON?
 
-blockItem ::= expression
+blockItem ::= expression {recoverWhile=expr_recover}
 
 useOfVariableOrFunction ::= ROOT | VARIABLE
 
@@ -88,5 +88,7 @@ defFunction ::= FUNCTION LPARENTH defFunctionArguments? RPARENTH LBRACE defFunct
 defFunctionArguments ::= VARIABLE (COMMA (VARIABLE))*
 
 defFunctionBody ::= expression
+
+private expr_recover ::= !(',' | ';' | RPARENTH | RBRACE)
 
 unusedInBnf ::= COMMENT | LINE_COMMENT | DOUBLE_QUOTE | BACKSLASH | QUOTE | BACKTICK
