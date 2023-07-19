@@ -1,0 +1,75 @@
+(
+          /* Обрабатываем параметры */
+          $areas := areas;
+          $components := components;
+          $manifest := manifest;
+
+          $join($map($areas, function($domain, $index) {(
+              $result := "";
+              $component := $lookup($components, $domain);
+              $context := $lookup($manifest.contexts, $domain);
+
+              /* Определяем является ли элемент областью */
+              $isAreaBegin := $areas[$index + 1].$substring(0, $domain.$length() + 1) = $domain & ".";
+
+              $result := $result & ($isAreaBegin ? (
+                  $title := $component.title ? $component.title : (
+                      $context.title ? $context.title : $domain
+                  );
+                      "$Region("
+                      & $domain
+                      & ",\"[[/architect/components/"
+                      & $domain
+                      & " " & $title
+                      & "]]\", ) {\n";
+              ) : "");
+
+              /* Если домен является компонентом, выводим его на диаграмму */
+              $result := $result & (
+                  $not($isAreaBegin) and $component ? (
+                      /* Открываем секцию компонента */
+                      $entity := $component.entity ? $component.entity : "component";
+                      $result := "$Entity(\""
+                          & $entity
+                          & "\", \""
+                          & "[[/architect/components/" & $domain & " " & $component.title & "]]"
+                          & "\", "
+                          & $domain
+                          & ", )\n";
+
+                      /* Добавляем аспекты */
+                      $result := $result & $join($component.aspects.(
+                          $aspect := $lookup($manifest.aspects, $);
+                          $title := $aspect ? $aspect.title : $;
+                          "$EntityAspect(\""
+                          & $entity
+                          & "\",\"[[/architect/aspects/"
+                          & $
+                          & " "
+                          & $title
+                          & "]]\")\n"
+                      ));
+
+                      /* Если компонент является контекстом добавляем дрилдаун */
+                      $context ?
+                          $result := $result & "$EntityExpand(\""
+                          & $entity
+                          & "\", "
+                          & $domain
+                          & ")\n";
+
+                      /* Закрываем секцию компонента */
+                      $result := $result &
+                          "$EntityEnd(\""
+                          & $entity
+                          & "\")\n";
+                  ): "";
+              );
+
+              /* Определяем, что область нужно закрыть*/
+              $result & (
+                $count($split($domain, ".")) > 1
+                and ($count($split($domain, ".")) > $count($split($areas[$index + 1], "."))
+              ) ? "}\n" : "");
+          )}));
+)
