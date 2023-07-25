@@ -28,7 +28,6 @@ import org.dochub.idea.arch.jsonata.psi.JSONataTypes;
 white_space         = \s+
 /* comment */
 comment             = "/*"~"*/"
-line_comment        = {quotient}{quotient}[^\n]*
 
 space               = [ \t\n\x0B\f\r]+
 /* string literal */
@@ -93,11 +92,8 @@ function            = "function" | \u03BB
         "or"                    { return JSONataTypes.OR; }
 
         {function}              { return JSONataTypes.FUNCTION; }
-
-
         {white_space}           { return TokenType.WHITE_SPACE; }
         {comment}               { return JSONataTypes.COMMENT; }
-        {line_comment}          { return JSONataTypes.LINE_COMMENT; }
         {space}                 { return JSONataTypes.SPACE; }
         {string}                { return JSONataTypes.STRING; }
         {number}                { return JSONataTypes.NUMBER; }

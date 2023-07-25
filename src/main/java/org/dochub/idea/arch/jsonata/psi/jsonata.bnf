@@ -91,4 +91,4 @@ defFunctionBody ::= expression
 
 private expr_recover ::= !(COMMA | SEMICOLON | RPARENTH | RBRACE)
 
-unusedInBnf ::= COMMENT | LINE_COMMENT | DOUBLE_QUOTE | BACKSLASH | QUOTE | BACKTICK
+unusedInBnf ::= COMMENT | DOUBLE_QUOTE | BACKSLASH | QUOTE | BACKTICK

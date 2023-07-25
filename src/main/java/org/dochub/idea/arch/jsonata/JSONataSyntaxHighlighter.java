@@ -16,7 +16,7 @@ public class JSONataSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final TextAttributesKey[] NUMBER_KEYS = new TextAttributesKey[]{TextAttributesKey.createTextAttributesKey("JSONATA_NUMBER", DefaultLanguageHighlighterColors.NUMBER)};
     private static final TextAttributesKey[] OPERATOR_KEYS = new TextAttributesKey[]{TextAttributesKey.createTextAttributesKey("JSONATA_OPERATOR", DefaultLanguageHighlighterColors.INSTANCE_METHOD)};
     private static final TextAttributesKey[] STRING_KEYS = new TextAttributesKey[]{TextAttributesKey.createTextAttributesKey("JSONATA_STRING", DefaultLanguageHighlighterColors.STRING)};
-    private static final TextAttributesKey[] LINE_COMMENT_KEYS = new TextAttributesKey[]{TextAttributesKey.createTextAttributesKey("JSONATA_LINE_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT)};
+    private static final TextAttributesKey[] COMMENT_KEYS = new TextAttributesKey[]{TextAttributesKey.createTextAttributesKey("JSONATA_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT)};
     private static final TextAttributesKey[] BRACKETS_KEYS = new TextAttributesKey[]{TextAttributesKey.createTextAttributesKey("JSONATA_BRACKETS", DefaultLanguageHighlighterColors.CLASS_REFERENCE)};
     private static final TextAttributesKey[] VARIABLES_KEYS = new TextAttributesKey[]{TextAttributesKey.createTextAttributesKey("JSONATA_VARIABLE", DefaultLanguageHighlighterColors.LOCAL_VARIABLE)};
     private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[]{TextAttributesKey.createTextAttributesKey("JSONATA_BAD_CHARACTER", HighlighterColors.BAD_CHARACTER)};
@@ -44,7 +44,7 @@ public class JSONataSyntaxHighlighter extends SyntaxHighlighterBase {
         } else if (tokenType == JSONataTypes.VARIABLE) {
             return VARIABLES_KEYS;
         } else if (tokenType == JSONataTypes.COMMENT) {
-            return LINE_COMMENT_KEYS;
+            return COMMENT_KEYS;
         }   else if (tokenType == TokenType.BAD_CHARACTER) {
             return BAD_CHAR_KEYS;
         }

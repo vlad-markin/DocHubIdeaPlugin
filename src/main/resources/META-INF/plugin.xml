@@ -40,7 +40,6 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>org.jetbrains.plugins.yaml</depends>
 
-
     <depends optional="true" config-file="java.xml">com.intellij.java</depends>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -55,28 +54,6 @@
 
         <lang.commenter language="JSONata" implementationClass="org.dochub.idea.arch.jsonata.JSONataCommenter"/>
 
-        <completion.contributor
-                language="yaml"
-                implementationClass="org.dochub.idea.arch.completions.YamlCompletion"
-        />
-        <psi.referenceContributor
-                language="yaml"
-                implementation="org.dochub.idea.arch.references.ReferenceContributor"
-        />
-        <annotator
-                language="yaml"
-                implementationClass="org.dochub.idea.arch.quickfix.FixAnnotator"
-        />
-        <localInspection
-                implementationClass="org.dochub.idea.arch.inspections.DocHubInspection"
-                level="WARNING"
-                enabledByDefault="true"
-                runForWholeFile="true"
-                language="yaml"
-                shortName="DocHubInspector"
-                displayName="DocHub Inspector"
-                groupName="DocHub"
-        />
         <toolWindow factoryClass="org.dochub.idea.arch.tools.DocHubToolWindowFactory"
                     icon="AllIcons.General.InspectionsEye"
                     anchor="right"
@@ -98,32 +75,32 @@
                 implementationClass="org.dochub.idea.arch.jsonata.JSONataSyntaxHighlighterFactory"
         />
 
-        <languageInjectionContributor implementationClass="org.dochub.idea.arch.jsonata.JSONataInjector" language="yaml"/>
+        <!-- YAML -->
+        <completion.contributor language="yaml" implementationClass="org.dochub.idea.arch.completions.YamlCompletion"/>
 
+        <psi.referenceContributor language="yaml" implementation="org.dochub.idea.arch.references.ReferenceContributor" />
+
+        <annotator language="yaml" implementationClass="org.dochub.idea.arch.quickfix.FixAnnotator"/>
+
+        <languageInjectionContributor language="yaml" implementationClass="org.dochub.idea.arch.jsonata.JSONataInjector"/>
+<!--        <languageInjectionPerformer language="yaml" implementationClass="org.dochub.idea.arch.jsonata.JSONataInjectionPerformer"/>-->
+
+        <codeInsight.lineMarkerProvider language="yaml" implementationClass="org.dochub.idea.arch.markline.LineMarkerYaml"/>
+        <codeInsight.lineMarkerProvider language="yaml" implementationClass="org.dochub.idea.arch.markline.InjectedJSONataLineMarkerProvider"/>
+
+
+        <!-- JSONATA -->
         <lang.braceMatcher language="JSONata" implementationClass="org.dochub.idea.arch.editor.JSONataBraceMatcher"/>
 
         <annotator language="JSONata" implementationClass="org.dochub.idea.arch.annotator.JSONataAnnotator"/>
 
-        <codeInsight.lineMarkerProvider language="JSONata" implementationClass="org.dochub.idea.arch.markline.JSONataLineMarkerProvider"/>
-        <!-- todo: Костыль. Требуются правки в определении элементов JSONata. Вложенные jsonata в yaml, которые нормально обрабатываются
-            в lang.syntaxHighlighterFactory, в расширении выше (codeInsight.lineMarkerProvider language="JSONata") не отрабатывают -->
-        <codeInsight.lineMarkerProvider language="yaml" implementationClass="org.dochub.idea.arch.markline.InjectedJSONataLineMarkerProvider"/>
+<!--        <codeInsight.lineMarkerProvider language="JSONata" implementationClass="org.dochub.idea.arch.markline.JSONataLineMarkerProvider"/>-->
 
         <completion.contributor language="JSONata" implementationClass="org.dochub.idea.arch.completion.JSONataKeywordCompletionContributor"/>
 
-        <codeInsight.lineMarkerProvider
-                language="yaml"
-                implementationClass="org.dochub.idea.arch.markline.LineMarkerYaml"
-        />
-        <fileBasedIndex implementation="org.dochub.idea.arch.indexing.DocHubIndex"/>
-        <!--
-        <editorTabTitleProvider
-                implementation="org.dochub.idea.arch.views.PreviewEditorTabTitleProvider"
-        />
-                key="inspection.display-name"
-                groupKey="inspection.group"
 
-        -->
+        <fileBasedIndex implementation="org.dochub.idea.arch.indexing.DocHubIndex"/>
+
     </extensions>
 
     <extensions defaultExtensionNs="JavaScript">
