@@ -86,7 +86,6 @@
 <!--        <languageInjectionPerformer language="yaml" implementationClass="org.dochub.idea.arch.jsonata.JSONataInjectionPerformer"/>-->
 
         <codeInsight.lineMarkerProvider language="yaml" implementationClass="org.dochub.idea.arch.markline.LineMarkerYaml"/>
-        <codeInsight.lineMarkerProvider language="yaml" implementationClass="org.dochub.idea.arch.markline.InjectedJSONataLineMarkerProvider"/>
 
 
         <!-- JSONATA -->
@@ -94,7 +93,7 @@
 
         <annotator language="JSONata" implementationClass="org.dochub.idea.arch.annotator.JSONataAnnotator"/>
 
-<!--        <codeInsight.lineMarkerProvider language="JSONata" implementationClass="org.dochub.idea.arch.markline.JSONataLineMarkerProvider"/>-->
+        <codeInsight.lineMarkerProvider language="JSONata" implementationClass="org.dochub.idea.arch.markline.JSONataLineMarkerProvider"/>
 
         <completion.contributor language="JSONata" implementationClass="org.dochub.idea.arch.completion.JSONataKeywordCompletionContributor"/>
 
