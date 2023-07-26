@@ -3,7 +3,7 @@ entities:
   contexts:
     title: Контексты
     description: >
-      Представлять указанные архитектурные компоненты в виде диаграмм.
+      Представляет указанные архитектурные компоненты в виде диаграмм.
     schema:
       type: object
       patternProperties:

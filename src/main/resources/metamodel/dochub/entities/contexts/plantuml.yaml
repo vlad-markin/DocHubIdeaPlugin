@@ -19,6 +19,8 @@ entities:
           $components := components;
           $manifest := manifest;
         
+          $stopBracketsCount := function($a, $b) {$a = 0 ? "}\n" : $a & "}\n"};
+          
           $join($map($areas, function($domain, $index) {(
               $result := "";
               $component := $lookup($components, $domain);
@@ -50,8 +52,10 @@ entities:
                           & "\", \""
                           & "[[/architect/components/" & $domain & " " & $component.title & "]]"
                           & "\", " 
-                          & $domain
-                          & ", )\n";
+                          & $domain                          
+                          & ", \""
+                          & $component.type
+                          & "\" )\n";
         
                       /* Добавляем аспекты */
                       $result := $result & $join($component.aspects.(
@@ -62,7 +66,7 @@ entities:
                           & "\",\"[[/architect/aspects/"
                           & $
                           & " " 
-                          & $title 
+                          & $title
                           & "]]\")\n"
                       ));
         
@@ -86,7 +90,10 @@ entities:
               $result & (
                 $count($split($domain, ".")) > 1 
                 and ($count($split($domain, ".")) > $count($split($areas[$index + 1], "."))
-              ) ? "}\n" : "");
+              ) ? (
+                $m := $areas[$index + 1] ? 0 : -1;
+                $reduce([0..($count($split($domain, ".")) - $count($split($areas[$index + 1], ".")) + $m)], $stopBracketsCount);
+              ) : "");
           )}));
         )
       # Генерирует PlantUML код связей для диаграммы компонентов
