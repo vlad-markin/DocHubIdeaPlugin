@@ -28,4 +28,5 @@ public class JSONataSuccessfulParsingDochubExamplesTest extends JSONataParsingTe
     public void testUserQuery() {doSuccessfulParsingTest();}
     public void testJsonataQueryExample() {doSuccessfulParsingTest();}
     public void testSequences() {doSuccessfulParsingTest();}
+    public void testPluntumlComponent() {doSuccessfulParsingTest();}
 }

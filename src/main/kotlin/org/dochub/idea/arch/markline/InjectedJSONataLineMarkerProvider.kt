@@ -11,7 +11,9 @@ import org.jetbrains.yaml.psi.YAMLKeyValue
 import org.jetbrains.yaml.psi.YAMLScalar
 
 class InjectedJSONataLineMarkerProvider: LineMarkerProvider {
-    private val injectedJSONataRegex = "[(][^+]*[)]\\s*".toRegex()
+
+    private val injectedJSONataRegex = "[(][\\s\\S]*[)]\\s*".toRegex()
+
     override fun getLineMarkerInfo(element: PsiElement) =
         (element as? YAMLScalar)?.run {
             if (element.textValue.matches(injectedJSONataRegex))
