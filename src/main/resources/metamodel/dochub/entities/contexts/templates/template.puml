@@ -168,14 +168,9 @@ skinparam component<<Person>> {
 !endprocedure
 
 !unquoted procedure $EntityExpand($entity, $ID)
-    !if ($entity == component)
+    !if ($entity == component || $entity == system || $entity == collections)
         ---
         [[/entities/contexts/{{presentation}}?dh-context-id=$ID ≫≫]]
-    !elseif ($entity == system)
-        ---
-        [[/entities/contexts/{{presentation}}?dh-context-id=$ID ≫≫]]
-    !elseif ($entity == actor || $entity == person)
-'nothing
     !else
 'nothing
     !endif
