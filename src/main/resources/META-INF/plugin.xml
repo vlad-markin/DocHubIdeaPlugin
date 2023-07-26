@@ -13,7 +13,7 @@
         <p>
             This release includes:
             <ul>
-                <li>DocHub core: v3.0.4;</li>
+                <li>DocHub core: v3.0.1;</li>
                 <li>Suggests for the structure of architecture manifests (yaml);</li>
                 <li>Suggests for the values of manifest fields;</li>
                 <li>Fast navigation through manifests;</li>
@@ -30,8 +30,7 @@
                 <li>Widgets;</li>
                 <li>Syntax color support in Markdown documents;</li>
                 <li>Syntax color support to JSONata DevTool;</li>
-                <li>Added Enterprise mode;</li>
-                <li>(new) JSONata syntax color support to IDE editor.</li>
+                <li>Added Enterprise mode.</li>
         </ul>
         </p>
     ]]></description>
@@ -84,15 +83,17 @@
         <annotator language="yaml" implementationClass="org.dochub.idea.arch.quickfix.FixAnnotator"/>
 
         <languageInjectionContributor language="yaml" implementationClass="org.dochub.idea.arch.jsonata.JSONataInjector"/>
+<!--        <languageInjectionPerformer language="yaml" implementationClass="org.dochub.idea.arch.jsonata.JSONataInjectionPerformer"/>-->
 
         <codeInsight.lineMarkerProvider language="yaml" implementationClass="org.dochub.idea.arch.markline.LineMarkerYaml"/>
-        <codeInsight.lineMarkerProvider language="yaml" implementationClass="org.dochub.idea.arch.markline.InjectedJSONataLineMarkerProvider"/>
 
 
         <!-- JSONATA -->
         <lang.braceMatcher language="JSONata" implementationClass="org.dochub.idea.arch.editor.JSONataBraceMatcher"/>
 
         <annotator language="JSONata" implementationClass="org.dochub.idea.arch.annotator.JSONataAnnotator"/>
+
+        <codeInsight.lineMarkerProvider language="JSONata" implementationClass="org.dochub.idea.arch.markline.JSONataLineMarkerProvider"/>
 
         <completion.contributor language="JSONata" implementationClass="org.dochub.idea.arch.completion.JSONataKeywordCompletionContributor"/>
 
@@ -108,7 +109,7 @@
     <actions>
         <action id="PopupJSONataRunAction" class="org.dochub.idea.arch.actions.PopupJSONataRunAction"
                 text="Run selection as JSONata" description="Run selection as JSONata in DocHub plugin developer tool"
-                icon="AllIcons.Actions.Execute">-->
+                icon="AllIcons.Actions.Execute">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
     </actions>
