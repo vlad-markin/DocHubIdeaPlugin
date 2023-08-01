@@ -112,8 +112,7 @@ public class BaseStructureQuickFix extends BaseQuickFix {
         assert mapping != null;
         if (element.getChildren().length > 0) {
             PsiElement keyMap = element.getLastChild();
-            final PsiElement newLineNode =
-                    PsiParserFacade.SERVICE.getInstance(project).createWhiteSpaceFromText("\n");
+            final PsiElement newLineNode = PsiParserFacade.getInstance(project).createWhiteSpaceFromText("\n");
             PsiElement lastKey = getLastKeyFromMap(keyMap);
 
             if (lastKey == null) {
