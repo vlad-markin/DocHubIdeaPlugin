@@ -1,0 +1,20 @@
+package info.dochub.idea.arch.tools;
+
+import com.intellij.openapi.editor.event.*;
+import com.intellij.ui.jcef.JBCefBrowser;
+import org.cef.*;
+import org.cef.callback.*;
+import org.cef.handler.*;
+import org.jetbrains.annotations.NotNull;
+
+
+public class SchemaViewer extends JBCefBrowser implements VisibleAreaListener {
+    public SchemaViewer(String url) {
+        super(url);
+    }
+
+    @Override
+    public void visibleAreaChanged(@NotNull VisibleAreaEvent e) {
+
+    }
+}
