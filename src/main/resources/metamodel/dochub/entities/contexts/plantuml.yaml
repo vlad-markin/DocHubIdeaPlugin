@@ -64,7 +64,7 @@ entities:
                           "$EntityAspect(\""
                           & $entity
                           & "\",\"[[/architect/aspects/"
-                          & $
+                          & $encodeUrlComponent($)
                           & " " 
                           & $title
                           & "]]\")\n"
@@ -165,24 +165,30 @@ entities:
             $defFunctions := $manifest.entities.contexts.api;
           
             /* Получаем коллекцию дефолтных параметров */
-            $defConfig := $manifest.entities.contexts.config; 
+            $defConfig := $manifest.entities.contexts.config;
+          
+            /* Получаем параметры из контекста */
+            $customConfig := $context.config;
+          
+            /* Формируем итоговый конфиг */
+            $config := $mergedeep([$defConfig,$customConfig]);
           
             /* Определяем движок рендеринга */
             $renderCore := $lookup({
               "elk": "!pragma layout elk",
               "smetana": "!pragma layout smetana"
-            }, $defConfig.renderCore);
+            }, $config.renderCore);
 
             /* Формируем заголовок */
             $header := "$Header(\"" & ($context.title ? $context.title : $id ) & "\", \"" & $context.uml."$autor" & "\", \"" & $context.uml."$version" & "\" , \"" & $context.uml."$moment" & "\")\n";
 
             /* Получаем все компоненты входящие в контекст */
-            $components := $eval($defFunctions.fetchComponents, {
+            $components := $eval($defFunctions.fetchComponents, $merge([$params, {
               "manifest": $manifest,
               "contextId": $id,
               "extra-links": $isExtraLinks,
               "componentId": $params.componentId
-            });
+            }]));
 
             /* Генерируем области */
             $areas := $eval($defFunctions.fetchAreas, {

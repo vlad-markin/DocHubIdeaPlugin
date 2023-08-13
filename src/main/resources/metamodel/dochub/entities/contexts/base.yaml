@@ -71,7 +71,6 @@ entities:
                   pattern: "\\s*\\((.|\\s)*\\)\\s*"
           required:
             - title
-            - components
       additionalProperties: false
     menu: >
       (
