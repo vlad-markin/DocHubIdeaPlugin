@@ -1,5 +1,5 @@
 <idea-plugin>
-    <id>info.dochub.idea.arch</id>
+    <id>org.dochub.idea.arch</id>
     <name>DocHub Architecture as code</name>
     <vendor email="r.piontik@mail.ru" url="https://dochub.info">DocHub</vendor>
 
@@ -45,74 +45,74 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <applicationService
-                serviceImplementation="info.dochub.idea.arch.settings.SettingsState"/>
+                serviceImplementation="org.dochub.idea.arch.settings.SettingsState"/>
 
         <applicationConfigurable
                 parentId="tools"
-                instance="info.dochub.idea.arch.settings.SettingConfigurable"
-                id="info.dochub.idea.arch.settings.SettingConfigurable"
+                instance="org.dochub.idea.arch.settings.SettingConfigurable"
+                id="org.dochub.idea.arch.settings.SettingConfigurable"
                 displayName="DocHub: Render settings"/>
 
-        <lang.commenter language="JSONata" implementationClass="info.dochub.idea.arch.jsonata.JSONataCommenter"/>
+        <lang.commenter language="JSONata" implementationClass="org.dochub.idea.arch.jsonata.JSONataCommenter"/>
 
-        <toolWindow factoryClass="info.dochub.idea.arch.tools.DocHubToolWindowFactory"
+        <toolWindow factoryClass="org.dochub.idea.arch.tools.DocHubToolWindowFactory"
                     icon="AllIcons.General.InspectionsEye"
                     anchor="right"
                     id="DocHub"
         />
         <fileType
                 name="JSONata"
-                implementationClass="info.dochub.idea.arch.jsonata.JSONataFileType"
+                implementationClass="org.dochub.idea.arch.jsonata.JSONataFileType"
                 fieldName="INSTANCE"
                 language="JSONata"
                 extensions="jsonata"
         />
         <lang.parserDefinition
                 language="JSONata"
-                implementationClass="info.dochub.idea.arch.jsonata.JSONataParserDefinition"
+                implementationClass="org.dochub.idea.arch.jsonata.JSONataParserDefinition"
         />
         <lang.syntaxHighlighterFactory
                 language="JSONata"
-                implementationClass="info.dochub.idea.arch.jsonata.JSONataSyntaxHighlighterFactory"
+                implementationClass="org.dochub.idea.arch.jsonata.JSONataSyntaxHighlighterFactory"
         />
 
-<!--        <lang.findUsagesProvider language="JSONata" implementationClass="info.dochub.idea.arch.findUsages.JSONataFindUsagesProvider"/>-->
-<!--        <lang.refactoringSupport language="JSONata" implementationClass="info.dochub.idea.arch.jsonata.psi.JSONataRefactoringSupportProvider"/>-->
+<!--        <lang.findUsagesProvider language="JSONata" implementationClass="org.dochub.idea.arch.findUsages.JSONataFindUsagesProvider"/>-->
+<!--        <lang.refactoringSupport language="JSONata" implementationClass="psi.jsonata.org.dochub.idea.arch.JSONataRefactoringSupportProvider"/>-->
 
         <!-- YAML -->
-        <completion.contributor language="yaml" implementationClass="info.dochub.idea.arch.completions.YamlCompletion"/>
+        <completion.contributor language="yaml" implementationClass="org.dochub.idea.arch.completions.YamlCompletion"/>
 
-        <psi.referenceContributor language="yaml" implementation="info.dochub.idea.arch.references.ReferenceContributor" />
+        <psi.referenceContributor language="yaml" implementation="org.dochub.idea.arch.references.ReferenceContributor" />
 
-        <annotator language="yaml" implementationClass="info.dochub.idea.arch.quickfix.FixAnnotator"/>
+        <annotator language="yaml" implementationClass="org.dochub.idea.arch.quickfix.FixAnnotator"/>
 
-        <languageInjectionContributor language="yaml" implementationClass="info.dochub.idea.arch.jsonata.JSONataInjector"/>
+        <languageInjectionContributor language="yaml" implementationClass="org.dochub.idea.arch.jsonata.JSONataInjector"/>
 
-        <codeInsight.lineMarkerProvider language="yaml" implementationClass="info.dochub.idea.arch.markline.LineMarkerYaml"/>
+        <codeInsight.lineMarkerProvider language="yaml" implementationClass="org.dochub.idea.arch.markline.LineMarkerYaml"/>
 
 
         <!-- JSONATA -->
-        <lang.braceMatcher language="JSONata" implementationClass="info.dochub.idea.arch.editor.JSONataBraceMatcher"/>
+        <lang.braceMatcher language="JSONata" implementationClass="org.dochub.idea.arch.editor.JSONataBraceMatcher"/>
 
-        <annotator language="JSONata" implementationClass="info.dochub.idea.arch.annotator.JSONataAnnotator"/>
+        <annotator language="JSONata" implementationClass="org.dochub.idea.arch.annotator.JSONataAnnotator"/>
 
-        <codeInsight.lineMarkerProvider language="JSONata" implementationClass="info.dochub.idea.arch.markline.JSONataLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="JSONata" implementationClass="org.dochub.idea.arch.markline.JSONataLineMarkerProvider"/>
 
-        <completion.contributor language="JSONata" implementationClass="info.dochub.idea.arch.completion.JSONataKeywordCompletionContributor"/>
+        <completion.contributor language="JSONata" implementationClass="org.dochub.idea.arch.completion.JSONataKeywordCompletionContributor"/>
 
 
-        <fileBasedIndex implementation="info.dochub.idea.arch.indexing.DocHubIndex"/>
+        <fileBasedIndex implementation="org.dochub.idea.arch.indexing.DocHubIndex"/>
 
-<!--        <stubIndex implementation=" index.stubs.info.dochub.idea.arch.JSONataMethodNameIndex"/>-->
+<!--        <stubIndex implementation=" index.stubs.org.dochub.idea.arch.JSONataMethodNameIndex"/>-->
 
     </extensions>
 
     <extensions defaultExtensionNs="JavaScript">
-        <JsonSchema.ProviderFactory implementation="info.dochub.idea.arch.jsonschema.EntityJSONSchemaProviderFactory"/>
+        <JsonSchema.ProviderFactory implementation="org.dochub.idea.arch.jsonschema.EntityJSONSchemaProviderFactory"/>
     </extensions>
 
     <actions>
-        <action id="PopupJSONataRunAction" class="info.dochub.idea.arch.actions.PopupJSONataRunAction"
+        <action id="PopupJSONataRunAction" class="org.dochub.idea.arch.actions.PopupJSONataRunAction"
                 text="Run selection as JSONata" description="Run selection as JSONata in DocHub plugin developer tool"
                 icon="AllIcons.Actions.Execute">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>

@@ -2,10 +2,10 @@
     <extensions defaultExtensionNs="com.intellij">
         <annotator
                 language="JAVA"
-                implementationClass="info.dochub.idea.arch.annotators.JavaAnnotator"/>
+                implementationClass="org.dochub.idea.arch.annotators.JavaAnnotator"/>
         <codeInsight.lineMarkerProvider
                 language="JAVA"
-                implementationClass="info.dochub.idea.arch.markline.LineMarkerJava"
+                implementationClass="org.dochub.idea.arch.markline.LineMarkerJava"
         />
     </extensions>
 </idea-plugin>
