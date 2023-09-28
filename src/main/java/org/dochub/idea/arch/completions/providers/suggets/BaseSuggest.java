@@ -10,6 +10,7 @@ import org.dochub.idea.arch.indexing.CacheBuilder;
 import java.util.Map;
 
 public class BaseSuggest extends CustomProvider {
+
     protected ElementPattern<? extends PsiElement> getPattern() {
         return PlatformPatterns.psiElement();
     }

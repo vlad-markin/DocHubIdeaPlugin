@@ -69,6 +69,7 @@ public class DocHubToolWindow extends JBCefBrowser {
   }
   private JBCefJSQuery.Response requestProcessing(String json) {
     // openDevtools();
+
     StringBuilder result = new StringBuilder();
     try {
       ObjectMapper mapper = new ObjectMapper();
@@ -223,7 +224,7 @@ public class DocHubToolWindow extends JBCefBrowser {
           ) {
             String path = event.getFile().getPath();
             int bpLength = Objects.requireNonNull(project.getBasePath()).length();
-            if (path.length() > bpLength) {
+            if (path.length() > bpLength && !isConfigurationFile(event.getFile())) {
               String source = path.substring(bpLength + 1);
               if (source.equals(rootManifest)) source = Consts.ROOT_SOURCE;
               jsGateway.appendMessage(Consts.ACTION_SOURCE_CHANGED, Consts.ROOT_SOURCE_PATH + source, null);
@@ -235,5 +236,23 @@ public class DocHubToolWindow extends JBCefBrowser {
     sourceQuery = JBCefJSQuery.create((JBCefBrowserBase)this);
     sourceQuery.addHandler(this::requestProcessing);
     reloadHtml(true);
+  }
+
+  private boolean isConfigurationFile(final VirtualFile file) {
+
+    final var extFile = getFileExt(file);
+    final var configFolder = ".idea";
+    final var fileExtensions = List.of("xml", "iml", "json");
+    return fileExtensions.stream().anyMatch(e -> e.equals(extFile)) || file.getParent().getName().equals(configFolder);
+  }
+
+  private String getFileExt(VirtualFile file) {
+
+    String fileName = file.getName();
+    int lastIndexOf = fileName.lastIndexOf(".");
+    if (lastIndexOf == -1) {
+      return "";
+    }
+    return fileName.substring(lastIndexOf);
   }
 }

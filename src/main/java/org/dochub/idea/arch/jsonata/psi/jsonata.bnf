@@ -35,7 +35,7 @@ expression ::= MINUS? expressionItem (transform | filterExpr | ternaryExpr | ord
 
 expressionItem ::= substitution | defFunction | filterExpr | block | object | binding | transformRightPart | term
 
-term ::= (LPARENTH expression RPARENTH) | useOfVariableOrFunction | STRING | REGEX | ID | BOOLEAN | MINUS? NUMBER | MUL | REMAINDER
+term ::= (LPARENTH expression RPARENTH) | useOfVariableOrFunction | STRING | REGEX | ID | BOOLEAN | MINUS? NUMBER | MUL | DESCENDANTS | REMAINDER
 
 binaryOperator ::= DOT | DOUBLE_DOT | PLUS | MINUS | MUL | QUOTIENT | REMAINDER | CONCAT | IN | EQ | NOT_EQ | GREATER | GREATER_OR_EQUAL | LESS | LESS_OR_EQUAL | OR | AND | CHAIN
 

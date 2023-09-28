@@ -21,7 +21,7 @@ import java.util.List;
 
 public class EmptyErrorPatterns {
 
-    private static ElementPattern<? extends PsiElement> patterns[] = null;
+    private static ElementPattern<? extends PsiElement>[] patterns = null;
     private static PatternCondition<PsiElement> emptyChecker = null;
 
     static ElementPattern<? extends PsiElement>[] getPatterns() {
@@ -37,7 +37,7 @@ public class EmptyErrorPatterns {
                 }
             };
 
-            patterns = new ElementPattern[]{
+            patterns = new ElementPattern[] {
                     makeRootPattern("Doc field checker", "docs", DocRootQuickFix.requiredProps),
                     makeRootPattern("Aspect field checker", "aspects", AspectRootQuickFix.requiredProps),
                     makeRootPattern("Component field checker", "components", ComponentRootQuickFix.requiredProps),
@@ -51,7 +51,7 @@ public class EmptyErrorPatterns {
     private static class RequiredFieldChecker extends PatternCondition<PsiElement> {
         List<String> fields = null;
 
-        public RequiredFieldChecker(@Nullable @NonNls String debugMethodName, String fields[]) {
+        public RequiredFieldChecker(@Nullable @NonNls String debugMethodName, String []fields) {
             super(debugMethodName);
             this.fields = List.of(fields);
         }

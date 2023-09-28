@@ -12,6 +12,8 @@ import org.dochub.idea.arch.utils.VirtualFileSystemUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 public class RefBaseSource extends BaseReferencesProvider {
 
     private class FileSourceReference extends PsiReferenceBase {
@@ -52,7 +54,7 @@ public class RefBaseSource extends BaseReferencesProvider {
         PsiFile containingFile = element.getContainingFile();
         PsiDirectory currDir = containingFile.getParent();
         if (currDir != null) {
-            String dirPath = currDir.getVirtualFile().getCanonicalPath().substring(project.getBasePath().length());
+            String dirPath = Objects.requireNonNull(currDir.getVirtualFile().getCanonicalPath()).substring(Objects.requireNonNull(project.getBasePath()).length());
             VirtualFile vTargetFile = VirtualFileSystemUtils.findFile(dirPath + "/" + ref, project);
             if (vTargetFile != null) {
                 PsiFile targetFile = PsiManager.getInstance(element.getManager().getProject()).findFile(vTargetFile);
