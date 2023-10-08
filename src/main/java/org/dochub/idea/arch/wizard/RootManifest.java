@@ -2,8 +2,6 @@ package org.dochub.idea.arch.wizard;
 
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.application.ModalityState;
-import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -29,8 +27,7 @@ public class RootManifest {
             @Override
             public void run() {
                 VirtualFile vProject =  ProjectRootManager.getInstance(project).getContentRoots()[0];
-                try {
-                    InputStream input = getClass().getClassLoader().getResourceAsStream("wizard/example.yaml");
+                try(InputStream input = getClass().getClassLoader().getResourceAsStream("wizard/example.yaml")) {
                     VirtualFile root = vProject.createChildData(this, "dochub.yaml");
                     root.setBinaryContent(input.readAllBytes());
                     (new Navigation(project)).gotoPsiElement(PsiManager.getInstance(project).findFile(root));
@@ -47,8 +44,7 @@ public class RootManifest {
             @Override
             public void run() {
                 VirtualFile vProject =  ProjectRootManager.getInstance(project).getContentRoots()[0];
-                try {
-                    InputStream input = getClass().getClassLoader().getResourceAsStream("wizard/dochub.yaml");
+                try(InputStream input = getClass().getClassLoader().getResourceAsStream("wizard/dochub.yaml")) {
                     VirtualFile root = vProject.createChildData(this, "dochub.yaml");
                     root.setBinaryContent(input.readAllBytes());
                     (new Navigation(project)).gotoPsiElement(PsiManager.getInstance(project).findFile(root));

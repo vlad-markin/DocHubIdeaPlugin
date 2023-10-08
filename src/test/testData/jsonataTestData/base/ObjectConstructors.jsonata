@@ -1,0 +1,5 @@
+(
+    Phone.{type: number};
+    Phone{type: number};
+    Phone{type: number[]};
+)

@@ -1,0 +1,17 @@
+(
+        $re := $eval("/((.+?\\.){" & (level + 2) & "})(.+?)\\..*\\.\".+\"/");
+        $componentNames := l4.key.($replace($, $re, "$1$3")) ~> $distinct();
+        $titlePrefix := titlePrefix;
+        [
+          root.components.$spread().(
+                                  $keys()[$ in $componentNames] ?
+                                  {
+                                      "key": $keys(),
+                                      "title": $titlePrefix  & " " & *.title,
+                                      "symbol":  *.entity = "actor" ? "user" : *.entity,
+                                      "level" : *.level
+                                  }
+
+                                )
+        ];
+)

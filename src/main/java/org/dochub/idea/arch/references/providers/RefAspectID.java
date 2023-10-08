@@ -4,13 +4,12 @@ import com.intellij.patterns.ElementPattern;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.patterns.StandardPatterns;
 import com.intellij.psi.*;
+import org.dochub.idea.arch.references.Consts;
 import org.dochub.idea.arch.completions.providers.Components;
 import org.jetbrains.yaml.psi.YAMLDocument;
 import org.jetbrains.yaml.psi.YAMLKeyValue;
 import org.jetbrains.yaml.psi.YAMLMapping;
 import org.jetbrains.yaml.psi.YAMLSequenceItem;
-
-import static org.dochub.idea.arch.references.Consts.ID_PATTERN;
 
 public class RefAspectID extends RefBaseID {
     private final static String keyword = "aspects";
@@ -34,7 +33,7 @@ public class RefAspectID extends RefBaseID {
                 // Ссылки в идентификаторах компонентов
                 PlatformPatterns.psiElement()
                         .notEmpty()
-                        .withText(StandardPatterns.string().matches(ID_PATTERN))
+                        .withText(StandardPatterns.string().matches(Consts.ID_PATTERN))
                         .withParent(psi(YAMLSequenceItem.class)
                                 .withSuperParent(2,
                                         psi(YAMLKeyValue.class)

@@ -1,0 +1,8 @@
+(
+          $getComponentsByThreads := function($level, $titlePrefix) {
+              $eval(root.functions.global.get_components_by_threads,
+                  {'root': root, 'l4': l4, 'level': $level, 'titlePrefix': $titlePrefix}
+              )
+          };
+          {'result': $getComponentsByThreads(2, "подсистема") }
+)

@@ -11,7 +11,6 @@ import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.psi.util.PsiModificationTracker;
 import com.intellij.util.ProcessingContext;
 import org.dochub.idea.arch.indexing.CacheBuilder;
-import org.dochub.idea.arch.indexing.CacheFileData;
 import org.dochub.idea.arch.utils.PsiUtils;
 import org.dochub.idea.arch.utils.SuggestUtils;
 import org.jetbrains.annotations.NotNull;

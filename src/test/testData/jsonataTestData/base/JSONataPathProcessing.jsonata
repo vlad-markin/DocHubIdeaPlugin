@@ -1,0 +1,8 @@
+(
+    seq.expr;
+    seq[expr];
+    seq^(expr);
+    seq#$var;
+    seq@$var;
+    seq{expr:expr, expr:expr}
+)

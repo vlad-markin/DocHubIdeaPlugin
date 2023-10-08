@@ -5,7 +5,6 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.util.ProcessingContext;
 import org.dochub.idea.arch.completions.providers.Components;
-import org.dochub.idea.arch.completions.providers.Contexts;
 import org.dochub.idea.arch.completions.providers.CustomProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.yaml.psi.YAMLKeyValue;

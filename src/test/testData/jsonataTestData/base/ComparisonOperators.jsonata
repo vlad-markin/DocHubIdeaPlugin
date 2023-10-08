@@ -1,0 +1,17 @@
+(
+    1+1 = 2;
+    "Hello" = "World";
+    1+1 != 3;
+    "Hello" != "World";
+    22 / 7 > 3;
+    5 > 5;
+    22 / 7 < 3;
+    5 < 5;
+    22 / 7 >= 3;
+    5 >= 5;
+    22 / 7 <= 3;
+    5 <= 5;
+    "world" in ["hello", "world"];
+    "hello" in "hello";
+    library.books["Aho" in authors].title
+)

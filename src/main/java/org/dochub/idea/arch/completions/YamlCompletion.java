@@ -1,20 +1,20 @@
 package org.dochub.idea.arch.completions;
 
 import com.intellij.codeInsight.completion.*;
-import org.dochub.idea.arch.completions.providers.*;
-import org.dochub.idea.arch.completions.providers.aspects.AspectID;
-import org.dochub.idea.arch.completions.providers.aspects.AspectLocation;
 import org.dochub.idea.arch.completions.providers.components.*;
 import org.dochub.idea.arch.completions.providers.contexts.*;
 import org.dochub.idea.arch.completions.providers.datasets.DatasetOrigin;
 import org.dochub.idea.arch.completions.providers.docs.*;
+import org.dochub.idea.arch.completions.providers.namespaces.NamespaceID;
+import org.dochub.idea.arch.completions.providers.technologies.ItemsItem;
+import org.dochub.idea.arch.completions.providers.technologies.SectionItem;
+import org.dochub.idea.arch.completions.providers.aspects.AspectID;
+import org.dochub.idea.arch.completions.providers.aspects.AspectLocation;
 import org.dochub.idea.arch.completions.providers.forms.FormItem;
 import org.dochub.idea.arch.completions.providers.forms.FormItemField;
 import org.dochub.idea.arch.completions.providers.forms.FormItemFieldRequired;
 import org.dochub.idea.arch.completions.providers.imports.ImportItem;
-import org.dochub.idea.arch.completions.providers.namespaces.NamespaceID;
-import org.dochub.idea.arch.completions.providers.technologies.ItemsItem;
-import org.dochub.idea.arch.completions.providers.technologies.SectionItem;
+import org.dochub.idea.arch.completions.providers.*;
 
 public class YamlCompletion extends CompletionContributor {
     private static final CustomProvider[] providers = {

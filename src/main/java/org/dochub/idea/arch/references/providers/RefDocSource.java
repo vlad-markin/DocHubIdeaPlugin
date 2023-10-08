@@ -4,9 +4,7 @@ import com.intellij.patterns.ElementPattern;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
 import org.dochub.idea.arch.completions.providers.Docs;
-import org.jetbrains.yaml.psi.YAMLDocument;
 import org.jetbrains.yaml.psi.YAMLKeyValue;
-import org.jetbrains.yaml.psi.YAMLSequenceItem;
 
 public class RefDocSource extends RefBaseSource {
     @Override

@@ -13,7 +13,7 @@
         <p>
             This release includes:
             <ul>
-                <li>DocHub core: v2.6.2;</li>
+                <li>DocHub core: v3.3.0;</li>
                 <li>Suggests for the structure of architecture manifests (yaml);</li>
                 <li>Suggests for the values of manifest fields;</li>
                 <li>Fast navigation through manifests;</li>
@@ -28,9 +28,11 @@
                 <li>Mermaid support;</li>
                 <li>Network diagram support;</li>
                 <li>Widgets;</li>
-                <li>Added syntax color support to Markdown documents;</li>
-                <li>Added syntax color support to JSOBata DevTool.</li>
-            </ul>
+                <li>Syntax color support in Markdown documents;</li>
+                <li>Syntax color support to JSONata DevTool;</li>
+                <li>Added Enterprise mode;</li>
+                <li>JSONata syntax support to IDE editor.</li>
+        </ul>
         </p>
     ]]></description>
 
@@ -38,6 +40,7 @@
          on how to target different products -->
     <depends>com.intellij.modules.platform</depends>
     <depends>org.jetbrains.plugins.yaml</depends>
+
     <depends optional="true" config-file="java.xml">com.intellij.java</depends>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -50,28 +53,8 @@
                 id="org.dochub.idea.arch.settings.SettingConfigurable"
                 displayName="DocHub: Render settings"/>
 
-        <completion.contributor
-                language="yaml"
-                implementationClass="org.dochub.idea.arch.completions.YamlCompletion"
-        />
-        <psi.referenceContributor
-                language="yaml"
-                implementation="org.dochub.idea.arch.references.ReferenceContributor"
-        />
-        <annotator
-                language="yaml"
-                implementationClass="org.dochub.idea.arch.quickfix.FixAnnotator"
-        />
-        <localInspection
-                implementationClass="org.dochub.idea.arch.inspections.DocHubInspection"
-                level="WARNING"
-                enabledByDefault="true"
-                runForWholeFile="true"
-                language="yaml"
-                shortName="DocHubInspector"
-                displayName="DocHub Inspector"
-                groupName="DocHub"
-        />
+        <lang.commenter language="JSONata" implementationClass="org.dochub.idea.arch.jsonata.JSONataCommenter"/>
+
         <toolWindow factoryClass="org.dochub.idea.arch.tools.DocHubToolWindowFactory"
                     icon="AllIcons.General.InspectionsEye"
                     anchor="right"
@@ -92,25 +75,47 @@
                 language="JSONata"
                 implementationClass="org.dochub.idea.arch.jsonata.JSONataSyntaxHighlighterFactory"
         />
-        <codeInsight.lineMarkerProvider
-                language="yaml"
-                implementationClass="org.dochub.idea.arch.markline.LineMarkerYaml"
-        />
-        <fileBasedIndex implementation="org.dochub.idea.arch.indexing.DocHubIndex"/>
-        <!--
-        <editorTabTitleProvider
-                implementation="org.dochub.idea.arch.views.PreviewEditorTabTitleProvider"
-        />
-                key="inspection.display-name"
-                groupKey="inspection.group"
 
-        -->
+<!--        <lang.findUsagesProvider language="JSONata" implementationClass="org.dochub.idea.arch.findUsages.JSONataFindUsagesProvider"/>-->
+<!--        <lang.refactoringSupport language="JSONata" implementationClass="psi.jsonata.org.dochub.idea.arch.JSONataRefactoringSupportProvider"/>-->
+
+        <!-- YAML -->
+        <completion.contributor language="yaml" implementationClass="org.dochub.idea.arch.completions.YamlCompletion"/>
+
+        <psi.referenceContributor language="yaml" implementation="org.dochub.idea.arch.references.ReferenceContributor" />
+
+        <annotator language="yaml" implementationClass="org.dochub.idea.arch.quickfix.FixAnnotator"/>
+
+        <languageInjectionContributor language="yaml" implementationClass="org.dochub.idea.arch.jsonata.JSONataInjector"/>
+
+        <codeInsight.lineMarkerProvider language="yaml" implementationClass="org.dochub.idea.arch.markline.LineMarkerYaml"/>
+
+
+        <!-- JSONATA -->
+        <lang.braceMatcher language="JSONata" implementationClass="org.dochub.idea.arch.editor.JSONataBraceMatcher"/>
+
+        <annotator language="JSONata" implementationClass="org.dochub.idea.arch.annotator.JSONataAnnotator"/>
+
+        <codeInsight.lineMarkerProvider language="JSONata" implementationClass="org.dochub.idea.arch.markline.JSONataLineMarkerProvider"/>
+
+        <completion.contributor language="JSONata" implementationClass="org.dochub.idea.arch.completion.JSONataKeywordCompletionContributor"/>
+
+
+        <fileBasedIndex implementation="org.dochub.idea.arch.indexing.DocHubIndex"/>
+
+<!--        <stubIndex implementation=" index.stubs.org.dochub.idea.arch.JSONataMethodNameIndex"/>-->
+
     </extensions>
-    <extensions defaultExtensionNs="JavaScript.JsonSchema">
-        <ProviderFactory implementation="org.dochub.idea.arch.jsonschema.EntityJSONSchemaProviderFactory"/>
+
+    <extensions defaultExtensionNs="JavaScript">
+        <JsonSchema.ProviderFactory implementation="org.dochub.idea.arch.jsonschema.EntityJSONSchemaProviderFactory"/>
     </extensions>
 
     <actions>
-        <!-- Add your actions here -->
+        <action id="PopupJSONataRunAction" class="org.dochub.idea.arch.actions.PopupJSONataRunAction"
+                text="Run selection as JSONata" description="Run selection as JSONata in DocHub plugin developer tool"
+                icon="AllIcons.Actions.Execute">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
     </actions>
 </idea-plugin>

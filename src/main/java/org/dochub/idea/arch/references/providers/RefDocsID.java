@@ -4,12 +4,11 @@ import com.intellij.patterns.ElementPattern;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.patterns.StandardPatterns;
 import com.intellij.psi.PsiElement;
+import org.dochub.idea.arch.references.Consts;
 import org.dochub.idea.arch.completions.providers.Components;
 import org.jetbrains.yaml.psi.YAMLDocument;
 import org.jetbrains.yaml.psi.YAMLKeyValue;
 import org.jetbrains.yaml.psi.YAMLMapping;
-
-import static org.dochub.idea.arch.references.Consts.*;
 
 public class RefDocsID extends RefBaseID {
     private final static String keyword = "docs";
@@ -33,7 +32,7 @@ public class RefDocsID extends RefBaseID {
                 PlatformPatterns.psiElement()
                         .notEmpty()
                         .afterLeaf(":")
-                        .withText(StandardPatterns.string().matches(ID_PATTERN))
+                        .withText(StandardPatterns.string().matches(Consts.ID_PATTERN))
                         .withParent(psi(YAMLKeyValue.class)
                                 .withName("contract")
                                 .withSuperParent(4,

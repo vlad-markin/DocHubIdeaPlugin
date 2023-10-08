@@ -1,23 +1,25 @@
 package org.dochub.idea.arch.jsonschema;
 
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.jetbrains.jsonSchema.extension.JsonSchemaFileProvider;
-import com.jetbrains.jsonSchema.extension.JsonSchemaProviderFactory;
-import com.jetbrains.jsonSchema.extension.SchemaType;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.intellij.openapi.project.*;
+import com.intellij.openapi.util.text.*;
+import com.intellij.openapi.vfs.*;
+import com.jetbrains.jsonSchema.extension.*;
+import org.jetbrains.annotations.*;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+
+import static com.intellij.openapi.util.NullableLazyValue.*;
+
 
 public class EntityJSONSchemaProviderFactory implements JsonSchemaProviderFactory {
+
     @Override
     public @NotNull List<JsonSchemaFileProvider> getProviders(@NotNull Project project) {
         return Collections.singletonList(new JsonSchemaFileProvider() {
+
             @Override
             public boolean isAvailable(@NotNull VirtualFile file) {
-                return true;
+                return StringUtil.endsWithIgnoreCase(file.getName(), ".yaml");
             }
 
             @NotNull
@@ -28,12 +30,16 @@ public class EntityJSONSchemaProviderFactory implements JsonSchemaProviderFactor
 
             @Nullable
             @Override
-            public VirtualFile getSchemaFile() {
-                VirtualFile result = EntityManager.getSchema(project);
-                if (result == null) {
-                    result = JsonSchemaProviderFactory.getResourceFile(getClass(), "/schemas/empty.json");
-                }
-                return result;
+            public VirtualFile getSchemaFile(){
+
+
+               return lazyNullable(() -> {
+                    VirtualFile result = EntityManager.getSchema(project);
+                    if(result == null) {
+                        return JsonSchemaProviderFactory.getResourceFile(getClass(), "/schemas/empty.json");
+                    }
+                    return  result;
+                }).getValue();
             }
 
             @NotNull
@@ -43,4 +49,6 @@ public class EntityJSONSchemaProviderFactory implements JsonSchemaProviderFactor
             }
         });
     }
+
+
 }

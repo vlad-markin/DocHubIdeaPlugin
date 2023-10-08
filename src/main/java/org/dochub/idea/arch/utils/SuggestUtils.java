@@ -1,6 +1,5 @@
 package org.dochub.idea.arch.utils;
 
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ObjectUtils;
 import org.jetbrains.yaml.psi.YAMLDocument;

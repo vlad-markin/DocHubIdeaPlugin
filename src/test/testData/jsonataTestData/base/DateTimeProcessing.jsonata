@@ -1,0 +1,10 @@
+(
+    {
+    "invoiceTime": $now(),
+    "total": $sum(Account.Order.Product.(Price * Quantity)),
+    "closingTime": $now()
+    };
+
+    $toMillis('10/12/2018', '[D]/[M]/[Y]') ~> $fromMillis('[M]/[D]/[Y]');
+    $toMillis('10/12/2018', '[D]/[M]/[Y]') ~> $fromMillis('[FNn], [D1o] [MNn] [YI]')
+)

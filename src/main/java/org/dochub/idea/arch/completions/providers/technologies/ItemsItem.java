@@ -1,13 +1,9 @@
 package org.dochub.idea.arch.completions.providers.technologies;
 
-import com.intellij.codeInsight.completion.*;
-import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.patterns.ElementPattern;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
-import com.intellij.util.ProcessingContext;
 import org.dochub.idea.arch.completions.CompletionKey;
-import org.dochub.idea.arch.completions.providers.CustomProvider;
 import org.dochub.idea.arch.completions.providers.FilteredCustomProvider;
 import org.dochub.idea.arch.completions.providers.Technologies;
 import org.jetbrains.annotations.NotNull;

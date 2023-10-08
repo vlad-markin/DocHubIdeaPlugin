@@ -15,7 +15,7 @@ public class DocHubToolWindowFactory implements ToolWindowFactory {
     group.add(new AnAction("Reset", "Перезагрузить", AllIcons.Actions.Refresh) {
       @Override
       public void actionPerformed(AnActionEvent e) {
-        myToolWindow.reloadHtml();
+        myToolWindow.reloadHtml(false);
       }
     });
 

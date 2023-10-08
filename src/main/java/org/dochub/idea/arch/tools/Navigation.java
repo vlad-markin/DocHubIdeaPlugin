@@ -17,8 +17,8 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtilCore;
 import com.intellij.util.messages.MessageBusConnection;
-import org.dochub.idea.arch.indexing.CacheBuilder;
 import org.dochub.idea.arch.references.providers.RefBaseID;
+import org.dochub.idea.arch.indexing.CacheBuilder;
 import org.dochub.idea.arch.utils.VirtualFileSystemUtils;
 
 import java.util.ArrayList;
@@ -38,6 +38,8 @@ public class Navigation {
             case "document": section = "docs"; break;
             case "context": section = "contexts"; break;
             case "aspect": section = "aspects"; break;
+            default:
+                section = entity;
         }
         return section;
     }

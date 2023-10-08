@@ -12,7 +12,6 @@ import org.dochub.idea.arch.completions.providers.CustomProvider;
 import org.dochub.idea.arch.completions.providers.Docs;
 import org.dochub.idea.arch.utils.SuggestUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.yaml.psi.YAMLDocument;
 import org.jetbrains.yaml.psi.YAMLKeyValue;
 
 import java.util.List;

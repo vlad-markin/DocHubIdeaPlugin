@@ -8,7 +8,6 @@ import org.dochub.idea.arch.completions.providers.Components;
 import org.dochub.idea.arch.completions.providers.CustomProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.yaml.psi.YAMLKeyValue;
-import org.jetbrains.yaml.psi.YAMLSequenceItem;
 
 public class ComponentLinksDirection extends CustomProvider {
     private static final String[] keys = {

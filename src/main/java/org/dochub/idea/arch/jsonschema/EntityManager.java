@@ -1,42 +1,53 @@
 package org.dochub.idea.arch.jsonschema;
 
-import com.intellij.openapi.application.Application;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.application.ModalityState;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.openapi.vfs.VfsUtil;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiManager;
-import com.intellij.ui.GuiUtils;
+import com.intellij.openapi.application.*;
+import com.intellij.openapi.project.*;
+import com.intellij.openapi.util.io.*;
+import com.intellij.openapi.vfs.*;
+import com.intellij.psi.*;
+import com.intellij.util.*;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
+import java.io.*;
+import java.util.*;
 
 public class EntityManager {
-    private static HashMap<String, VirtualFile> schemas = new HashMap<>();
+    private static Map<String, VirtualFile> schemas = new HashMap<>();
 
     // Применяет JSONSchema для проекта
     public static VirtualFile applySchema(Project project, String schema) {
+
         String projectHash = project.getLocationHash();
+
         VirtualFile currentSchema = schemas.get(projectHash);
+
         if (currentSchema != null) {
             (new File(currentSchema.getPath())).delete();
         }
+
         try {
+
             File file = File.createTempFile("EntityDocHubJSONSchema", ".json");
+
+            FileUtil.ensureExists(file);
+
             FileUtil.writeToFile(file, String.valueOf(schema));
-            currentSchema = VfsUtil.findFileByIoFile(file, true);
+
+            LocalFileSystem fs = LocalFileSystem.getInstance();
+            currentSchema = fs.findFileByPath(file.getAbsolutePath());
+
+            VirtualFileManager.getInstance().refreshAndFindFileByNioPath(file.toPath());
+
+
             schemas.put(projectHash, currentSchema);
 
-            ApplicationManager.getApplication().invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    PsiManager.getInstance(project).dropResolveCaches();
-                    PsiManager.getInstance(project).dropPsiCaches();
+            Runnable dropCaches = () -> {
+                for (Project pjt : ProjectManager.getInstance().getOpenProjects()) {
+                    PsiManager.getInstance(pjt).dropPsiCaches();
+                    PsiManager.getInstance(pjt).dropResolveCaches();
                 }
-            }, ModalityState.defaultModalityState());
+            };
+
+            ModalityUiUtil.invokeLaterIfNeeded(ModalityState.defaultModalityState(), dropCaches);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

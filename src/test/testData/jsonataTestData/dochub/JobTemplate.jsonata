@@ -1,0 +1,17 @@
+(
+            $f := $.f;
+            $ctx := $.ctx;
+            $self := function($x) { $x };
+            $template := function($x) { $x.spec.template };
+            $jobTemplate := function($x) { $x.spec.jobTemplate.spec.template };
+            $distinct([
+                $f('Pod', $ctx.k8s.*.pods, $self),
+                $f('Deployment', $ctx.k8s.*.deployments, $template),
+                $f('ReplicaSet', $ctx.k8s.*.replicaSets, $template),
+                $f('ReplicationController', $ctx.k8s.*.replicationControllers, $template),
+                $f('StatefulSet', $ctx.k8s.*.statefulSets, $template),
+                $f('DaemonSet', $ctx.k8s.*.daemonSets, $template),
+                $f('Job', $ctx.k8s.*.jobs, $template),
+                $f('CronJob', $ctx.k8s.*.cronJobs, $jobTemplate)
+            ].{'e': $}.*);
+)

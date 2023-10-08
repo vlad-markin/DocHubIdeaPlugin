@@ -1,11 +1,7 @@
 package org.dochub.idea.arch.markline;
 
 import com.intellij.codeInsight.daemon.*;
-import com.intellij.icons.AllIcons;
-import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.psi.PsiElement;
-import com.intellij.util.Function;
-import com.intellij.util.messages.Topic;
 import org.dochub.idea.arch.references.providers.RefAspectID;
 import org.dochub.idea.arch.references.providers.RefComponentID;
 import org.dochub.idea.arch.references.providers.RefContextID;
@@ -14,10 +10,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.yaml.psi.YAMLKeyValue;
 import org.jetbrains.yaml.psi.impl.YAMLPlainTextImpl;
 
-import java.awt.event.MouseEvent;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Supplier;
 
 import static org.dochub.idea.arch.markline.LineMarkerNavigator.*;
 

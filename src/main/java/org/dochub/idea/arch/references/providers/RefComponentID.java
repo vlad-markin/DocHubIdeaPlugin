@@ -4,11 +4,10 @@ import com.intellij.patterns.ElementPattern;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.patterns.StandardPatterns;
 import com.intellij.psi.*;
+import org.dochub.idea.arch.references.Consts;
 import org.dochub.idea.arch.completions.providers.Components;
 import org.dochub.idea.arch.completions.providers.Contexts;
 import org.jetbrains.yaml.psi.*;
-
-import static org.dochub.idea.arch.references.Consts.*;
 
 public class RefComponentID extends RefBaseID {
     static private final String keyword = "components";
@@ -28,7 +27,7 @@ public class RefComponentID extends RefBaseID {
                 PlatformPatterns.psiElement()
                         .notEmpty()
                         .afterLeaf(":")
-                        .withText(StandardPatterns.string().matches(ID_PATTERN))
+                        .withText(StandardPatterns.string().matches(Consts.ID_PATTERN))
                         .withParent(
                                 psi(YAMLKeyValue.class)
                                         .withName("id")
@@ -41,7 +40,7 @@ public class RefComponentID extends RefBaseID {
                 ,
                 // Ссылки в контекстах
                 PlatformPatterns.psiElement()
-                        .withText(StandardPatterns.string().matches(ID_PATTERN))
+                        .withText(StandardPatterns.string().matches(Consts.ID_PATTERN))
                         .withParent(psi(YAMLSequenceItem.class)
                                 .withSuperParent(2,
                                         psi(YAMLKeyValue.class)

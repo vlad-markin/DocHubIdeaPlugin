@@ -1,8 +1,8 @@
 package org.dochub.idea.arch.tools;
 // JBCefBrowser (https://intellij-support.jetbrains.com/hc/en-us/community/posts/4403677440146-how-to-add-a-JBCefBrowser-in-toolWindow-)
 
-import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.*;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.*;
 import com.intellij.openapi.util.SystemInfoRt;
 import com.intellij.openapi.vfs.*;
@@ -10,64 +10,60 @@ import com.intellij.openapi.vfs.newvfs.*;
 import com.intellij.openapi.vfs.newvfs.events.*;
 import com.intellij.ui.jcef.*;
 import com.intellij.util.messages.*;
+import org.cef.handler.CefLoadHandler;
+import org.dochub.idea.arch.indexing.CacheBuilder;
+import org.dochub.idea.arch.jsonschema.EntityManager;
+import org.dochub.idea.arch.manifests.PlantUMLDriver;
+import org.dochub.idea.arch.settings.SettingsState;
+import org.dochub.idea.arch.wizard.RootManifest;
 import org.apache.commons.io.*;
-import org.dochub.idea.arch.indexing.*;
-import org.dochub.idea.arch.jsonschema.*;
-import org.dochub.idea.arch.manifests.*;
-import org.dochub.idea.arch.settings.*;
-import org.dochub.idea.arch.wizard.*;
+import org.apache.http.client.utils.URIBuilder;
 import org.jetbrains.annotations.*;
 
 import java.io.*;
+import java.net.URISyntaxException;
 import java.nio.charset.*;
 import java.nio.file.*;
 import java.util.*;
-import java.util.regex.*;
 
-import static org.dochub.idea.arch.tools.Consts.*;
 public class DocHubToolWindow extends JBCefBrowser {
   private final JBCefJSQuery sourceQuery;
   private final Project project;
   private final Navigation navigation;
   private final JSGateway jsGateway;
-  private String getInjectionSettings() {
+  private String html = null;
+  public void reloadHtml(Boolean root) {
     SettingsState settingsState = SettingsState.getInstance();
-    Map<String, Object> settings = new HashMap<>();
-    Map<String, Object> render = new HashMap<>();
-    render.put("mode", settingsState.renderMode);
-    render.put("external", settingsState.renderIsExternal);
-    render.put("server", settingsState.serverRendering);
-    settings.put("render", render);
-    try {
-      ObjectMapper mapper = new ObjectMapper();
-      return Matcher.quoteReplacement(
-              mapper.writeValueAsString(settings)
-      );
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
-  }
-  public void reloadHtml() {
-    InputStream input = getClass().getClassLoader().getResourceAsStream("html/plugin.html");
-    String html;
-    try {
-      assert input != null;
-      html = new String(input.readAllBytes(), StandardCharsets.UTF_8);
-      String injectionCode = sourceQuery.inject("data","resolve","reject");
-      html =
-              html.replaceAll("\"API_INJECTION\"", Matcher.quoteReplacement(injectionCode))
-              .replaceAll("\"SETTING_INJECTION\"", getInjectionSettings());
-    } catch (IOException e) {
-      html = e.toString();
-    }
-    String currentURL = getCefBrowser().getURL();
-    if (currentURL.length() > 0) {
-      loadHTML(html, currentURL);
+    String currentURL = root ? "" : getCefBrowser().getURL();
+    // Если используем корпоративный портал или портал в режиме DEV mode
+    if (settingsState.isEnterprise()) {
+      String url = currentURL.length() > 0 ? currentURL : settingsState.enterprisePortal;
+      try {
+        URIBuilder urlBuilder = new URIBuilder(url);
+        urlBuilder.addParameter("$dochub-api-interface-func", sourceQuery.getFuncName());
+        url = urlBuilder.toString() + "#/root/";
+      } catch (URISyntaxException e) {
+        throw new RuntimeException(e);
+      }
+      loadURL(url);
     } else {
-      loadHTML(html);
+      // Если НЕ используем, то грузим из собственных ресурсов
+      if (html == null) {
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("html/plugin.html")) {
+          assert input != null;
+          html = new String(input.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+          html = e.toString();
+        }
+        html = html.replaceAll("\\%\\$dochub-api-interface-func\\%", sourceQuery.getFuncName());
+      }
+
+      if (currentURL.length() > 0) {
+        loadHTML(html, currentURL);
+      } else {
+        loadHTML(html, "file:///url=main");
+      }
     }
-    if (!SystemInfoRt.isWindows)
-      getCefBrowser().getUIComponent().setFocusable(false);
   }
   private JBCefJSQuery.Response requestProcessing(String json) {
     // openDevtools();
@@ -78,7 +74,7 @@ public class DocHubToolWindow extends JBCefBrowser {
       JsonNode jsonURL = jsonObj.get("url");
       if (jsonURL != null) {
         String url = jsonURL.asText();
-        if (url.equals(ROOT_SOURCE_URI)) {
+        if (url.equals(Consts.ROOT_SOURCE_URI)) {
           Map<String, Object> response = new HashMap<>();
           String rootName = project.getBasePath() + "/" + CacheBuilder.getRootManifestName(project);
           File rootFile = new File(rootName);
@@ -88,15 +84,15 @@ public class DocHubToolWindow extends JBCefBrowser {
           response.put("contentType", rootName.substring(rootName.length() - 4).toLowerCase(Locale.ROOT));
           response.put("data", Files.readString(Path.of(rootName)));
           result.append(mapper.writeValueAsString(response));
-        } else if (url.equals(PLANTUML_RENDER_SVG_URI)) {
+        } else if (url.equals(Consts.PLANTUML_RENDER_SVG_URI)) {
           JsonNode jsonSource = jsonObj.get("source");
           String source = jsonSource != null ? jsonSource.asText() : "@startuml\n@enduml";
           Map<String, Object> response = new HashMap<>();
           response.put("data", PlantUMLDriver.makeSVG(source));
           result.append(mapper.writeValueAsString(response));
-        } else if (url.equals(NAVI_GOTO_SOURCE_URI)) {
+        } else if (url.equals(Consts.NAVI_GOTO_SOURCE_URI)) {
           navigation.go(jsonObj);
-        } else if (url.equals(WIZARD_INIT_URI)) {
+        } else if (url.equals(Consts.WIZARD_INIT_URI)) {
           JsonNode jsonMode = jsonObj.get("mode");
           String mode = jsonMode != null ? jsonMode.asText() : "production";
           if (mode.equals("example")) {
@@ -104,8 +100,26 @@ public class DocHubToolWindow extends JBCefBrowser {
           } else {
             (new RootManifest()).createRootManifest(project);
           }
-          reloadHtml();
-        } else if ((url.length() > 20) && url.startsWith(ROOT_SOURCE_PATH)) {
+          reloadHtml(false);
+        } else if ((url.length() > 23) && url.startsWith(Consts.METAMODEL_PATH)) {
+          String sourcePath =  url.substring(23).split("\\?")[0];
+
+          String path = Paths.get("metamodel", sourcePath).toString();
+
+          if (SystemInfoRt.isWindows) path = path.replace('\\', '/');
+
+          try(InputStream input = getClass().getClassLoader().getResourceAsStream(path)) {
+            assert input != null;
+            Map<String, Object> response = new HashMap<>();
+            String content = new String(input.readAllBytes(), StandardCharsets.UTF_8);
+            response.put("data", content);
+            String contentType = FilenameUtils.getExtension(path).toLowerCase(Locale.ROOT);
+            response.put("contentType", contentType);
+            result.append(mapper.writeValueAsString(response));
+          } catch (IOException e) {
+            return new JBCefJSQuery.Response("", 500, "Could not open source " + path + "\nError: " + e.toString());
+          }
+        } else if ((url.length() > 20) && url.startsWith(Consts.ROOT_SOURCE_PATH)) {
           String basePath = project.getBasePath() + "/";
           String parentPath = (new File(CacheBuilder.getRootManifestName(project))).getParent();
           String sourcePath =
@@ -125,12 +139,12 @@ public class DocHubToolWindow extends JBCefBrowser {
           } else
             response.put("data", Files.readString(Path.of(sourcePath)));
           result.append(mapper.writeValueAsString(response));
-        } else if (url.equals(ACTION_PULL_URI)) {
+        } else if (url.equals(Consts.ACTION_PULL_URI)) {
           Map<String, Object> response = new HashMap<>();
           response.put("contentType", "json");
           response.put("data", jsGateway.pullJSONMessage());
           result.append(mapper.writeValueAsString(response));
-        } else if (url.equals(ACTION_DOWNLOAD_URI)) { // Сохранение файлов из WEB морды
+        } else if (url.equals(Consts.ACTION_DOWNLOAD_URI)) { // Сохранение файлов из WEB морды
           JsonNode jsonContent = jsonObj.get("content");
           JsonNode jsonTitle = jsonObj.get("title");
           JsonNode jsonDescription = jsonObj.get("description");
@@ -143,16 +157,33 @@ public class DocHubToolWindow extends JBCefBrowser {
                     jsonExtension != null ? jsonExtension.asText() : "svg"
             );
           }
-        } else if (url.equals(DEVTOOL_SHOW_URI)){
+        } else if (url.equals(Consts.DEVTOOL_SHOW_URI)){
           openDevtools();
           getCefBrowser().executeJavaScript("console.info('GO!!');", "events.js", 0);
-        } else if (url.equals(HTML_RELOAD_URI)){
-          reloadHtml();
-        } else if (url.equals(ENTITIES_APPLY_SCHEMA)) {
+        } else if (url.equals(Consts.HTML_RELOAD_URI)){
+          reloadHtml(false);
+        } else if (url.equals(Consts.ENTITIES_APPLY_SCHEMA)) {
+
           JsonNode schema = jsonObj.get("schema");
           EntityManager.applySchema(project, schema.asText());
-        } else if (url.equals(CLIPBOARD_COPY)) {
+
+        } else if (url.equals(Consts.CLIPBOARD_COPY)) {
           Clipboard.copy(jsonObj.get("data").asText());
+        } else if (url.equals(Consts.GET_SETTINGS)) {
+          SettingsState settingsState = SettingsState.getInstance();
+          Map<String, Object> response = new HashMap<>();
+          response.put("isEnterprise", settingsState.isEnterprise());
+          // todo Нужно перенести в какой-то конфиг
+          response.put("api", "1.0.0");
+
+          Map<String, Object> render = new HashMap<>();
+          render.put("external", settingsState.renderIsExternal);
+          render.put("mode", settingsState.renderMode);
+          render.put("server", settingsState.serverRendering);
+          render.put("request_type", "GET");
+          response.put("render", render);
+
+          result.append(mapper.writeValueAsString(response));
         } else {
           return new JBCefJSQuery.Response("", 404, "No found: " + url);
         }
@@ -167,6 +198,12 @@ public class DocHubToolWindow extends JBCefBrowser {
 
     PlantUMLDriver.init();
 
+    ApplicationManager.getApplication().getMessageBus().connect().subscribe(SettingsState.ON_SETTING_CHANGED, new SettingsState.DocHubSettingsMessage() {
+      @Override
+      public void on() {
+        reloadHtml(true);
+      }
+    });
 
     this.project = project;
 
@@ -188,19 +225,26 @@ public class DocHubToolWindow extends JBCefBrowser {
             int bpLength = Objects.requireNonNull(project.getBasePath()).length();
             if (path.length() > bpLength) {
               String source = path.substring(bpLength + 1);
-              if (source.equals(rootManifest)) source = ROOT_SOURCE;
-              jsGateway.appendMessage(ACTION_SOURCE_CHANGED, ROOT_SOURCE_PATH + source, null);
+              if (source.equals(rootManifest)) source = Consts.ROOT_SOURCE;
+              jsGateway.appendMessage(Consts.ACTION_SOURCE_CHANGED, Consts.ROOT_SOURCE_PATH + source, null);
             }
           }
         });
       }
     });
-
     sourceQuery = JBCefJSQuery.create((JBCefBrowserBase)this);
     sourceQuery.addHandler(this::requestProcessing);
 
-    reloadHtml();
+    setErrorPage(new JBCefBrowserBase.ErrorPage() {
+      @Override
+      public @Nullable String create(CefLoadHandler.@NotNull ErrorCode errorCode,
+                                     @NotNull String errorText,
+                                     @NotNull String failedUrl) {
+        return (errorCode == CefLoadHandler.ErrorCode.ERR_ABORTED) ?
+                null : JBCefBrowserBase.ErrorPage.DEFAULT.create(errorCode, errorText, failedUrl);
+        }
+    });
+
+    reloadHtml(true);
   }
-
-
 }
