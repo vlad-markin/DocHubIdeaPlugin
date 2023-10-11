@@ -36,5 +36,5 @@ public class JSONataSuccessfulParsingBaseExamplesTest extends JSONataParsingTest
     public void testRegularExpressions() {doSuccessfulParsingTest();}
     public void testStringExpressions() {doSuccessfulParsingTest();}
     public void testVariables() {doSuccessfulParsingTest();}
-
+    public void testHexCore() {doSuccessfulParsingTest();}
 }
