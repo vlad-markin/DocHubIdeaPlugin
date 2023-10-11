@@ -224,8 +224,10 @@ public class DocHubToolWindow extends JBCefBrowser {
             int bpLength = Objects.requireNonNull(project.getBasePath()).length();
             if (path.length() > bpLength) {
               String source = path.substring(bpLength + 1);
-              if (source.equals(rootManifest)) source = Consts.ROOT_SOURCE;
-              jsGateway.appendMessage(Consts.ACTION_SOURCE_CHANGED, Consts.ROOT_SOURCE_PATH + source, null);
+              if (!source.startsWith(".")) {
+                if (source.equals(rootManifest)) source = Consts.ROOT_SOURCE;
+                jsGateway.appendMessage(Consts.ACTION_SOURCE_CHANGED, Consts.ROOT_SOURCE_PATH + source, null);
+              }
             }
           }
         });
