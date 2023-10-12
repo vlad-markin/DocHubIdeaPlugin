@@ -59,6 +59,7 @@ assign              = :=
 question_mark       = \?
 plus                = \+
 minus               = \-
+descendants         = "**"
 mul                 = "*"
 quotient            = \/
 remainder           = \%
@@ -119,6 +120,7 @@ function            = "function" | \u03BB
         {question_mark}         { return JSONataTypes.QUESTION_MARK; }
         {plus}                  { return JSONataTypes.PLUS; }
         {minus}                 { return JSONataTypes.MINUS; }
+        {descendants}           { return JSONataTypes.DESCENDANTS; }
         {mul}                   { return JSONataTypes.MUL; }
         {quotient}              { return JSONataTypes.QUOTIENT; }
         {vertical_bar}          { return JSONataTypes.VERTICAL_BAR; }
