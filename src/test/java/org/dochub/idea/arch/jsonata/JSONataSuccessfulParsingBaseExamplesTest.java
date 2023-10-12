@@ -6,7 +6,6 @@ public class JSONataSuccessfulParsingBaseExamplesTest extends JSONataParsingTest
     protected String getTestDataPath() {
         return "src/test/testData/jsonataTestData/base";
     }
-
     public void testAggregationQuery() {
         doSuccessfulParsingTest();
     }
