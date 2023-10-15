@@ -34,7 +34,10 @@ public class DocHubToolWindow extends JBCefBrowser {
   private String html = null;
   public void reloadHtml(Boolean root) {
     SettingsState settingsState = SettingsState.getInstance();
-    String currentURL = root ? "" : getCefBrowser().getURL();
+    String currentURL = root ? ""
+            : String.join("#",
+                Arrays.copyOfRange(getCefBrowser().getURL().split("#")
+                        , 0, 2));
     // Если используем корпоративный портал или портал в режиме DEV mode
     if (settingsState.isEnterprise()) {
       String url = currentURL.length() > 0 ? currentURL : settingsState.enterprisePortal;
@@ -221,14 +224,12 @@ public class DocHubToolWindow extends JBCefBrowser {
                   )
           ) {
             String path = event.getFile().getPath();
-            int bpLength = Objects.requireNonNull(project.getBasePath()).length();
-            if (path.length() > bpLength) {
-              String source = path.substring(bpLength + 1);
-              if (!source.startsWith(".")) {
-                if (source.equals(rootManifest)) source = Consts.ROOT_SOURCE;
-                jsGateway.appendMessage(Consts.ACTION_SOURCE_CHANGED, Consts.ROOT_SOURCE_PATH + source, null);
-              }
-            }
+            String basePath = project.getBasePath();
+            if ((basePath == null) || (path == null) || !path.startsWith(basePath)) return;
+            String source = path.substring(project.getBasePath().length() + 1);
+            if (source.startsWith(".")) return;
+            if (source.equals(rootManifest)) source = Consts.ROOT_SOURCE;
+            jsGateway.appendMessage(Consts.ACTION_SOURCE_CHANGED, Consts.ROOT_SOURCE_PATH + source, null);
           }
         });
       }
