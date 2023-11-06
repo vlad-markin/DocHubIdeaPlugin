@@ -1,0 +1,49 @@
+(
+            /*link: ...view?id=vId&mode=mode_x.mode_y*/
+            $vId:= $params.id; $modes_selected:= $params.mode;
+            $modes_selected:= $split($modes_selected, ".");$log($modes_selected);
+
+            $view:= $lookup($$.ttl, $vId);
+            $view.hexV ?
+              (
+                $count($view.hexV) = 0 ? {"error": "Object **" & $vId & "** has empty view configuration (hexV)"} :
+                $count($view.hexV) > 0 ?
+                  (
+                    $chunks:= $distinct($view.hexV.**.modes.%.{"h": $.title, "l": $.modes.title}); $log($chunks);
+                    $patternPre:= $count($chunks) > 0 ?
+                      (
+                        $chunks:= $map($chunks, function($v) {
+                          $map($v.l, function($vv) {($log("", $v &" ", $vv);
+                            {"source": $v.h ? $v.h : "viewRoot", "target": $vv, "label": "moded"}
+                          )})
+                        });$log($chunks);
+                        $chains:= $eval($$.hexF.getChains, {"edges": $reduce($chunks, $append)});
+                        $maxChain:= function($max, $v) {$count($v.path) > $max ? $count($v.path) : $max};
+                        $v_dim:= $reduce($chains, $maxChain, 0);$log($chains, "chains");
+                        $leveling:= function($chains, $ci, $v_dim, $matrix) {(
+                          $level:= $map($chains, function($v){( $log($v);
+                            $ch:= $map($v.path[[0..$ci]], function($vv){$vv != "viewRoot" and $vv != "moded" ? $vv});
+                            $v.path[$ci] ? {"chain": $ch, "b": $v.path[$ci-2], "l":$v.path[$ci]} : null
+                          )});
+                          $matrix:= $append($matrix, {"lev_" & $ci/2:$distinct($level)[$ != null]});
+                          $ci< $v_dim-1 ? $leveling($chains, $ci+2, $v_dim, $matrix) : $matrix;
+                        )};
+                        $modes:= $leveling($chains, 2, $v_dim, []);$log($modes, "modes aval");
+                        $modes:= $map($modes, function($v, $i) {(
+                          $row:= $map($v.*, function($vv) {
+                            $vv.b = "viewRoot" or $vv.b = $modes_selected[$i-1] ?
+                              {"level": $eval($replace($keys($v), "lev_", "")), "chain": $encodeUrl($join($vv.chain, ".")), "b": $vv.b, "title": $vv.l, "selected": $vv.l = $modes_selected[$i] ? true : false}
+                          });
+                          $row ? (true in $row.selected ? {"row": $row} : {"row": $row~>|$[0]|{"selected": true}|})
+                        )});
+                        $assemblyMode:= $modes.*.selected[$=true].%.title; $log($assemblyMode);
+                        $patternNodes:= $keys($merge($view.*.hexV.%[$.title in $assemblyMode].hexV)); $log($patternNodes);
+                        {"vId": $vId, "body": $view~>|$|{}, ["hexV"]|, "modes": $modes, "patternPre": $patternNodes}
+                      ) : {"vId": $vId, "body": $view~>|$|{}, ["hexV"]|, "patternPre": $keys($view.hexV)};
+                    $r:= $eval($$.hexF.resolveView, {"patternPre": $patternPre.patternPre});
+                    $patternPre~>|$|{"resView": {"pattern": $encodeUrl($string($r.pattern)), "landscape": $encodeUrl($string($r.landscape))}}, ["patternPre"]|
+
+                  )
+              ) :
+              {"error": "Object **" & $vId & "** has no view configuration (hexV)"}
+)
