@@ -22,6 +22,9 @@ object JSONataPatterns {
             return psiElement()
         }
 
+        fun commonPattern(): PsiElementPattern.Capture<PsiElement> {
+            return psiElement()
+        }
 
         fun andPattern(): PsiElementPattern.Capture<PsiElement> {
             return psiElement().andOr(

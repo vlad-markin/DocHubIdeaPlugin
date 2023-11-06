@@ -13,7 +13,7 @@
         <p>
             This release includes:
             <ul>
-                <li>DocHub core: v3.3.0;</li>
+                <li>DocHub core: v3.5.0;</li>
                 <li>Suggests for the structure of architecture manifests (yaml);</li>
                 <li>Suggests for the values of manifest fields;</li>
                 <li>Fast navigation through manifests;</li>
@@ -76,8 +76,8 @@
                 implementationClass="org.dochub.idea.arch.jsonata.JSONataSyntaxHighlighterFactory"
         />
 
-<!--        <lang.findUsagesProvider language="JSONata" implementationClass="org.dochub.idea.arch.findUsages.JSONataFindUsagesProvider"/>-->
-<!--        <lang.refactoringSupport language="JSONata" implementationClass="psi.jsonata.org.dochub.idea.arch.JSONataRefactoringSupportProvider"/>-->
+        <lang.findUsagesProvider language="JSONata" implementationClass="org.dochub.idea.arch.findUsages.JSONataFindUsagesProvider"/>
+        <lang.refactoringSupport language="JSONata" implementationClass="org.dochub.idea.arch.jsonata.psi.JSONataRefactoringSupportProvider"/>
 
         <!-- YAML -->
         <completion.contributor language="yaml" implementationClass="org.dochub.idea.arch.completions.YamlCompletion"/>
@@ -99,7 +99,6 @@
         <codeInsight.lineMarkerProvider language="JSONata" implementationClass="org.dochub.idea.arch.markline.JSONataLineMarkerProvider"/>
 
         <completion.contributor language="JSONata" implementationClass="org.dochub.idea.arch.completion.JSONataKeywordCompletionContributor"/>
-
 
         <fileBasedIndex implementation="org.dochub.idea.arch.indexing.DocHubIndex"/>
 
