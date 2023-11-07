@@ -16,7 +16,7 @@ imports:
 # найти то, что нужно.
 aspects:
   auth:                       # Идентификатор аспекта
-    title: Автризация         # Название
+    title: Авторизация         # Название
     location: Авторизация     # Размещение в меню
   goods:
     title: Покупка товара
@@ -35,7 +35,7 @@ components:
   user:                       # Идентификатор компонента
     title: Пользователь       # Название
     entity: actor             # Представление на схеме
-    links:                    # Компоненты с которым происходит взаимодействие
+    links:                    # Компоненты, с которыми происходит взаимодействие
       - id: system            # Идентификатор компонента
         direction: <-->       # Направление взаимодействия (<-- | -- | --> | <-->)
         title: Покупка        # Смысл взаимодействия
@@ -98,7 +98,7 @@ components:
       - OAuth
 
   system.db:
-    title: Харнилища
+    title: Хранилище
     entity: database
   system.db.business:
     title: Данные
@@ -141,11 +141,11 @@ docs:
 # Описание технологического стека
 technologies:
   sections:                           # Определение разделов стека
-    language:                         # Идентификатор раздела
+    languages:                         # Идентификатор раздела
       title: Языки программирования   # Название раздела
-    frameforks:
+    frameworks:
       title: Фреймворки
-    databaeses:
+    databases:
       title: Базы данных
     storages:
       title: Хранилища
@@ -157,22 +157,22 @@ technologies:
         - пыха
       title: Супер-крутой язык программирования   # Название технологии
       link: https://www.php.net/                  # Ссылка на документацию
-      section: language               # Идентификатор секции технологии
+      section: languages              # Идентификатор секции технологии
       status: adopt                   # Статус технологии adopt / trial / assess / hold
     Go:
       title: Go
       link: https://go.dev/
-      section: language
+      section: languages
       status: trial
     Laravel:
       title: Laravel
       link: https://laravel.ru/
-      section: frameforks
+      section: frameworks
       status: trial
     PostgreSQL:
       title: PostgreSQL
       link: https://www.postgresql.org/
-      section: databaeses
+      section: databases
       status: assess
     HTTP:
       title: HTTP
