@@ -148,15 +148,18 @@ public class DocHubToolWindow extends JBCefBrowser {
           response.put("data", jsGateway.pullJSONMessage());
           result.append(mapper.writeValueAsString(response));
         } else if (url.equals(Consts.ACTION_DOWNLOAD_URI)) { // Сохранение файлов из WEB морды
+
           JsonNode jsonContent = jsonObj.get("content");
           JsonNode jsonTitle = jsonObj.get("title");
           JsonNode jsonDescription = jsonObj.get("description");
           JsonNode jsonExtension = jsonObj.get("extension");
+
           if (jsonContent != null) {
             Download.download(
                     jsonContent.asText(),
                     jsonTitle != null ? jsonTitle.asText() : "",
-                    jsonDescription != null ? jsonDescription.asText() : ""
+                    jsonDescription != null ? jsonDescription.asText() : "",
+                    jsonExtension != null ? jsonExtension.asText(): ""
             );
           }
         } else if (url.equals(Consts.DEVTOOL_SHOW_URI)){
