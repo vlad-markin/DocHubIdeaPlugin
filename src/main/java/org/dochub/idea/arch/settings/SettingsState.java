@@ -18,18 +18,18 @@ public class SettingsState implements PersistentStateComponent<SettingsState> {
         void on();
     }
     public static Topic<DocHubSettingsMessage> ON_SETTING_CHANGED = Topic.create("On changed DocHub settings", DocHubSettingsMessage.class);
-    public static String modes[] = { "Personal", "Enterprise" };
+    public static String[] modes = { "Personal", "Enterprise" };
     public static String defaultUsingMode = "Personal";
     public static String defaultRenderServer = "http://localhost:8079/svg/";
     public static Boolean defaultIsExternalRender = false;
-    public static String defaultRenderMode = "Smetana";
+    public static String[] renderServerRequestTypes = { "get", "post", "post_compressed"};
+    public static String defaultRenderServerRequestType = "get";
     public static Boolean defaultIsEnterprisePortal = false;
     public static String defaultEnterprisePortal = "http://dochub.info";
-    public static String renderModes[] = { "Smetana", "ELK", "GraphViz" };
     public String usingMode = SettingsState.defaultUsingMode;
-    public String renderMode = SettingsState.defaultRenderMode;
     public Boolean renderIsExternal = SettingsState.defaultIsExternalRender;
     public String serverRendering = SettingsState.defaultRenderServer;
+    public String renderServerRequestType = SettingsState.defaultRenderServerRequestType;
     public String enterprisePortal = SettingsState.defaultEnterprisePortal;
 
     public static SettingsState getInstance() {

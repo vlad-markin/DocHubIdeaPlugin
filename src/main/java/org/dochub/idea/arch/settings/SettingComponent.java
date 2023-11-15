@@ -15,16 +15,16 @@ public class SettingComponent {
     private final JPanel enterprisePanel;
     private final JPanel paramsPanel;
     private final DefaultComboBoxModel<String> modeModel = new DefaultComboBoxModel<>();
-    private final DefaultComboBoxModel<String> renderModeModel = new DefaultComboBoxModel<>();
+    private final DefaultComboBoxModel<String> renderServerRequestTypeModel = new DefaultComboBoxModel<>();
     private final ComboBox<String> usingMode = new ComboBox<>(modeModel);
-    private final ComboBox<String> renderMode = new ComboBox<>(renderModeModel);
+    private final ComboBox<String> renderServerRequestType = new ComboBox<>(renderServerRequestTypeModel);
     private final JBTextField renderServer = new JBTextField();
     private final JBCheckBox isExternalRender = new JBCheckBox("External rendering");
     private final JBTextField enterprisePortal = new JBTextField();
 
     public SettingComponent() {
         modeModel.addAll(Arrays.asList(SettingsState.modes));
-        renderModeModel.addAll(Arrays.asList(SettingsState.renderModes));
+        renderServerRequestTypeModel.addAll(Arrays.asList(SettingsState.renderServerRequestTypes));
 
         isExternalRender.addItemListener(new ItemListener() {
             @Override
@@ -46,9 +46,9 @@ public class SettingComponent {
                 .getPanel();
 
         paramsPanel = FormBuilder.createFormBuilder()
-                .addLabeledComponent(new JBLabel("Render mode: "), renderMode, 1, false)
                 .addComponent(isExternalRender, 1)
                 .addLabeledComponent(new JBLabel("Render server: "), renderServer, 1, false)
+                .addLabeledComponent(new JBLabel("Render server request type: "), renderServerRequestType, 1, false)
                 .getPanel();
 
         myMainPanel = FormBuilder.createFormBuilder()
@@ -69,6 +69,7 @@ public class SettingComponent {
             enterprisePanel.setVisible(false);
             paramsPanel.setVisible(true);
             renderServer.setEnabled(isExternalRender.isSelected());
+            renderServerRequestType.setEnabled(isExternalRender.isSelected());
         }
     }
 
@@ -77,7 +78,7 @@ public class SettingComponent {
     }
 
     public JComponent getPreferredFocusedComponent() {
-        return renderMode;
+        return isExternalRender;
     }
 
     public String getUsingModeText() {
@@ -91,13 +92,13 @@ public class SettingComponent {
     }
 
     @NotNull
-    public String getRenderModeText() {
-        return renderModeModel.getElementAt(renderMode.getSelectedIndex());
+    public String getRenderServerRequestTypeText() {
+        return renderServerRequestTypeModel.getElementAt(renderServerRequestType.getSelectedIndex());
     }
 
-    public void setRenderModeText(@NotNull String mode) {
-        int index = renderModeModel.getIndexOf(mode);
-        if (index >= 0) renderMode.setSelectedIndex(index);
+    public void setRenderServerRequestTypeText(@NotNull String mode) {
+        int index = renderServerRequestTypeModel.getIndexOf(mode);
+        if (index >= 0) renderServerRequestType.setSelectedIndex(index);
         updateVisible();
     }
 
