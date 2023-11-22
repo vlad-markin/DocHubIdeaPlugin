@@ -10,6 +10,8 @@ import com.intellij.openapi.vfs.newvfs.*;
 import com.intellij.openapi.vfs.newvfs.events.*;
 import com.intellij.ui.jcef.*;
 import com.intellij.util.messages.*;
+import net.sourceforge.plantuml.code.ArobaseStringCompressor;
+import net.sourceforge.plantuml.code.StringCompressor;
 import org.cef.handler.CefLoadHandler;
 import org.dochub.idea.arch.indexing.CacheBuilder;
 import org.dochub.idea.arch.jsonschema.EntityManager;
@@ -31,6 +33,7 @@ public class DocHubToolWindow extends JBCefBrowser {
   private final Project project;
   private final Navigation navigation;
   private final JSGateway jsGateway;
+  private static final StringCompressor stringCompressor = new ArobaseStringCompressor();
   private String html = null;
   public void reloadHtml(Boolean root) {
     SettingsState settingsState = SettingsState.getInstance();
@@ -90,6 +93,7 @@ public class DocHubToolWindow extends JBCefBrowser {
         } else if (url.equals(Consts.PLANTUML_RENDER_SVG_URI)) {
           JsonNode jsonSource = jsonObj.get("source");
           String source = jsonSource != null ? jsonSource.asText() : "@startuml\n@enduml";
+          source = stringCompressor.decompress(source);
           Map<String, Object> response = new HashMap<>();
           response.put("data", PlantUMLDriver.makeSVG(source));
           result.append(mapper.writeValueAsString(response));
@@ -148,15 +152,18 @@ public class DocHubToolWindow extends JBCefBrowser {
           response.put("data", jsGateway.pullJSONMessage());
           result.append(mapper.writeValueAsString(response));
         } else if (url.equals(Consts.ACTION_DOWNLOAD_URI)) { // Сохранение файлов из WEB морды
+
           JsonNode jsonContent = jsonObj.get("content");
           JsonNode jsonTitle = jsonObj.get("title");
           JsonNode jsonDescription = jsonObj.get("description");
           JsonNode jsonExtension = jsonObj.get("extension");
+
           if (jsonContent != null) {
             Download.download(
                     jsonContent.asText(),
                     jsonTitle != null ? jsonTitle.asText() : "",
-                    jsonDescription != null ? jsonDescription.asText() : ""
+                    jsonDescription != null ? jsonDescription.asText() : "",
+                    jsonExtension != null ? jsonExtension.asText(): ""
             );
           }
         } else if (url.equals(Consts.DEVTOOL_SHOW_URI)){
@@ -180,9 +187,8 @@ public class DocHubToolWindow extends JBCefBrowser {
 
           Map<String, Object> render = new HashMap<>();
           render.put("external", settingsState.renderIsExternal);
-          render.put("mode", settingsState.renderMode);
           render.put("server", settingsState.serverRendering);
-          render.put("request_type", "GET");
+          render.put("request_type", settingsState.renderServerRequestType);
           response.put("render", render);
 
           result.append(mapper.writeValueAsString(response));

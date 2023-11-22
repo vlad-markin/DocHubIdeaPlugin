@@ -16,7 +16,7 @@ public class SettingConfigurable implements Configurable {
     @Nls(capitalization = Nls.Capitalization.Title)
     @Override
     public @NlsContexts.ConfigurableName String getDisplayName() {
-        return "DocHub: External server rendering";
+        return "DocHub: Plugin settings";
     }
 
     @Override
@@ -34,7 +34,7 @@ public class SettingConfigurable implements Configurable {
     public boolean isModified() {
         SettingsState settingsState = SettingsState.getInstance();
         boolean modified = !settingComponent.getRenderServerText().equals(settingsState.serverRendering);
-        modified |= !settingComponent.getRenderModeText().equals(settingsState.renderMode);
+        modified |= !settingComponent.getRenderServerRequestTypeText().equals(settingsState.renderServerRequestType);
         modified |= settingComponent.getIsExternalRenderBool() != settingsState.renderIsExternal;
         modified |= settingComponent.getEnterprisePortalText() != settingsState.enterprisePortal;
         modified |= !settingComponent.getUsingModeText().equals(settingsState.usingMode);
@@ -44,7 +44,7 @@ public class SettingConfigurable implements Configurable {
     @Override
     public void apply() throws ConfigurationException {
         SettingsState settingsState = SettingsState.getInstance();
-        settingsState.renderMode = settingComponent.getRenderModeText();
+        settingsState.renderServerRequestType = settingComponent.getRenderServerRequestTypeText();
         settingsState.serverRendering = settingComponent.getRenderServerText();
         settingsState.renderIsExternal = settingComponent.getIsExternalRenderBool();
         settingsState.usingMode = settingComponent.getUsingModeText();
@@ -57,7 +57,7 @@ public class SettingConfigurable implements Configurable {
     @Override
     public void reset() {
         SettingsState settingsState = SettingsState.getInstance();
-        settingComponent.setRenderModeText(settingsState.renderMode);
+        settingComponent.setRenderServerRequestTypeText(settingsState.renderServerRequestType);
         settingComponent.setRenderServerText(settingsState.serverRendering);
         settingComponent.setIsExternalRenderBool(settingsState.renderIsExternal);
         settingComponent.setUsingModeText(settingsState.usingMode);

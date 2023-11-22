@@ -7,26 +7,30 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFileWrapper;
 
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class Download {
-    static public void download(String content, String title, String description) {
+    static public void download(String content, String title, String description, String extention) {
         Timer timer = new Timer("Download diagram");
         timer.schedule(new TimerTask() {
             public void run() {
                 ApplicationManager.getApplication().invokeLater(() -> {
-                        byte payload[] = null;
-                        String exts[] = new String[]{};
+                        byte[] payload = null;
+                        String[] exts = new String[]{};
                         if (content.startsWith("data:")) {
                             String[] parts = content.split(",");
                             payload = Base64.getDecoder().decode(parts[1]);
                             String header = parts[0];
                             String mimeType = header.split(":")[1].split(";")[0];
                             String ext = MimeTypes.getDefaultExt(mimeType);
-                            if (ext != null) exts = new String[]{ext};
+                            exts = new String[]{ext};
                             /*
                             switch (mimeType) {
                                 case "image/jpeg":
@@ -40,7 +44,10 @@ public class Download {
                                     break;
                             }
                             */
-                        } else payload = content.getBytes();
+                        } else {
+                            payload = content.getBytes(StandardCharsets.UTF_8);
+                            exts = new String[]{extention};
+                        }
 
                         FileSaverDescriptor descriptor = new FileSaverDescriptor(title, description, exts);
                         FileSaverDialog dialog = FileChooserFactory.getInstance().createSaveFileDialog(descriptor, (Project) null);
@@ -50,7 +57,7 @@ public class Download {
                             return;
                         }
                         File file = vf.getFile();
-                        try {
+                        try{
                             Files.write(file.toPath(), payload);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
