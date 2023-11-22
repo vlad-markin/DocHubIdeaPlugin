@@ -10,6 +10,8 @@ import com.intellij.openapi.vfs.newvfs.*;
 import com.intellij.openapi.vfs.newvfs.events.*;
 import com.intellij.ui.jcef.*;
 import com.intellij.util.messages.*;
+import net.sourceforge.plantuml.code.ArobaseStringCompressor;
+import net.sourceforge.plantuml.code.StringCompressor;
 import org.cef.handler.CefLoadHandler;
 import org.dochub.idea.arch.indexing.CacheBuilder;
 import org.dochub.idea.arch.jsonschema.EntityManager;
@@ -31,6 +33,7 @@ public class DocHubToolWindow extends JBCefBrowser {
   private final Project project;
   private final Navigation navigation;
   private final JSGateway jsGateway;
+  private static final StringCompressor stringCompressor = new ArobaseStringCompressor();
   private String html = null;
   public void reloadHtml(Boolean root) {
     SettingsState settingsState = SettingsState.getInstance();
@@ -90,6 +93,7 @@ public class DocHubToolWindow extends JBCefBrowser {
         } else if (url.equals(Consts.PLANTUML_RENDER_SVG_URI)) {
           JsonNode jsonSource = jsonObj.get("source");
           String source = jsonSource != null ? jsonSource.asText() : "@startuml\n@enduml";
+          source = stringCompressor.decompress(source);
           Map<String, Object> response = new HashMap<>();
           response.put("data", PlantUMLDriver.makeSVG(source));
           result.append(mapper.writeValueAsString(response));
