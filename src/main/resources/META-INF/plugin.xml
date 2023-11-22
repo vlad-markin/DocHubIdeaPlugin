@@ -51,7 +51,7 @@
                 parentId="tools"
                 instance="org.dochub.idea.arch.settings.SettingConfigurable"
                 id="org.dochub.idea.arch.settings.SettingConfigurable"
-                displayName="DocHub: Render settings"/>
+                displayName="DocHub: Plugin settings"/>
 
         <lang.commenter language="JSONata" implementationClass="org.dochub.idea.arch.jsonata.JSONataCommenter"/>
 
